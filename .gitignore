@@ -1,0 +1,8 @@
+node_modules/
+.DS__Store
+*.log
+.idea
+haters/
+variables.env
+
+public/uploads/*
