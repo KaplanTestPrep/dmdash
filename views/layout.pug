@@ -1,52 +1,152 @@
 doctype html
-html
+html(lang='en')
   head
-    title= `${title} | ${h.siteName}`
-    link(rel='stylesheet', href='/dist/style.css')
-    link(rel="shortcut icon" type="image/png" href="/images/icons/doughnut.png")
-    meta(name="viewport" content="width=device-width, initial-scale=1")
+    meta(charset='utf-8')
+    link(rel='apple-touch-icon', sizes='76x76', href='assets/img/apple-icon.png')
+    link(rel='icon', type='image/png', sizes='96x96', href='images/favicon.png')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+    title Paper Dashboard by Creative Tim
+    meta(content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0', name='viewport')
+    meta(name='viewport', content='width=device-width')
+    // Bootstrap core CSS
+    //link(href='css/bootstrap.min.css', rel='stylesheet')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u', crossorigin='anonymous')
+    // Animation library for notifications
+    link(href='css/animate.min.css', rel='stylesheet')
+    // Paper Dashboard core CSS
+    link(href='css/paper-dashboard.css', rel='stylesheet')
+    // CSS for Demo Purpose, don't include it in your project
+    link(href='css/demo.css', rel='stylesheet')
+    // Fonts and icons
+    link(href='http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css', rel='stylesheet')
+    link(href='https://fonts.googleapis.com/css?family=Muli:400,300', rel='stylesheet', type='text/css')
+    link(href='css/themify-icons.css', rel='stylesheet')
   body
-    block header
-      header.top
-        nav.nav
-          .nav__section.nav__section--pages
-            li.nav__item
-              a.nav__link.nav__link--logo(href="/")
-                | Site Name
-            each item in h.menu
-              li.nav__item
-                a.nav__link(href=item.slug, class=(currentPath.startsWith(item.slug) ? 'nav__link--active' : ''))
-                  //- != h.icon(item.icon)
-                  span #{item.title}
-          //- .nav__section.nav__section--search
-          //-   .search
-          //-     input.search__input(type="text" placeholder="Coffee, beer..." name="search")
-          //-     .search__results
-          .nav__section.nav__section--user
-            if user
-              li.nav__item: a.nav__link(href="/hearts", class=(currentPath.startsWith('/hearts') ? 'nav__link--active' : ''))
-                span.heart-count #{user.hearts && user.hearts.length}
-              li.nav__item: a.nav__link(href="/logout", class=(currentPath.startsWith('/logout') ? 'nav__link--active' : ''))
-                span Logout
-              li.nav__item: a.nav__link(href="/account", class=(currentPath.startsWith('/account') ? 'nav__link--active' : ''))
-                img.avatar(src=user.gravatar + 'd=retro')
-            else
-              li.nav__item: a.nav__link(href="/register", class=(currentPath.startsWith('/register') ? 'nav__link--active' : '')) Register
-              li.nav__item: a.nav__link(href="/login", class=(currentPath.startsWith('/login') ? 'nav__link--active' : '')) Log In
-
-    block messages
-      if locals.flashes
-        .inner
-          .flash-messages
-            - const categories = Object.keys(locals.flashes)
-            each category in categories
-              each message in flashes[category]
-                .flash(class=`flash--${category}`)
-                  p.flash__text!= message
-                  button.flash__remove(onClick="this.parentElement.remove()") &times;
-    .content
-      block content
-
-    block scripts
-      script(src=`https://maps.googleapis.com/maps/api/js?key=${process.env.MAP_KEY}&libraries=places`)
-      script(src="/dist/App.bundle.js")
+    .wrapper
+      .sidebar(data-background-color='white', data-active-color='danger')
+        //
+          Tip 1: you can change the color of the sidebar's background using: data-background-color="white | black"
+          Tip 2: you can change the color of the active button using the data-active-color="primary | info | success | warning | danger"
+        .sidebar-wrapper
+          .logo
+            a.simple-text(href='http://www.creative-tim.com')
+              | Creative Tim
+          ul.nav
+            li.active
+              a(href='/dashboard')
+                i.ti-panel
+                p Live Online
+            li
+              a(href='user.html')
+                i.ti-user
+                p User Profile
+            li
+              a(href='table.html')
+                i.ti-view-list-alt
+                p Table List
+            li
+              a(href='typography.html')
+                i.ti-text
+                p Typography
+            li
+              a(href='icons.html')
+                i.ti-pencil-alt2
+                p Icons
+            li
+              a(href='maps.html')
+                i.ti-map
+                p Maps
+            li
+              a(href='notifications.html')
+                i.ti-bell
+                p Notifications
+            li.active-pro
+              a(href='upgrade.html')
+                i.ti-export
+                p Upgrade to PRO
+      .main-panel
+        nav.navbar.navbar-default
+          .container-fluid
+            .navbar-header
+              button.navbar-toggle(type='button')
+                span.sr-only Toggle navigation
+                span.icon-bar.bar1
+                span.icon-bar.bar2
+                span.icon-bar.bar3
+              a.navbar-brand(href='#') Dashboard
+            .collapse.navbar-collapse
+              ul.nav.navbar-nav.navbar-right
+                li
+                  a.dropdown-toggle(href='#', data-toggle='dropdown')
+                    i.ti-panel 
+                    p Stats
+                li.dropdown
+                  a.dropdown-toggle(href='#', data-toggle='dropdown')
+                    i.ti-bell
+                    p.notification 5
+                    p Notifications
+                    b.caret
+                  ul.dropdown-menu
+                    li
+                      a(href='#') Notification 1
+                    li
+                      a(href='#') Notification 2
+                    li
+                      a(href='#') Notification 3
+                    li
+                      a(href='#') Notification 4
+                    li
+                      a(href='#') Another notification
+                li
+                  a(href='#')
+                    i.ti-settings
+                    p Settings
+        .content
+          block content
+        footer.footer
+          .container-fluid
+            nav.pull-left
+              ul
+                li
+                  a(href='http://www.creative-tim.com')
+                    | Creative Tim
+                li
+                  a(href='http://blog.creative-tim.com')
+                    | Blog
+                li
+                  a(href='http://www.creative-tim.com/license')
+                    | Licenses
+            .copyright.pull-right
+              | © 
+              script.
+                document.write(new Date().getFullYear())
+              | , made with 
+              i.fa.fa-heart.heart
+              |  by 
+              a(href='http://www.creative-tim.com') Creative Tim
+  // Core JS Files
+  script(src='js/jquery-1.10.2.js', type='text/javascript')
+  script(src='js/bootstrap.min.js', type='text/javascript')
+  // Checkbox, Radio & Switch Plugins
+  script(src='js/bootstrap-checkbox-radio.js')
+  // Charts Plugin
+  script(src='js/chartist.min.js')
+  // Notifications Plugin
+  script(src='js/bootstrap-notify.js')
+  // Google Maps Plugin
+  script(type='text/javascript', src='https://maps.googleapis.com/maps/api/js')
+  // Paper Dashboard Core javascript and methods for Demo purpose
+  script(src='js/paper-dashboard.js')
+  // Paper Dashboard DEMO methods, don't include it in your project!
+  script(src='js/demo.js')
+  script(type='text/javascript').
+    $(document).ready(function(){
+    demo.initChartist();
+    $.notify({
+    icon: 'ti-gift',
+    message: "Welcome to <b>Paper Dashboard</b> - a beautiful Bootstrap freebie for your next project."
+    },{
+    type: 'success',
+    timer: 4000
+    });
+    });
