@@ -6,3 +6,5 @@ haters/
 variables.env
 
 public/uploads/*
+views/OGlayout.pug
+public/dist/*
