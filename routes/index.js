@@ -1,10 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-// Do work here
-router.get('/', (req, res) => {
-  // res.send('Hey! It works!');
-  res.render('layout');
+router.get("/", (req, res) => {
+  res.render("layout");
+});
+
+router.get("/dashboard", (req, res) => {
+  res.render("dashboard");
 });
 
 module.exports = router;
