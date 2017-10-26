@@ -1,0 +1,143 @@
+extends layout
+
+block content
+  .container-fluid
+    .row
+      .col-lg-4.col-md-5
+        .card.card-user
+          .image
+            img(src='assets/img/background.jpg', alt='...')
+          .content
+            .author
+              img.avatar.border-white(src='assets/img/faces/face-2.jpg', alt='...')
+              h4.title
+                | Chet Faker
+                br
+                a(href='#')
+                  small @chetfaker
+            p.description.text-center
+              | "I like the way you work it 
+              br
+              |                                     No diggity 
+              br
+              |                                     I wanna bag it up"
+          hr
+          .text-center
+            .row
+              .col-md-3.col-md-offset-1
+                h5
+                  | 12
+                  br
+                  small Files
+              .col-md-4
+                h5
+                  | 2GB
+                  br
+                  small Used
+              .col-md-3
+                h5
+                  | 24,6$
+                  br
+                  small Spent
+        .card
+          .header
+            h4.title Team Members
+          .content
+            ul.list-unstyled.team-members
+              li
+                .row
+                  .col-xs-3
+                    .avatar
+                      img.img-circle.img-no-padding.img-responsive(src='assets/img/faces/face-0.jpg', alt='Circle Image')
+                  .col-xs-6
+                    | DJ Khaled
+                    br
+                    span.text-muted
+                      small Offline
+                  .col-xs-3.text-right
+                    btn.btn.btn-sm.btn-success.btn-icon
+                      i.fa.fa-envelope
+              li
+                .row
+                  .col-xs-3
+                    .avatar
+                      img.img-circle.img-no-padding.img-responsive(src='assets/img/faces/face-1.jpg', alt='Circle Image')
+                  .col-xs-6
+                    | Creative Tim
+                    br
+                    span.text-success
+                      small Available
+                  .col-xs-3.text-right
+                    btn.btn.btn-sm.btn-success.btn-icon
+                      i.fa.fa-envelope
+              li
+                .row
+                  .col-xs-3
+                    .avatar
+                      img.img-circle.img-no-padding.img-responsive(src='assets/img/faces/face-3.jpg', alt='Circle Image')
+                  .col-xs-6
+                    | Flume
+                    br
+                    span.text-danger
+                      small Busy
+                  .col-xs-3.text-right
+                    btn.btn.btn-sm.btn-success.btn-icon
+                      i.fa.fa-envelope
+      .col-lg-8.col-md-7
+        .card
+          .header
+            h4.title Edit Profile
+          .content
+            form
+              .row
+                .col-md-5
+                  .form-group
+                    label Company
+                    input.form-control.border-input(type='text', disabled='', placeholder='Company', value='Creative Code Inc.')
+                .col-md-3
+                  .form-group
+                    label Username
+                    input.form-control.border-input(type='text', placeholder='Username', value='michael23')
+                .col-md-4
+                  .form-group
+                    label(for='exampleInputEmail1') Email address
+                    input.form-control.border-input(type='email', placeholder='Email')
+              .row
+                .col-md-6
+                  .form-group
+                    label First Name
+                    input.form-control.border-input(type='text', placeholder='Company', value='Chet')
+                .col-md-6
+                  .form-group
+                    label Last Name
+                    input.form-control.border-input(type='text', placeholder='Last Name', value='Faker')
+              .row
+                .col-md-12
+                  .form-group
+                    label Address
+                    input.form-control.border-input(type='text', placeholder='Home Address', value='Melbourne, Australia')
+              .row
+                .col-md-4
+                  .form-group
+                    label City
+                    input.form-control.border-input(type='text', placeholder='City', value='Melbourne')
+                .col-md-4
+                  .form-group
+                    label Country
+                    input.form-control.border-input(type='text', placeholder='Country', value='Australia')
+                .col-md-4
+                  .form-group
+                    label Postal Code
+                    input.form-control.border-input(type='number', placeholder='ZIP Code')
+              .row
+                .col-md-12
+                  .form-group
+                    label About Me
+                    textarea.form-control.border-input(rows='5', placeholder='Here can be your description', value='Mike')
+                      | Oh so, your weak rhyme
+                      | You doubt I'll bother, reading into it
+                      | I'll probably won't, left to my own devices
+                      | But that's the difference in our opinions.
+              .text-center
+                button.btn.btn-info.btn-fill.btn-wd(type='submit') Update Profile
+              .clearfix
