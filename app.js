@@ -1,27 +1,29 @@
-const express = require('express');
-const session = require('express-session');
-const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo')(session);
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const passport = require('passport');
-const promisify = require('es6-promisify');
-const flash = require('connect-flash');
-const expressValidator = require('express-validator');
-const routes = require('./routes/index');
-const helpers = require('./helpers');
-const errorHandlers = require('./handlers/errorHandlers');
+const express = require("express");
+const session = require("express-session");
+const mongoose = require("mongoose");
+const MongoStore = require("connect-mongo")(session);
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
+const passport = require("passport");
+const promisify = require("es6-promisify");
+const flash = require("connect-flash");
+const expressValidator = require("express-validator");
+const routes = require("./routes/index");
+const helpers = require("./helpers");
+const errorHandlers = require("./handlers/errorHandlers");
+// const User = require("./models/User");
+const User = mongoose.model("User");
 
 // create our Express app
 const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views')); // this is the folder where we keep our pug files
-app.set('view engine', 'pug'); // we use the engine pug, mustache or EJS work great too
+app.set("views", path.join(__dirname, "views")); // this is the folder where we keep our pug files
+app.set("view engine", "pug"); // we use the engine pug, mustache or EJS work great too
 
 // serves up static files from the public folder. Anything in public/ will just be served up as the file it is
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Takes the raw requests and turns them into usable properties on req.body
 app.use(bodyParser.json());
@@ -35,17 +37,21 @@ app.use(cookieParser());
 
 // Sessions allow us to store data on visitors from request to request
 // This keeps users logged in and allows us to send flash messages
-app.use(session({
-  secret: process.env.SECRET,
-  key: process.env.KEY,
-  resave: false,
-  saveUninitialized: false,
-  store: new MongoStore({ mongooseConnection: mongoose.connection })
-}));
+app.use(
+  session({
+    secret: process.env.SECRET,
+    key: process.env.KEY,
+    resave: false,
+    saveUninitialized: false,
+    store: new MongoStore({ mongooseConnection: mongoose.connection })
+  })
+);
 
-// // Passport JS is what we use to handle our logins
+// Passport JS is what we use to handle our logins
 app.use(passport.initialize());
 app.use(passport.session());
+// Import passport config file
+require("./auth/authentication");
 
 // // The flash middleware let's us use req.flash('error', 'Shit!'), which will then pass that message to the next page the user requests
 app.use(flash());
@@ -65,8 +71,36 @@ app.use((req, res, next) => {
   next();
 });
 
+passport.serializeUser((user, done) => {
+  console.log("SerializeUser");
+  done(null, user.oauthID);
+});
+passport.deserializeUser((id, done) => {
+  console.log("DeserializeUser");
+  console.log("USER: ", id);
+  User.findOne({ oauthID: id }, function(err, user) {
+    console.log("Logged in user: ", user);
+    if (!err) done(null, user);
+    else done(err, null);
+  });
+});
+
+// // serialize and deserialize
+// passport.serializeUser(function(user, done) {
+//   console.log("serializeUser: " + user.id);
+//   done(null, user.id);
+// });
+
+// passport.deserializeUser(function(id, done) {
+//   User.findById(id, function(err, user) {
+//     console.log(user);
+//     if (!err) done(null, user);
+//     else done(err, null);
+//   });
+// });
+
 // After allllll that above middleware, we finally handle our own routes!
-app.use('/', routes);
+app.use("/", routes);
 
 // If that above routes didnt work, we 404 them and forward to error handler
 app.use(errorHandlers.notFound);
@@ -75,7 +109,7 @@ app.use(errorHandlers.notFound);
 app.use(errorHandlers.flashValidationErrors);
 
 // Otherwise this was a really bad error we didn't expect! Shoot eh
-if (app.get('env') === 'development') {
+if (app.get("env") === "development") {
   /* Development Error Handler - Prints stack trace */
   app.use(errorHandlers.developmentErrors);
 }
