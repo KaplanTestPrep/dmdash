@@ -11,3 +11,4 @@ public/dist/*
 public/dist/App.bundle.js
 public/dist/App.bundle.js.map
 public/dist/style.css
+auth/oauth.js
