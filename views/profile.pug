@@ -6,12 +6,12 @@ block content
       .col-lg-4.col-md-5
         .card.card-user
           .image
-            img(src='assets/img/background.jpg', alt='...')
+            img(src=user.picture, alt='...')
           .content
             .author
-              img.avatar.border-white(src='assets/img/faces/face-2.jpg', alt='...')
+              img.avatar.border-white(src=user.picture, alt='...')
               h4.title
-                | Chet Faker
+                | #{user.name}
                 br
                 a(href='#')
                   small @chetfaker
