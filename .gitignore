@@ -13,3 +13,4 @@ public/dist/App.bundle.js.map
 public/dist/style.css
 auth/oauth.js
 public/img/*
+views/OGlogin.pug
