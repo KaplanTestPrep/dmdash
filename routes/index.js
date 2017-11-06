@@ -14,7 +14,6 @@ router.get("/dashboard", authController.isLoggedIn, (req, res) => {
 });
 
 router.get("/profile", authController.isLoggedIn, (req, res) => {
-  req.flash("error", "Testing 123 123");
   res.render("profile", { pageTitle: "Profile" });
 });
 
