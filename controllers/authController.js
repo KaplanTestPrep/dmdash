@@ -13,22 +13,22 @@ exports.isLoggedIn = (req, res, next) => {
     next();
     return;
   }
-  req.flash("danger", "Oops, you must be logged in to do that!");
+  req.flash("warning", "Oops, you must be logged in to do that!");
   res.redirect("/login");
 };
 
-exports.authenticate = (req, res) => {
-  passport.authenticate("google", {
-    scope: [
-      "https://www.googleapis.com/auth/plus.login",
-      "https://www.googleapis.com/auth/plus.profile.emails.read"
-    ]
-  });
-};
+// exports.googleAuthenticate = (req, res) => {
+//   passport.authenticate("google", {
+//     scope: [
+//       "https://www.googleapis.com/auth/plus.login",
+//       "https://www.googleapis.com/auth/plus.profile.emails.read"
+//     ]
+//   });
+// };
 
-exports.authCallback = () => {
-  passport.authenticate("google", { failureRedirect: "/login" }),
-    function(req, res) {
-      res.redirect("/dashboard");
-    };
-};
+// exports.googleAuthCallback = () => {
+//   passport.authenticate("google", { failureRedirect: "/login" }),
+//     function(req, res) {
+//       res.redirect("/dashboard");
+//     };
+// };
