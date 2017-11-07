@@ -72,32 +72,14 @@ app.use((req, res, next) => {
 });
 
 passport.serializeUser((user, done) => {
-  console.log("SerializeUser");
   done(null, user.oauthID);
 });
 passport.deserializeUser((id, done) => {
-  console.log("DeserializeUser");
-  console.log("USER: ", id);
   User.findOne({ oauthID: id }, function(err, user) {
-    console.log("Logged in user: ", user);
     if (!err) done(null, user);
     else done(err, null);
   });
 });
-
-// // serialize and deserialize
-// passport.serializeUser(function(user, done) {
-//   console.log("serializeUser: " + user.id);
-//   done(null, user.id);
-// });
-
-// passport.deserializeUser(function(id, done) {
-//   User.findById(id, function(err, user) {
-//     console.log(user);
-//     if (!err) done(null, user);
-//     else done(err, null);
-//   });
-// });
 
 // After allllll that above middleware, we finally handle our own routes!
 app.use("/", routes);
