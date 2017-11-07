@@ -11,7 +11,6 @@ module.exports = passport.use(
       callbackURL: auth.google.callbackURL
     },
     function(request, accessToken, refreshToken, profile, done) {
-      console.log(profile);
       User.findOne({ oauthID: profile.id }, function(err, user) {
         if (err) {
           console.log(err); // handle errors!
