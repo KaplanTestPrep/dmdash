@@ -10,8 +10,19 @@ exports.logout = (req, res) => {
 
 exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
+    console.log("PATH:", req.route.path);
+    if(req.route.path === "/login"){
+      console.log("/login route and authenticated");
+      res.redirect("/");
+      return false;
+    }
+    
     next();
     return;
+  }
+  else if(req.route.path === "/login"){
+    next();
+    return false;
   }
   req.flash("danger", "Oops, you must be logged in to do that!");
   res.redirect("/login");
@@ -29,6 +40,6 @@ exports.authenticate = (req, res) => {
 exports.authCallback = () => {
   passport.authenticate("google", { failureRedirect: "/login" }),
     function(req, res) {
-      res.redirect("/dashboard");
+      res.redirect("/");
     };
 };

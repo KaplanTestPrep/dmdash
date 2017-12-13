@@ -2,22 +2,24 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 const authController = require("../controllers/authController");
+const dashController = require("../controllers/dashController");
+const zoomController = require("../controllers/zoomController");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
+const { catchErrors } = require('../handlers/errorHandlers');
 
-router.get("/", (req, res) => {
-  res.render("layout");
-});
-
-router.get("/dashboard", authController.isLoggedIn, (req, res) => {
-  res.render("dashboard", { pageTitle: "Dashboard" });
-});
+router.get("/", authController.isLoggedIn, catchErrors(dashController.getDashboard));
 
 router.get("/profile", authController.isLoggedIn, (req, res) => {
   res.render("profile", { pageTitle: "Profile" });
 });
 
-router.get("/login", userController.loginForm);
+router.get("/login", authController.isLoggedIn, userController.loginForm);
+
+router.get("/zoomRecordings", authController.isLoggedIn, zoomController.recordings);
+router.get("/zoomRecordingsData", authController.isLoggedIn, catchErrors(zoomController.recordingsData));
+router.get("/zoomUsers", authController.isLoggedIn, zoomController.users)
+
 
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);
@@ -35,7 +37,7 @@ router.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   function(req, res) {
-    res.redirect("/dashboard");
+    res.redirect("/");
   }
 );
 
