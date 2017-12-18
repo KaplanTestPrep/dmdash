@@ -39,6 +39,7 @@ $(document).ready(function() {
   window_width = $(window).width();
   $sidebar = $(".sidebar");
 
+
   // We put modals out of wrapper to working properly
   $(".modal").appendTo("body");
 

@@ -9,7 +9,7 @@ const passport = require("passport");
 const promisify = require("es6-promisify");
 const flash = require("connect-flash");
 const expressValidator = require("express-validator");
-const routes = require("./routes/index");
+const routes = require("./routes/routes");
 const helpers = require("./helpers");
 const errorHandlers = require("./handlers/errorHandlers");
 // const User = require("./models/User");
@@ -41,8 +41,8 @@ app.use(
   session({
     secret: process.env.SECRET,
     key: process.env.KEY,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     store: new MongoStore({ mongooseConnection: mongoose.connection })
   })
 );

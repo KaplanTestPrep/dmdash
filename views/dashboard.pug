@@ -9,11 +9,11 @@ block content
             .row
               .col-xs-5
                 .icon-big.icon-warning.text-center
-                  i.ti-server
+                  i.ti-user
               .col-xs-7
                 .numbers
-                  p Capacity
-                  | 	                                            105GB
+                  p Participants
+                  | #{dailyReport.participants}
           .card-footer
             hr
             .stats
@@ -25,11 +25,11 @@ block content
             .row
               .col-xs-5
                 .icon-big.icon-success.text-center
-                  i.ti-wallet
+                  i.ti-time
               .col-xs-7
                 .numbers
-                  p Revenue
-                  | 	                                            $1,345
+                  p Meeting Minutes
+                  | #{dailyReport.meeting_minutes}
           .card-footer
             hr
             .stats
@@ -41,11 +41,11 @@ block content
             .row
               .col-xs-5
                 .icon-big.icon-danger.text-center
-                  i.ti-pulse
+                  i.ti-calendar
               .col-xs-7
                 .numbers
-                  p Errors
-                  | 	                                            23
+                  p Meetings
+                  | #{dailyReport.meetings}
           .card-footer
             hr
             .stats
@@ -57,11 +57,11 @@ block content
             .row
               .col-xs-5
                 .icon-big.icon-info.text-center
-                  i.ti-twitter-alt
+                  i.ti-user
               .col-xs-7
                 .numbers
-                  p Followers
-                  | 	                                            +45
+                  p New Users
+                  | + #{dailyReport.new_users}
           .card-footer
             hr
             .stats

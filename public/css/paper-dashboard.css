@@ -8467,6 +8467,7 @@ star {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  user-select: none;
 }
 .card-chat .chat .footer {
   padding: 0;
@@ -8500,6 +8501,7 @@ star {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  user-select: none;
 }
 .card-chat .send-message .send-button {
   width: 75px;
@@ -8591,6 +8593,7 @@ star {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  user-select: none;
 }
 .card-chat input.textarea {
   display: inline-block;
@@ -10758,11 +10761,11 @@ star {
     display: none !important;
   }
 
-  .card form {
+  /* .card form {
     /*[class*="col-"]{
         padding: 6px;
-    }*/
-  }
+    }*
+  } */
   .card form [class*="col-"]:first-child {
     padding-left: 15px;
   }
@@ -10795,6 +10798,8 @@ star {
     transition: opacity 150ms ease-in;
   }
 }
+
+
 /*          Changes for small display      */
 @media (max-width: 992px) {
   .navbar-form {
@@ -11383,6 +11388,7 @@ star {
 
   .navbar-fixed-top {
     -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   .bodyClick {
