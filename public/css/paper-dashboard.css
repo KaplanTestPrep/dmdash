@@ -11641,4 +11641,8 @@ star {
   margin: 0;
 }
 
+table.dataTable tbody tr.selected {
+  background-color: #F3BB45 !important;
+}
+
 
