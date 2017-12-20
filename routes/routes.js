@@ -6,9 +6,13 @@ const dashController = require("../controllers/dashController");
 const zoomController = require("../controllers/zoomController");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
-const { catchErrors } = require('../handlers/errorHandlers');
+const { catchErrors } = require("../handlers/errorHandlers");
 
-router.get("/", authController.isLoggedIn, catchErrors(dashController.getDashboard));
+router.get(
+  "/",
+  authController.isLoggedIn,
+  catchErrors(dashController.getDashboard)
+);
 
 router.get("/profile", authController.isLoggedIn, (req, res) => {
   res.render("profile", { pageTitle: "Profile" });
@@ -16,10 +20,17 @@ router.get("/profile", authController.isLoggedIn, (req, res) => {
 
 router.get("/login", authController.isLoggedIn, userController.loginForm);
 
-router.get("/zoomRecordings", authController.isLoggedIn, zoomController.recordings);
-router.get("/zoomRecordingsData", authController.isLoggedIn, catchErrors(zoomController.recordingsData));
-router.get("/zoomUsers", authController.isLoggedIn, zoomController.users)
-
+router.get(
+  "/zoomRecordings",
+  authController.isLoggedIn,
+  zoomController.recordings
+);
+router.get(
+  "/getRecordings",
+  authController.isLoggedIn,
+  catchErrors(zoomController.getRecordings)
+);
+router.get("/zoomUsers", authController.isLoggedIn, zoomController.users);
 
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);

@@ -9,19 +9,22 @@ exports.recordings = (req, res) => {
   });
 };
 
-exports.recordingsData = async (req, res) => {
+exports.getRecordings = async (req, res) => {
+  //   let meetings = [];
+  let recordings = [];
   // Get list of all users
   const url = "https://api.zoom.us/v2/users";
   const token = exports.getToken();
 
   const response = await axios.get(url, {
     params: {
-      access_token: token
+      access_token: token,
+      page_size: 100
     }
   });
 
   const users = response.data.users;
-  console.log(users);
+  //   console.log(response.data);
 
   // Get list of recordings for each user
   const endDate = moment()
@@ -31,8 +34,6 @@ exports.recordingsData = async (req, res) => {
     .subtract(6, "months")
     .toISOString()
     .split("T")[0];
-  let meetings = [];
-  let recordings = [];
 
   // console.log({startDate, endDate});
 
@@ -40,7 +41,7 @@ exports.recordingsData = async (req, res) => {
     users.map(async user => {
       const url = `https://api.zoom.us/v2/users/${user.id}/recordings`;
       const token = exports.getToken();
-      let recording = {};
+      const userEmail = user.email;
 
       const response = await axios.get(url, {
         params: {
@@ -51,20 +52,39 @@ exports.recordingsData = async (req, res) => {
         }
       });
 
-      const responsMeetings = response.data.meetings;
+      //   console.log(response.data);
+      const meetings = response.data.meetings;
+      let recording = {};
 
-      // if (typeof responsMeetings !== 'undefined' && responsMeetings.length > 0) {
+      meetings.forEach(meeting => {
+        console.log(meeting.id);
+        const topic = meeting.topic;
+
+        meeting.recording_files.forEach(rawRecording => {
+          recording = (({
+            id,
+            meeting_id,
+            file_size,
+            recording_start,
+            recording_end
+          }) => ({
+            id,
+            meeting_id,
+            file_size,
+            recording_start,
+            recording_end
+          }))(rawRecording);
+
+          recording.user = userEmail;
+          recording.topic = topic;
+
+          recordings.push(recording);
+        });
+      });
     })
   );
 
-  let justMeetings = [];
-  meetings.forEach(meeting => {
-    justMeetings = [...justMeetings, ...meeting.recording_files];
-  });
-
-  const data = { data: meetings };
-
-  //   console.log(justMeetings);
+  const data = { data: recordings };
 
   res.send(data);
 };
