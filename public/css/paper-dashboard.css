@@ -11641,8 +11641,17 @@ star {
   margin: 0;
 }
 
+
+/* dataTable overwrites/customizations */
+
+table.dataTable tr {
+  cursor: pointer;
+}
 table.dataTable tbody tr.selected {
   background-color: #FFA534 !important;
 }
 
-
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: none !important;
+  border: 1px solid #fff !important;
+  }
