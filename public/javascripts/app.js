@@ -27,7 +27,7 @@ $(document).ready(function() {
         searchable: false
       }
     ],
-    pageLength: 20
+    pageLength: 25
   });
 
   $("#datatables").on("click", "tr", function() {
@@ -38,4 +38,21 @@ $(document).ready(function() {
     console.table(table.rows(".selected").data());
     alert(table.rows(".selected").data().length + " row(s) selected");
   });
+
+  $("#delete").click(function() {
+    // console.table(table.rows(".selected").data()[0]);
+    // alert(table.rows(".selected").data()[0].id);
+
+    const recordings = table.rows(".selected").data();
+      // recordings.forEach(recording => {
+      //   console.log()
+
+      // });
+
+
+    console.log(recordings[0]);
+
+  });
+
+
 });

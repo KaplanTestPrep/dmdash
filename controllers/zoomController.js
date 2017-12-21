@@ -10,83 +10,108 @@ exports.recordings = (req, res) => {
 };
 
 exports.getRecordings = async (req, res) => {
-  //   let meetings = [];
+
   let recordings = [];
-  // Get list of all users
-  const url = "https://api.zoom.us/v2/users";
-  const token = exports.getToken();
+  // let pageNumber = 0;
+  // let pageCount = 0;
 
-  const response = await axios.get(url, {
-    params: {
-      access_token: token,
-      page_size: 100
-    }
-  });
+  //  Get list of all users
+   const url = "https://api.zoom.us/v2/users";
+   const token = exports.getToken();
 
-  const users = response.data.users;
-  //   console.log(response.data);
+   const response = await axios.get(url, {
+     params: {
+       access_token: token,
+       page_size: 10
+     }
+   });
 
-  // Get list of recordings for each user
-  const endDate = moment()
-    .toISOString()
-    .split("T")[0];
-  const startDate = moment()
-    .subtract(6, "months")
-    .toISOString()
-    .split("T")[0];
+   const pageCount = response.data.page_count;
+   let pageNumber = response.data.page_number;
 
-  // console.log({startDate, endDate});
-
-  await Promise.all(
-    users.map(async user => {
-      const url = `https://api.zoom.us/v2/users/${user.id}/recordings`;
+  do {
+        // Get list of all users
+      const url = "https://api.zoom.us/v2/users";
       const token = exports.getToken();
-      const userEmail = user.email;
 
       const response = await axios.get(url, {
         params: {
           access_token: token,
-          userId: user.id,
-          from: startDate,
-          to: endDate
+          page_size: 10,
+          page_number: pageNumber
         }
       });
+      console.log(pageCount, pageNumber);
+      
+      const users = response.data.users;
+      console.log(users);
 
-      //   console.log(response.data);
-      const meetings = response.data.meetings;
-      let recording = {};
+      // Get list of recordings for each user
+      const endDate = moment().toISOString().split("T")[0];
+      const startDate = moment().subtract(6, "months").toISOString().split("T")[0];
 
-      meetings.forEach(meeting => {
-        console.log(meeting.id);
-        const topic = meeting.topic;
+      // console.log({startDate, endDate});
 
-        meeting.recording_files.forEach(rawRecording => {
-          recording = (({
-            id,
-            meeting_id,
-            file_size,
-            recording_start,
-            recording_end
-          }) => ({
-            id,
-            meeting_id,
-            file_size,
-            recording_start,
-            recording_end
-          }))(rawRecording);
+      await Promise.all(
+        users.map(async user => {
+          const url = `https://api.zoom.us/v2/users/${user.id}/recordings`;
+          const token = exports.getToken();
+          const userEmail = user.email;
 
-          recording.user = userEmail;
-          recording.topic = topic;
+          const response = await axios.get(url, {
+            params: {
+              access_token: token,
+              userId: user.id,
+              from: startDate,
+              to: endDate
+            }
+          });
 
-          recordings.push(recording);
-        });
-      });
-    })
-  );
+          // console.log(response.status);
+          if(response.status !== 200){
+            console.log('Error: ', response.statusText);
+          }
+
+          //   console.log(response.data);
+          const meetings = response.data.meetings;
+          let recording = {};
+
+          meetings.forEach(meeting => {
+            // console.log(meeting.id);
+            const topic = meeting.topic;
+
+            meeting.recording_files.forEach(rawRecording => {
+              recording = (({
+                id,
+                meeting_id,
+                file_size,
+                recording_start,
+                recording_end
+              }) => ({
+                id,
+                meeting_id,
+                file_size,
+                recording_start,
+                recording_end
+              }))(rawRecording);
+
+              recording.user = userEmail;
+              recording.topic = topic;
+
+              recordings.push(recording);
+            });
+          });
+        })
+      );
+
+      pageNumber++;
+  }
+  while (pageNumber <= pageCount );
+
 
   const data = { data: recordings };
-
-  res.send(data);
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(data));
 };
 
 exports.users = (req, res) => {
@@ -121,7 +146,9 @@ exports.getDailyReport = () => {
         const dailyReportObj = response.data.dates.filter(
           report => report.date === todaysDate
         );
+        console.log('Resolve:',dailyReportObj[0] )
         resolve(dailyReportObj[0]);
       });
   });
 };
+
