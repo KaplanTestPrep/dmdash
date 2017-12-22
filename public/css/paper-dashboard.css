@@ -11641,6 +11641,15 @@ star {
   margin: 0;
 }
 
+/*  Custom */
+
+.toolbar {
+  padding: 10px;
+}
+.toolbar .btn {
+  margin: 5px;
+}
+
 
 /* dataTable overwrites/customizations */
 
