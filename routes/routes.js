@@ -25,11 +25,21 @@ router.get(
   authController.isLoggedIn,
   zoomController.recordings
 );
+
 router.get(
   "/getRecordings",
   authController.isLoggedIn,
   catchErrors(zoomController.getRecordings)
 );
+
+router.post(
+  "/deleteRecordings",
+  authController.isLoggedIn,
+  zoomController.deleteRecordings
+);
+
+
+
 router.get("/zoomUsers", authController.isLoggedIn, zoomController.users);
 
 // router.get("/auth/google", authController.authenticate);
