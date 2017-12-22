@@ -1,9 +1,6 @@
-// import "../sass/style.scss";
-
-// import { $, $$ } from "./modules/bling";
-
-// Datatable init
 $(document).ready(function() {
+
+  // Datatable init
   const table = $("#datatables").DataTable({
     ajax: "/getRecordings",
     columns: [
@@ -13,7 +10,8 @@ $(document).ready(function() {
       { data: "topic" },
       { data: "recording_start" },
       { data: "recording_end" },
-      { data: "file_size" }
+      { data: "file_size" },
+      { data: "file_type"}
     ],
     columnDefs: [
       {
@@ -40,18 +38,27 @@ $(document).ready(function() {
   });
 
   $("#delete").click(function() {
-    // console.table(table.rows(".selected").data()[0]);
-    // alert(table.rows(".selected").data()[0].id);
-
     const recordings = table.rows(".selected").data();
-      // recordings.forEach(recording => {
-      //   console.log()
+      let toBeDeleted = [];
+      for(let i=0; i < recordings.length; i++){
+        let rec = {
+          id: recordings[i].id,
+          meetingId: recordings[i].meeting_id
+        }
+        toBeDeleted.push(rec);
+      }
 
-      // });
+      $.ajax({
+        url: '/deleteRecordings',
+        dataType: 'json',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(toBeDeleted)
+      });
 
 
-    console.log(recordings[0]);
-
+      console.log(JSON.stringify(toBeDeleted));
+      location.reload();
   });
 
 
