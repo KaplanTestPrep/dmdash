@@ -10,15 +10,13 @@ exports.recordings = (req, res) => {
 };
 
 exports.getRecordings = async (req, res) => {
-
   let recordings = [];
-  // let pageNumber = 0;
-  // let pageCount = 0;
 
   //  Get list of all users
+
+  // Get page count
    const url = "https://api.zoom.us/v2/users";
    const token = exports.getToken();
-
    const response = await axios.get(url, {
      params: {
        access_token: token,
@@ -33,7 +31,6 @@ exports.getRecordings = async (req, res) => {
         // Get list of all users
       const url = "https://api.zoom.us/v2/users";
       const token = exports.getToken();
-
       const response = await axios.get(url, {
         params: {
           access_token: token,
@@ -41,16 +38,12 @@ exports.getRecordings = async (req, res) => {
           page_number: pageNumber
         }
       });
-      console.log(pageCount, pageNumber);
       
       const users = response.data.users;
-      console.log(users);
 
       // Get list of recordings for each user
       const endDate = moment().toISOString().split("T")[0];
       const startDate = moment().subtract(6, "months").toISOString().split("T")[0];
-
-      // console.log({startDate, endDate});
 
       await Promise.all(
         users.map(async user => {
@@ -67,17 +60,10 @@ exports.getRecordings = async (req, res) => {
             }
           });
 
-          // console.log(response.status);
-          if(response.status !== 200){
-            console.log('Error: ', response.statusText);
-          }
-
-          //   console.log(response.data);
           const meetings = response.data.meetings;
           let recording = {};
 
           meetings.forEach(meeting => {
-            // console.log(meeting.id);
             const topic = meeting.topic;
 
             meeting.recording_files.forEach(rawRecording => {
@@ -86,13 +72,15 @@ exports.getRecordings = async (req, res) => {
                 meeting_id,
                 file_size,
                 recording_start,
-                recording_end
+                recording_end,
+                file_type
               }) => ({
                 id,
                 meeting_id,
                 file_size,
                 recording_start,
-                recording_end
+                recording_end,
+                file_type
               }))(rawRecording);
 
               recording.user = userEmail;
@@ -110,9 +98,33 @@ exports.getRecordings = async (req, res) => {
 
 
   const data = { data: recordings };
-  res.setHeader('Content-Type', 'application/json');
+  //res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(data));
 };
+
+exports.deleteRecordings = async (req, res) => {
+  const toBeDeleted = req.body;
+  console.log(toBeDeleted);
+
+  const token = exports.getToken();
+  try{  
+    const promises = toBeDeleted.map( rec => {
+      const url = `https://api.zoom.us/v2/meetings/${rec.meetingId}/recordings/${rec.id}`;
+      return axios.delete(url, {
+        params: {
+          access_token: token
+        }
+      });
+    });
+
+    const response = await Promise.all(promises);
+    console.log(response);
+  }catch(err) {
+    console.log(err);
+  }
+ 
+  res.sendStatus(200);
+}
 
 exports.users = (req, res) => {
   res.render("zoomUsers", { pageTitle: "Zoom Users", active: "zoom" });
