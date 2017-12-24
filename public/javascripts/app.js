@@ -1,5 +1,4 @@
 $(document).ready(function() {
-
   // Datatable init
   const table = $("#datatables").DataTable({
     ajax: "/getRecordings",
@@ -11,7 +10,7 @@ $(document).ready(function() {
       { data: "recording_start" },
       { data: "recording_end" },
       { data: "file_size" },
-      { data: "file_type"}
+      { data: "file_type" }
     ],
     columnDefs: [
       {
@@ -32,34 +31,66 @@ $(document).ready(function() {
     $(this).toggleClass("selected");
   });
 
-  $("#test").click(function() {
-    console.table(table.rows(".selected").data());
-    alert(table.rows(".selected").data().length + " row(s) selected");
-  });
-
   $("#delete").click(function() {
     const recordings = table.rows(".selected").data();
-      let toBeDeleted = [];
-      for(let i=0; i < recordings.length; i++){
-        let rec = {
-          id: recordings[i].id,
-          meetingId: recordings[i].meeting_id
+    const msg = `Are you sure you want to delete ${
+      recordings.length
+    } recordings?`;
+
+    swal({
+      title: "Are you sure?",
+      text: msg,
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
+    }).then(result => {
+      if (result.value) {
+        let toBeDeleted = [];
+        for (let i = 0; i < recordings.length; i++) {
+          let rec = {
+            id: recordings[i].id,
+            meetingId: recordings[i].meeting_id
+          };
+          toBeDeleted.push(rec);
         }
-        toBeDeleted.push(rec);
+
+        $.ajax({
+          url: "/deleteRecordings",
+          dataType: "json",
+          type: "POST",
+          contentType: "application/json",
+          data: JSON.stringify(toBeDeleted)
+        });
+
+        swal({
+          position: "top",
+          type: "success",
+          title: "Recording(s) deleted!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        }).then(result => {
+          table
+            .rows(".selected")
+            .remove()
+            .draw(false);
+        });
+        // result.dismiss can be 'cancel', 'overlay',
+        // 'close', and 'timer'
+      } else if (result.dismiss) {
+        swal({
+          position: "top",
+          type: "error",
+          title: "Canceled!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        });
       }
-
-      $.ajax({
-        url: '/deleteRecordings',
-        dataType: 'json',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(toBeDeleted)
-      });
-
-
-      console.log(JSON.stringify(toBeDeleted));
-      location.reload();
+    });
   });
-
-
 });
