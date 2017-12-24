@@ -15,7 +15,7 @@ router.get(
 );
 
 router.get("/profile", authController.isLoggedIn, (req, res) => {
-  res.render("profile", { pageTitle: "Profile" });
+  res.render("profile", { pageTitle: "Profile", active: "profile" });
 });
 
 router.get("/login", authController.isLoggedIn, userController.loginForm);
@@ -37,8 +37,6 @@ router.post(
   authController.isLoggedIn,
   zoomController.deleteRecordings
 );
-
-
 
 router.get("/zoomUsers", authController.isLoggedIn, zoomController.users);
 
