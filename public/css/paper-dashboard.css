@@ -201,7 +201,7 @@ Copyright (c) 2015 Daniel Eden
   -webkit-animation-name: fadeOutUp;
   animation-name: fadeOutUp;
 }
-
+/*
 body.swal2-in {
   overflow-y: hidden;
 }
@@ -1179,6 +1179,8 @@ body.swal2-iosfix {
     transform: rotate(360deg);
   }
 }
+
+*/
 /**
  * @author zhixin wen <wenzhixin2010@gmail.com>
  * version: 1.8.1
@@ -11656,6 +11658,7 @@ star {
 table.dataTable tr {
   cursor: pointer;
 }
+
 table.dataTable tbody tr.selected {
   background-color: #FFA534 !important;
 }
@@ -11664,3 +11667,8 @@ table.dataTable tbody tr.selected {
   background: none !important;
   border: 1px solid #fff !important;
   }
+
+
+.swal2-buttonswrapper .btn{
+  margin: 0 5px;
+}
