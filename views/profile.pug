@@ -7,20 +7,20 @@ block content
         .card.card-user
           .image
             img(src=user.picture, alt='...')
-          .content
+          .card-content
             .author
               img.avatar.border-white(src=user.picture, alt='...')
-              h4.title
+              h4.card-title
                 | #{user.name}
                 br
                 a(href='#')
-                  small @chetfaker
+                  small #{user.email}
             p.description.text-center
               | "I like the way you work it 
               br
-              |                                     No diggity 
+              | No diggity 
               br
-              |                                     I wanna bag it up"
+              | I wanna bag it up"
           hr
           .text-center
             .row
@@ -36,58 +36,14 @@ block content
                   small Used
               .col-md-3
                 h5
-                  | 24,6$
+                  | $24.6
                   br
                   small Spent
-        .card
-          .header
-            h4.title Team Members
-          .content
-            ul.list-unstyled.team-members
-              li
-                .row
-                  .col-xs-3
-                    .avatar
-                      img.img-circle.img-no-padding.img-responsive(src='assets/img/faces/face-0.jpg', alt='Circle Image')
-                  .col-xs-6
-                    | DJ Khaled
-                    br
-                    span.text-muted
-                      small Offline
-                  .col-xs-3.text-right
-                    btn.btn.btn-sm.btn-success.btn-icon
-                      i.fa.fa-envelope
-              li
-                .row
-                  .col-xs-3
-                    .avatar
-                      img.img-circle.img-no-padding.img-responsive(src='assets/img/faces/face-1.jpg', alt='Circle Image')
-                  .col-xs-6
-                    | Creative Tim
-                    br
-                    span.text-success
-                      small Available
-                  .col-xs-3.text-right
-                    btn.btn.btn-sm.btn-success.btn-icon
-                      i.fa.fa-envelope
-              li
-                .row
-                  .col-xs-3
-                    .avatar
-                      img.img-circle.img-no-padding.img-responsive(src='assets/img/faces/face-3.jpg', alt='Circle Image')
-                  .col-xs-6
-                    | Flume
-                    br
-                    span.text-danger
-                      small Busy
-                  .col-xs-3.text-right
-                    btn.btn.btn-sm.btn-success.btn-icon
-                      i.fa.fa-envelope
       .col-lg-8.col-md-7
         .card
-          .header
-            h4.title Edit Profile
-          .content
+          .card-header
+            h4.card-title Edit Profile
+          .card-content
             form
               .row
                 .col-md-5
@@ -111,24 +67,6 @@ block content
                   .form-group
                     label Last Name
                     input.form-control.border-input(type='text', placeholder='Last Name', value='Faker')
-              .row
-                .col-md-12
-                  .form-group
-                    label Address
-                    input.form-control.border-input(type='text', placeholder='Home Address', value='Melbourne, Australia')
-              .row
-                .col-md-4
-                  .form-group
-                    label City
-                    input.form-control.border-input(type='text', placeholder='City', value='Melbourne')
-                .col-md-4
-                  .form-group
-                    label Country
-                    input.form-control.border-input(type='text', placeholder='Country', value='Australia')
-                .col-md-4
-                  .form-group
-                    label Postal Code
-                    input.form-control.border-input(type='number', placeholder='ZIP Code')
               .row
                 .col-md-12
                   .form-group
