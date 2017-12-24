@@ -45,13 +45,13 @@ html(lang='en')
             .photo
               img(src=user.picture)
             .info
-              a.collapsed(data-toggle='collapse', href='#collapseExample')
+              a.collapsed(data-toggle='collapse', href='#profile')
                 span=user.name               
                   b.caret
               .clearfix
-              #collapseExample.collapse
+              #profile.collapse(class=( active === 'profile' ? 'in' : null ), aria-expanded=( active === 'profile' ? 'true' : 'false' ))
                 ul.nav
-                  li
+                  li(class=( pageTitle === 'Profile' ? 'active' : null ))
                     a(href='/profile')
                       span.sidebar-mini P
                       span.sidebar-normal Profile
@@ -66,7 +66,7 @@ html(lang='en')
                 p
                   | Zoom
                   b.caret
-              #zoom.collapse
+              #zoom.collapse(class=( active === 'zoom' ? 'in' : null ), aria-expanded=( active === 'zoom' ? 'true' : 'false' ))
                 ul.nav
                   li(class=( pageTitle === 'Zoom Recordings' ? 'active' : null ))
                     a(href='zoomRecordings')
@@ -146,24 +146,18 @@ html(lang='en')
   script(src='./js/bootstrap.min.js', type='text/javascript')
   // Forms Validations Plugin
   script(src='./js/jquery.validate.min.js')
-
   // Bootstrap Tables
   scrip(src='./js/bootstrap-table.js')
-
   //Data Tables
   <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
-  
   //  Plugin for DataTables.net
   script(src='./js/jquery.datatables.js')
- 
-  
+   // Sweet Alert 2 plugin
+  script(src='./js/sweetalert2.all.js')
   // Promise Library for SweetAlert2 working on IE
   //script(src='./js/es6-promise-auto.min.js')
   // Notifications Plugin
-  //script(src='./js/bootstrap-notify.js')
-  // Sweet Alert 2 plugin
-  //script(src='./js/sweetalert2.js')
-
+  script(src='./js/bootstrap-notify.js')
   // Paper Dashboard PRO Core javascript and methods for Demo purpose
   script(src='./js/paper-dashboard.js')
   // Dashboard Core Javascript
