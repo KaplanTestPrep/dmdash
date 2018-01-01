@@ -4,6 +4,7 @@ const userController = require("../controllers/userController");
 const authController = require("../controllers/authController");
 const dashController = require("../controllers/dashController");
 const zoomController = require("../controllers/zoomController");
+const bcController = require("../controllers/bcController");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const { catchErrors } = require("../handlers/errorHandlers");
@@ -38,7 +39,35 @@ router.post(
   zoomController.deleteRecordings
 );
 
-router.get("/zoomUsers", authController.isLoggedIn, zoomController.users);
+router.get(
+  "/zoomAltHost",
+  authController.isLoggedIn,
+  zoomController.alternateHosts
+);
+
+router.post(
+  "/zoomAltHost/:email",
+  authController.isLoggedIn,
+  zoomController.setAlternateHosts
+);
+
+router.get(
+  "/bcVideoRenditions",
+  authController.isLoggedIn,
+  bcController.videoRenditions
+);
+
+router.get(
+  "/bc/getRenditions/:accountId/:update",
+  authController.isLoggedIn,
+  catchErrors(bcController.getRenditions)
+);
+
+router.get(
+  "/bcRetranscode",
+  authController.isLoggedIn,
+  catchErrors(bcController.batchRetranscode)
+);
 
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);
@@ -55,7 +84,7 @@ router.get(
 router.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
-  function(req, res) {
+  function (req, res) {
     res.redirect("/");
   }
 );

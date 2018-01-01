@@ -2,18 +2,21 @@ const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { moment } = require("../helpers");
 
-exports.recordings = (req, res) => {
-  res.render("zoomRecordings", {
-    pageTitle: "Zoom Recordings",
-    active: "zoom"
-  });
+exports.getToken = () => {
+  const payload = {
+    iss: process.env.ZOOMAPIKEY,
+    exp: new Date().getTime() + 5000
+  };
+  //Automatically creates header, and returns JWT
+  var token = jwt.sign(payload, process.env.ZOOMAPISECRET);
+
+  return token;
 };
 
 exports.getRecordings = async (req, res) => {
   let recordings = [];
 
   //  Get list of all users
-
   // Get page count
   const url = "https://api.zoom.us/v2/users";
   const token = exports.getToken();
@@ -80,13 +83,13 @@ exports.getRecordings = async (req, res) => {
               recording_end,
               file_type
             }) => ({
-              id,
-              meeting_id,
-              file_size,
-              recording_start,
-              recording_end,
-              file_type
-            }))(rawRecording);
+                id,
+                meeting_id,
+                file_size,
+                recording_start,
+                recording_end,
+                file_type
+              }))(rawRecording);
 
             recording.user = userEmail;
             recording.topic = topic;
@@ -114,7 +117,7 @@ exports.deleteRecordings = async (req, res) => {
     const promises = toBeDeleted.map(rec => {
       const url = `https://api.zoom.us/v2/meetings/${
         rec.meetingId
-      }/recordings/${rec.id}`;
+        }/recordings/${rec.id}`;
       return axios.delete(url, {
         params: {
           access_token: token
@@ -131,21 +134,6 @@ exports.deleteRecordings = async (req, res) => {
   res.sendStatus(200);
 };
 
-exports.users = (req, res) => {
-  res.render("zoomUsers", { pageTitle: "Zoom Users", active: "zoom" });
-};
-
-exports.getToken = () => {
-  const payload = {
-    iss: process.env.ZOOMAPIKEY,
-    exp: new Date().getTime() + 5000
-  };
-  //Automatically creates header, and returns JWT
-  var token = jwt.sign(payload, process.env.ZOOMAPISECRET);
-
-  return token;
-};
-
 exports.getDailyReport = () => {
   const url = "https://api.zoom.us/v2/report/daily";
   const token = exports.getToken();
@@ -157,7 +145,7 @@ exports.getDailyReport = () => {
           access_token: token
         }
       })
-      .then(function(response) {
+      .then(function (response) {
         // console.log("Response:", response.data);
         const todaysDate = new Date().toISOString().split("T")[0];
         console.log(todaysDate);
@@ -169,4 +157,60 @@ exports.getDailyReport = () => {
         resolve(dailyReportObj[0]);
       });
   });
+};
+
+exports.recordings = (req, res) => {
+  res.render("zoomRecordings", {
+    pageTitle: "Zoom Recordings",
+    active: "zoom"
+  });
+};
+
+exports.alternateHosts = (req, res) => {
+  res.render("zoomAltHosts", {
+    pageTitle: "Alternate Host Tool",
+    active: "zoom"
+  });
+};
+
+exports.setAlternateHosts = async (req, res) => {
+  const email = req.params.email;
+  const url = `https://api.zoom.us/v2/users/${email}/meetings`;
+  const token = exports.getToken();
+
+  const response = await axios.get(url, {
+    params: {
+      access_token: token,
+      page_size: 100
+    }
+  });
+
+  const meetings = response.data.meetings;
+
+  try {
+    await Promise.all(
+      meetings.map(async meeting => {
+        meetingId = meeting.id;
+        const url = `https://api.zoom.us/v2/meetings/${meetingId}`;
+        const token = exports.getToken();
+
+        const response = await axios({
+          method: 'patch',
+          url,
+          params: {
+            access_token: token
+          },
+          data: {
+            "settings": {
+              "alternative_hosts": "LiveOnlineService@kaplan.com loltech@kaplan.com"
+            }
+          }
+        });
+      })
+    )
+  } catch (error) {
+    console.log(error);
+  }
+
+  res.sendStatus(200);
 };

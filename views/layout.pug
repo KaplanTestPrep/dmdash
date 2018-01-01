@@ -72,14 +72,26 @@ html(lang='en')
                     a(href='zoomRecordings')
                       span.sidebar-mini ZR
                       span.sidebar-normal Recordings Tool
-                  li(class=( pageTitle === 'Zoom Users' ? 'active' : null ))
-                    a(href='zoomUsers')
-                      span.sidebar-mini ZU
-                      span.sidebar-normal Users
-            li
-              a(href='/')
-                i.ti-calendar
-                p Simple Link
+                  li(class=( pageTitle === 'Alternate Host Tool' ? 'active' : null ))
+                    a(href='zoomAltHost')
+                      span.sidebar-mini ZH
+                      span.sidebar-normal Alternate Hosts Tool
+            li(class=( active === 'bc' ? 'active' : null ))
+              a(data-toggle='collapse', href='#bc')
+                i.ti-panel
+                p
+                  | Brightcove
+                  b.caret
+              #bc.collapse(class=( active === 'bc' ? 'in' : null ), aria-expanded=( active === 'bc' ? 'true' : 'false' ))
+                ul.nav
+                  li(class=( pageTitle === 'Video Renditions' ? 'active' : null ))
+                    a(href='bcVideoRenditions')
+                      span.sidebar-mini BV
+                      span.sidebar-normal Video Renditions
+                  li(class=( pageTitle === 'Alternate Host Tool' ? 'active' : null ))
+                    a(href='bcRetranscode')
+                      span.sidebar-mini BR
+                      span.sidebar-normal Batch Retranscode
       .main-panel
         nav.navbar.navbar-default
           .container-fluid
@@ -146,16 +158,19 @@ html(lang='en')
   script(src='./js/bootstrap.min.js', type='text/javascript')
   // Forms Validations Plugin
   script(src='./js/jquery.validate.min.js')
+  // Bootstrap DateTimePicker
+  script(src="./js/moment.min.js")
+  script(src='./js/bootstrap-datetimepicker.js')
   // Bootstrap Tables
-  scrip(src='./js/bootstrap-table.js')
-  //Data Tables
-  <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+  // script(src='./js/bootstrap-table.js')
+  // Bootstrap picker
+  script(src="./js/bootstrap-selectpicker.js")
   //  Plugin for DataTables.net
   script(src='./js/jquery.datatables.js')
    // Sweet Alert 2 plugin
   script(src='./js/sweetalert2.all.js')
   // Promise Library for SweetAlert2 working on IE
-  //script(src='./js/es6-promise-auto.min.js')
+  script(src='./js/es6-promise-auto.min.js')
   // Notifications Plugin
   script(src='./js/bootstrap-notify.js')
   // Paper Dashboard PRO Core javascript and methods for Demo purpose

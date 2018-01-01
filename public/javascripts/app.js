@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
   // Datatable init
   const table = $("#datatables").DataTable({
     ajax: "/getRecordings",
@@ -14,28 +14,23 @@ $(document).ready(function() {
     ],
     columnDefs: [
       {
-        targets: [0],
+        targets: [0, 1],
         visible: false,
-        searchable: false
-      },
-      {
-        targets: [1],
-        visible: false,
-        searchable: false
+        searchable: true
       }
     ],
     pageLength: 25
   });
 
-  $("#datatables").on("click", "tr", function() {
+  $("#datatables").on("click", "tr", function () {
     $(this).toggleClass("selected");
   });
 
-  $("#delete").click(function() {
+  $("#delete").click(function () {
     const recordings = table.rows(".selected").data();
     const msg = `Are you sure you want to delete ${
       recordings.length
-    } recordings?`;
+      } recordings?`;
 
     swal({
       title: "Are you sure?",
@@ -93,4 +88,83 @@ $(document).ready(function() {
       }
     });
   });
-});
+
+
+  $("#addCoHosts").click((e) => {
+    e.preventDefault();
+
+    const emails = $("textarea")
+      .val()
+      .trim()
+      .split(/[\r\n,]+/);
+    console.log(emails);
+
+    emails.forEach(email => {
+      $.ajax({
+        url: `/zoomAltHost/${email}`,
+        type: "POST"
+      });
+    });
+  });
+
+
+  // Video Renditions
+  $('#datepicker').datetimepicker({
+    format: 'YYYY-MM-DD'
+  });
+
+  $('.selectpicker').selectpicker({
+    style: 'btn-info',
+    size: 8
+  });
+
+  $('#videoRenditions').click((e) => {
+    e.preventDefault();
+    const accountId = $('#acccount').val();
+    const update = $('#datepicker').val();
+    let renditionsTable = $("#renditionsTable");
+    $('#renditionsTable').removeClass('hidden');
+
+    if (!$.fn.DataTable.isDataTable('#renditionsTable')) {
+      renditionsTable.DataTable({
+        ajax: `/bc/getRenditions/${accountId}/${update}`,
+        columns: [
+          { data: "videoId" },
+          { data: "accountId" },
+          { data: "refId" },
+          { data: "videoName" },
+          { data: "description" },
+          { data: "state" },
+          { data: "createdAt" },
+          { data: "updatedAt" },
+          { data: "publishedAt" },
+          { data: "duration" },
+          { data: "folderId" },
+          { data: "digitalMasterId" },
+          { data: "tags" },
+          { data: "textTrackId" },
+          { data: "textTrackSrc" },
+          { data: "textTrackLang" },
+          { data: "textTrackLabel" },
+          { data: "textTrackKind" },
+          { data: "renditions" },
+          { data: "renditionCount" },
+        ],
+        columnDefs: [
+          {
+            targets: [0, 1, 5, 6, 8, 10, 11, 13, 14, 15, 17, 18],
+            visible: false,
+            searchable: true
+          }
+        ],
+        pageLength: 25,
+        processing: true
+      });
+    } else {
+      renditionsTable = new $.fn.dataTable.Api("#renditionsTable");
+      renditionsTable.ajax.url(`/bc/getRenditions/${accountId}/${update}`).load();
+    }
+  })
+
+
+}); // doc.ready
