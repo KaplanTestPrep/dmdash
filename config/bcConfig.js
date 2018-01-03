@@ -1,10 +1,13 @@
-exports.bcCredentials = {
-  serviceUrl: "https://oauth.brightcove.com/v3/access_token",
-  clientId: "49c143b5-5de8-455c-9d2c-a2f45c487d2e",
-  client_secret: "7AZvDiX1WpUHX2pawI50uNEJDiqV02ftCilaFDzzJayitgfsSTDFiU815lq0n5YN31Td93MwfL90AS-AEemN8Q"
-}
+exports.renditions = [
+  "screencast-1280",
+  "videocloud-default-v1",
+  "single-bitrate-high",
+  "high-resolution",
+  "single-bitrate-standard",
+  "smart-player-transition"
+];
 
-exports.brightcoveAccounts = [
+exports.accounts = [
   {
     name: "ATOM - Kaplan Test Prep",
     id: 1107601866001
@@ -53,5 +56,5 @@ exports.brightcoveAccounts = [
     name: "KTPi (Legacy) - Kaplan Test Prep",
     id: 2546882126001
   }
-]
+];
 
