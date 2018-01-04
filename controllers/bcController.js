@@ -8,7 +8,7 @@ exports.videoRenditions = (req, res) => {
   res.render("bcRenditionsList", {
     pageTitle: "Video Renditions",
     active: "bc",
-    bcAccounts: bc.brightcoveAccounts
+    bcAccounts: bc.accounts
   });
 };
 
@@ -146,8 +146,9 @@ exports.getRenditions = async (req, res) => {
 }
 
 exports.getBcToken = async () => {
-  const url = `${bc.bcCredentials.serviceUrl}?grant_type=client_credentials`;
-  const auth64 = new Buffer(`${bc.bcCredentials.clientId}:${bc.bcCredentials.client_secret}`).toString('base64');
+    
+  const url = `${process.env.BCSERVICEURL}?grant_type=client_credentials`;
+  const auth64 = new Buffer(`${process.env.BCCLIENTID}:${process.env.BCCLIENTSECRET}`).toString('base64');
 
   const options = {
     method: 'post',
