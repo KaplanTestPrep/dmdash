@@ -70,10 +70,10 @@ exports.retranscode = async (req, res) => {
 
   try {
     response = await axios(options);
-
     res.sendStatus(200);
   } catch (error) {
-    res.sendStatus(error.status);
+    console.log(error.response.status, error.response.statusText);
+    res.status(error.response.status).send({ error: error.response.statusText });
   }
 };
 
