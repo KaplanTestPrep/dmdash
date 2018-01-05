@@ -20,7 +20,7 @@ block content
                         .form-group
                             label.col-md-3.control-label Videos to be Transcoded:
                             .col-md-3
-                                textarea.form-control.datepicker#vidoesToTranscode(placeholder='List to Retranscode', rows='5')
+                                textarea.form-control.datepicker#vidoesToTranscode(placeholder='List to Retranscode', rows='5' required)
                         .form-group
                             label.col-md-3.control-label Type of ID :
                             .col-md-3
@@ -44,3 +44,9 @@ block content
                             label.col-md-3
                             .col-md-9
                                 button.btn.btn-fill.btn-info#batchRetranscode(type='submit') Start Batch Retranscode
+            .card
+                .card-content
+                    .div#percentage
+                    .progress
+                        .progress-bar.progress-bar-success(style='width: 0%')
+                            span.sr-only 0% Complete (success)

@@ -173,7 +173,11 @@ $(document).ready(function () {
     const videos = $('#vidoesToTranscode').val().trim().split(/[\r\n\s,]+/);
     const idType = $('input[name=idType]:checked').val();
     const renditionProfile = $('#bcRenditionProfile').val();
+    let percentDone = 0;
+    let completed = 0
+    let fail = 0;
 
+    let total = videos.length; 
 
     videos.forEach(video => {
       $.ajax({
@@ -186,12 +190,19 @@ $(document).ready(function () {
           renditionProfile
         }
       })
-        .done(res => {
+      .done(res => {
           console.log(res);
-        })
-        .fail(err => {
-
-        })
+          completed++;
+          $('.progress-bar').css("width", `${(completed/total)*100}%`);
+          $("#percentage").text(`${Math.round((completed/total)*100)}%`);
+      })
+      .fail(err => {
+          completed++;
+          fail++;
+          console.log(`${video} Failed: ${err.responseText}`, err);
+          $('.progress-bar').css("width", `${(completed/total)*100}%`);
+          $("#percentage").text(`${Math.round((completed/total)*100)}%`);
+      })
     });
 
     console.log(accountId, videos, idType, renditionProfile);
