@@ -3,8 +3,6 @@ const { moment } = require("../helpers");
 const bc = require("../config/bcConfig");
 
 exports.videoRenditions = (req, res) => {
-  console.log("bcRenditionsList");
-
   res.render("bcRenditionsList", {
     pageTitle: "Video Renditions",
     active: "bc",
@@ -13,12 +11,75 @@ exports.videoRenditions = (req, res) => {
 };
 
 exports.batchRetranscode = (req, res) => {
-  console.log("bcBatchRetranscode");
   res.render("bcBatchRetranscode", {
-    pageTitle: "Video Renditions",
-    active: "bc"
+    pageTitle: "Batch Retranscode",
+    active: "bc",
+    bcAccounts: bc.accounts,
+    bcRenditions: bc.renditions
   });
 };
+
+// ----------- APIs
+
+exports.retranscode = async (req, res) => {
+  //console.log(req.body);
+  const data = req.body;
+  let response = {};
+  let videoId = "";
+  let bcToken = await exports.getBcToken();
+  const headers = {
+    'Authorization': `Bearer ${bcToken.token}`,
+    'Content-Type': 'application/json'
+  };
+
+
+  if (data.idType === 'refId') {
+    let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountId}/videos/ref:${data.videoId}`
+    const options = {
+      method: 'get',
+      url,
+      headers
+    }
+
+    try {
+      response = await axios(options);
+    } catch (error) {
+      console.log(error.response.status);
+      res.status(error.response.status).send('RefId not found!');
+      return;
+    }
+
+    videoId = response.data.id;
+
+  } else {
+    videoId = data.videoId;
+  }
+
+
+  let url = `https://ingest.api.brightcove.com/v1/accounts/${data.accountId}/videos/${videoId}/ingest-requests`
+  const body = {
+    master: { "use_archived_master": true },
+    profile: `${data.renditionProfile}`
+  }
+  const options = {
+    method: 'post',
+    url,
+    headers,
+    data: body
+  }
+
+  try {
+    response = await axios(options);
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(error.status);
+  }
+};
+
+
+
+
 exports.getRenditions = async (req, res) => {
   console.log("getRenditions!!!");
   let offset = 0;
@@ -50,7 +111,6 @@ exports.getRenditions = async (req, res) => {
   }
 
   const videoCount = response.data.count;
-  console.log(videoCount);
 
   // Search Vidoes
   while (offset < videoCount) {
@@ -105,7 +165,6 @@ exports.getRenditions = async (req, res) => {
           video.textTrackKind = "";
         }
 
-        console.log(video.videoName);
         // Get Video Renditions
         if (bcToken.token <= Date.now()) {
           bcToken = await exports.getBcToken();
@@ -130,7 +189,6 @@ exports.getRenditions = async (req, res) => {
         let renditionCount = 0;
         video.renditions = "";
         renditions.data.forEach(rendition => {
-          //$videoRenditions .= "$videoRenditionCodec-$videoRenditionContainer  $videoRenditionFrame  $videoRenditionRate \n";
           video.renditions += `${rendition.video_codec}-${rendition.video_container} ${rendition.frame_width}x${rendition.frame_height} ${rendition.encoding_rate} \n`
           renditionCount++;
         });
@@ -146,7 +204,7 @@ exports.getRenditions = async (req, res) => {
 }
 
 exports.getBcToken = async () => {
-    
+
   const url = `${process.env.BCSERVICEURL}?grant_type=client_credentials`;
   const auth64 = new Buffer(`${process.env.BCCLIENTID}:${process.env.BCCLIENTSECRET}`).toString('base64');
 
