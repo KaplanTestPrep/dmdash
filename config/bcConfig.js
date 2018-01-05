@@ -1,4 +1,5 @@
 exports.renditions = [
+  "videocloud-default-v1",
   "screencast-1280",
   "videocloud-default-v1",
   "single-bitrate-high",
