@@ -66,7 +66,13 @@ router.get(
 router.get(
   "/bcRetranscode",
   authController.isLoggedIn,
-  catchErrors(bcController.batchRetranscode)
+  bcController.batchRetranscode
+);
+
+router.post(
+  "/bcRetranscode",
+  authController.isLoggedIn,
+  catchErrors(bcController.retranscode)
 );
 
 // router.get("/auth/google", authController.authenticate);

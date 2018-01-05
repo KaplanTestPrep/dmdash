@@ -164,7 +164,40 @@ $(document).ready(function () {
       renditionsTable = new $.fn.dataTable.Api("#renditionsTable");
       renditionsTable.ajax.url(`/bc/getRenditions/${accountId}/${update}`).load();
     }
-  })
+  });
+
+
+  $('#batchRetranscode').click((e) => {
+    e.preventDefault();
+    const accountId = $('#bcAcccount').val();
+    const videos = $('#vidoesToTranscode').val().trim().split(/[\r\n\s,]+/);
+    const idType = $('input[name=idType]:checked').val();
+    const renditionProfile = $('#bcRenditionProfile').val();
+
+
+    videos.forEach(video => {
+      $.ajax({
+        url: `/bcRetranscode`,
+        type: "POST",
+        data: {
+          accountId,
+          videoId: video,
+          idType,
+          renditionProfile
+        }
+      })
+        .done(res => {
+          console.log(res);
+        })
+        .fail(err => {
+
+        })
+    });
+
+    console.log(accountId, videos, idType, renditionProfile);
+
+  });
+
 
 
 }); // doc.ready
