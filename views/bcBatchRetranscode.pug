@@ -44,9 +44,19 @@ block content
                             label.col-md-3
                             .col-md-9
                                 button.btn.btn-fill.btn-info#batchRetranscode(type='submit') Start Batch Retranscode
-            .card
+    .row
+        .col-lg-12.col-md-12
+            .card#resultsCard.hidden
+                .card-header
+                    h4.card-title#percentage
+                        | Progress: 0%
                 .card-content
-                    .div#percentage
                     .progress
                         .progress-bar.progress-bar-success(style='width: 0%')
                             span.sr-only 0% Complete (success)
+                    .row
+                        .col-md-3
+                            ul#success
+                        .col-md-3
+                            ul#fail
+

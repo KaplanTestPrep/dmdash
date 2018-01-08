@@ -123,7 +123,8 @@ $(document).ready(function () {
     const accountId = $('#acccount').val();
     const update = $('#datepicker').val();
     let renditionsTable = $("#renditionsTable");
-    $('#renditionsTable').removeClass('hidden');
+
+    $('#resultsCard').removeClass('hidden');
 
     if (!$.fn.DataTable.isDataTable('#renditionsTable')) {
       renditionsTable.DataTable({
@@ -176,8 +177,13 @@ $(document).ready(function () {
     let percentDone = 0;
     let completed = 0
     let fail = 0;
-
     let total = videos.length; 
+
+
+    $('#resultsCard').removeClass('hidden');
+    $('ul#success').html(""); 
+    $('ul#fail').html(""); 
+
 
     videos.forEach(video => {
       $.ajax({
@@ -194,19 +200,20 @@ $(document).ready(function () {
           console.log(res);
           completed++;
           $('.progress-bar').css("width", `${(completed/total)*100}%`);
-          $("#percentage").text(`${Math.round((completed/total)*100)}%`);
+          $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+          $('ul#success').append(`<li>${video} Sucessfully processsed.</li>`);
       })
       .fail(err => {
           completed++;
           fail++;
+          
           console.log(`${video} Failed: ${err.responseText}`, err);
           $('.progress-bar').css("width", `${(completed/total)*100}%`);
-          $("#percentage").text(`${Math.round((completed/total)*100)}%`);
+          $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+          $('ul#fail').append(`<li>${video} Failed: ${err.responseText}</li>`);
+
       })
     });
-
-    console.log(accountId, videos, idType, renditionProfile);
-
   });
 
 
