@@ -159,15 +159,15 @@ exports.getDailyReport = () => {
   });
 };
 
-exports.recordings = (req, res) => {
-  res.render("zoomRecordings", {
+exports.recordingsTool = (req, res) => {
+  res.render("zoomRecordingsTool", {
     pageTitle: "Zoom Recordings",
     active: "zoom"
   });
 };
 
-exports.alternateHosts = (req, res) => {
-  res.render("zoomAltHosts", {
+exports.alternateHostTool = (req, res) => {
+  res.render("alternateHostTool", {
     pageTitle: "Alternate Host Tool",
     active: "zoom"
   });
