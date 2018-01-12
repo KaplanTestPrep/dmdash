@@ -22,9 +22,9 @@ router.get("/profile", authController.isLoggedIn, (req, res) => {
 router.get("/login", authController.isLoggedIn, userController.loginForm);
 
 router.get(
-  "/zoomRecordings",
+  "/recordingsTool",
   authController.isLoggedIn,
-  zoomController.recordings
+  zoomController.recordingsTool
 );
 
 router.get(
@@ -40,9 +40,9 @@ router.post(
 );
 
 router.get(
-  "/zoomAltHost",
+  "/alternateHostTool",
   authController.isLoggedIn,
-  zoomController.alternateHosts
+  zoomController.alternateHostTool
 );
 
 router.post(
@@ -52,9 +52,9 @@ router.post(
 );
 
 router.get(
-  "/bcVideoRenditions",
+  "/videoRenditionsTool",
   authController.isLoggedIn,
-  bcController.videoRenditions
+  bcController.videoRenditionsTool
 );
 
 router.get(
@@ -64,9 +64,9 @@ router.get(
 );
 
 router.get(
-  "/bcRetranscode",
+  "/batchRetranscodeTool",
   authController.isLoggedIn,
-  bcController.batchRetranscode
+  bcController.batchRetranscodeTool
 );
 
 router.post(
@@ -74,6 +74,20 @@ router.post(
   authController.isLoggedIn,
   catchErrors(bcController.retranscode)
 );
+
+router.get(
+  "/thumbnailUpdateTool",
+  authController.isLoggedIn,
+  bcController.thumbnailUpdateTool
+);
+
+router.post(
+  "/bcThumbnailUpload",
+  authController.isLoggedIn,
+  bcController.thumbnailUpload,
+  bcController.thumbnailSave
+);
+
 
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);
