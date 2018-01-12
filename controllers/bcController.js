@@ -1,17 +1,33 @@
 const axios = require("axios");
 const { moment } = require("../helpers");
 const bc = require("../config/bcConfig");
+const multer = require("multer");
+const fs = require('fs');
 
-exports.videoRenditions = (req, res) => {
-  res.render("bcRenditionsList", {
+const multerOptions = {
+  storage: multer.memoryStorage(),
+  fileFilter(req, file, next){
+    const isPhoto = file.mimetype.startsWith('image/');
+
+    if(isPhoto){
+      next(null, true);
+    }else {
+      next({message: 'That filetype is not allowed'}, false);
+    }
+  }
+}
+
+
+exports.videoRenditionsTool = (req, res) => {
+  res.render("videoRenditionsTool", {
     pageTitle: "Video Renditions",
     active: "bc",
     bcAccounts: bc.accounts
   });
 };
 
-exports.batchRetranscode = (req, res) => {
-  res.render("bcBatchRetranscode", {
+exports.batchRetranscodeTool = (req, res) => {
+  res.render("batchRetranscodeTool", {
     pageTitle: "Batch Retranscode",
     active: "bc",
     bcAccounts: bc.accounts,
@@ -19,10 +35,31 @@ exports.batchRetranscode = (req, res) => {
   });
 };
 
+exports.thumbnailUpdateTool = (req, res) => {
+  res.render("bcThumbnailUpdater", {
+    pageTitle: "Thumbnail Updater",
+    active: "bc",
+    bcAccounts: bc.accounts
+  });
+};
+
 // ----------- APIs
 
+exports.thumbnailUpload = multer(multerOptions).single('thumbnail');
+
+exports.thumbnailSave = (req, res, next) => {
+  let filename = req.file.originalname;
+  let buffer = req.file.buffer; 
+
+  fs.writeFile('./public/uploads/' + filename, buffer, 'binary', function(err) {
+    if (err) throw err
+    res.end('File is uploaded')
+  });
+
+  res.sendStatus(200);
+}
+
 exports.retranscode = async (req, res) => {
-  //console.log(req.body);
   const data = req.body;
   let response = {};
   let videoId = "";
