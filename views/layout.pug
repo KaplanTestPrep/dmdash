@@ -69,11 +69,11 @@ html(lang='en')
               #zoom.collapse(class=( active === 'zoom' ? 'in' : null ), aria-expanded=( active === 'zoom' ? 'true' : 'false' ))
                 ul.nav
                   li(class=( pageTitle === 'Zoom Recordings' ? 'active' : null ))
-                    a(href='zoomRecordings')
+                    a(href='recordingsTool')
                       span.sidebar-mini ZR
                       span.sidebar-normal Recordings Tool
                   li(class=( pageTitle === 'Alternate Host Tool' ? 'active' : null ))
-                    a(href='zoomAltHost')
+                    a(href='alternateHostTool')
                       span.sidebar-mini ZH
                       span.sidebar-normal Alternate Hosts Tool
             li(class=( active === 'bc' ? 'active' : null ))
@@ -85,13 +85,17 @@ html(lang='en')
               #bc.collapse(class=( active === 'bc' ? 'in' : null ), aria-expanded=( active === 'bc' ? 'true' : 'false' ))
                 ul.nav
                   li(class=( pageTitle === 'Video Renditions' ? 'active' : null ))
-                    a(href='bcVideoRenditions')
+                    a(href='videoRenditionsTool')
                       span.sidebar-mini BV
                       span.sidebar-normal Video Renditions
                   li(class=( pageTitle === 'Batch Retranscode' ? 'active' : null ))
-                    a(href='bcRetranscode')
+                    a(href='batchRetranscodeTool')
                       span.sidebar-mini BR
                       span.sidebar-normal Batch Retranscode
+                  li(class=( pageTitle === 'Thumbnail Updater' ? 'active' : null ))
+                    a(href='thumbnailUpdateTool')
+                      span.sidebar-mini BT
+                      span.sidebar-normal Thumbnail Updater
       .main-panel
         nav.navbar.navbar-default
           .container-fluid
@@ -167,12 +171,14 @@ html(lang='en')
   script(src="./js/bootstrap-selectpicker.js")
   //  Plugin for DataTables.net
   script(src='./js/jquery.datatables.js')
-   // Sweet Alert 2 plugin
+  script(src='./js/dataTables.buttons.min.js')
+  script(src='./js/dataTables.buttons.html5.min.js')
+  // Sweet Alert 2 plugin
   script(src='./js/sweetalert2.all.js')
   // Promise Library for SweetAlert2 working on IE
   script(src='./js/es6-promise-auto.min.js')
   // Notifications Plugin
-  script(src='./js/bootstrap-notify.js')
+  // script(src='./js/bootstrap-notify.js')
   // Paper Dashboard PRO Core javascript and methods for Demo purpose
   script(src='./js/paper-dashboard.js')
   // Dashboard Core Javascript
