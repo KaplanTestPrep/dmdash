@@ -1,6 +1,14 @@
 $(document).ready(function () {
   // Datatable init
   const table = $("#datatables").DataTable({
+    // dom: 'lfrtBip',
+    // buttons: [
+    //   {
+    //     extend: 'csvHtml5',
+    //     text: 'Download CSV',
+    //     className: 'btn btn-default'
+    //    }
+    // ],
     ajax: "/getRecordings",
     columns: [
       { data: "id" },
@@ -128,6 +136,14 @@ $(document).ready(function () {
 
     if (!$.fn.DataTable.isDataTable('#renditionsTable')) {
       renditionsTable.DataTable({
+        dom: 'lfrtBip',
+        buttons: [
+          {
+            extend: 'csvHtml5',
+            text: 'Download CSV',
+            className: 'btn btn-default'
+          }
+        ],
         ajax: `/bc/getRenditions/${accountId}/${update}`,
         columns: [
           { data: "videoId" },
@@ -216,6 +232,38 @@ $(document).ready(function () {
     });
   });
 
+
+  $("#imageUploadForm").submit( (e) => {
+    e.preventDefault();
+    
+    let filename = $("#selectThumbnail").val().split('\\').pop();
+    $("#uploadedImage").val(filename);
+
+    $("span#status").removeClass();
+    $("span#status").addClass('text-warning');
+    $("span#status").text("  Uploading...");
+
+    let fileSelect = document.getElementById('selectThumbnail');
+    let files = fileSelect.files;
+    let form = new FormData();
+
+    console.log(files);
+    form.append('thumbnail', files[0], files[0].name);
+    
+    $.ajax({
+      url: '/bcThumbnailUpload',
+      data: form,
+      processData: false,
+      contentType: false,
+      type: 'POST',
+      success: function(data){
+        $("span#status").removeClass();
+        $("span#status").addClass('text-success');
+        $("span#status").text("  Upload Completed!");
+      }
+    });
+
+  });
 
 
 }); // doc.ready
