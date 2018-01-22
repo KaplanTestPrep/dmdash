@@ -2,6 +2,20 @@ const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { moment } = require("../helpers");
 
+exports.recordingsTool = (req, res) => {
+  res.render("zoomRecordingsTool", {
+    pageTitle: "Zoom Recordings",
+    active: "zoom"
+  });
+};
+
+exports.alternateHostTool = (req, res) => {
+  res.render("alternateHostTool", {
+    pageTitle: "Alternate Host Tool",
+    active: "zoom"
+  });
+};
+
 exports.getToken = () => {
   const payload = {
     iss: process.env.ZOOMAPIKEY,
@@ -12,6 +26,37 @@ exports.getToken = () => {
 
   return token;
 };
+
+exports.getDailyReport = () => {
+  const url = "https://api.zoom.us/v2/report/daily";
+  const token = exports.getToken();
+  
+  return new Promise(resolve => {
+    axios
+      .get(url, {
+        params: {
+          access_token: token
+        }
+      })
+      .then(function (response) {
+        // console.log("Response:", response.data);
+        const todaysDate = new Date().toISOString().split("T")[0];
+        console.log(todaysDate);
+
+        const dailyReportObj = response.data.dates.filter(
+          report => report.date === todaysDate
+        );
+        console.log("Resolve:", dailyReportObj[0]);
+        resolve(dailyReportObj[0]);
+      });
+  });
+};
+
+
+
+
+// ---- APIs 
+
 
 exports.getRecordings = async (req, res) => {
   let recordings = [];
@@ -108,6 +153,7 @@ exports.getRecordings = async (req, res) => {
   res.send(JSON.stringify(data));
 };
 
+
 exports.deleteRecordings = async (req, res) => {
   const toBeDeleted = req.body;
   console.log(toBeDeleted);
@@ -134,66 +180,34 @@ exports.deleteRecordings = async (req, res) => {
   res.sendStatus(200);
 };
 
-exports.getDailyReport = () => {
-  const url = "https://api.zoom.us/v2/report/daily";
-  const token = exports.getToken();
-
-  return new Promise(resolve => {
-    axios
-      .get(url, {
-        params: {
-          access_token: token
-        }
-      })
-      .then(function (response) {
-        // console.log("Response:", response.data);
-        const todaysDate = new Date().toISOString().split("T")[0];
-        console.log(todaysDate);
-
-        const dailyReportObj = response.data.dates.filter(
-          report => report.date === todaysDate
-        );
-        console.log("Resolve:", dailyReportObj[0]);
-        resolve(dailyReportObj[0]);
-      });
-  });
-};
-
-exports.recordingsTool = (req, res) => {
-  res.render("zoomRecordingsTool", {
-    pageTitle: "Zoom Recordings",
-    active: "zoom"
-  });
-};
-
-exports.alternateHostTool = (req, res) => {
-  res.render("alternateHostTool", {
-    pageTitle: "Alternate Host Tool",
-    active: "zoom"
-  });
-};
-
 exports.setAlternateHosts = async (req, res) => {
   const email = req.params.email;
   const url = `https://api.zoom.us/v2/users/${email}/meetings`;
   const token = exports.getToken();
-
-  const response = await axios.get(url, {
-    params: {
-      access_token: token,
-      page_size: 100
-    }
-  });
+  let response = {};
+  
+  try {
+    response = await axios.get(url, {
+      params: {
+        access_token: token,
+        page_size: 100
+      }
+    });
+  } catch(error){
+    console.log("It's catching here ain't it?");
+    console.log(error.response.status, error.response.statusText);
+    return res.status(error.response.status).send({ error: error.response.statusText });
+  }
 
   const meetings = response.data.meetings;
-
+  
   try {
     await Promise.all(
       meetings.map(async meeting => {
         meetingId = meeting.id;
         const url = `https://api.zoom.us/v2/meetings/${meetingId}`;
         const token = exports.getToken();
-
+        
         const response = await axios({
           method: 'patch',
           url,
@@ -208,8 +222,10 @@ exports.setAlternateHosts = async (req, res) => {
         });
       })
     )
-  } catch (error) {
-    console.log(error);
+  } catch(error) {
+    console.log("IS IT CATCHING HERE?");
+    console.log(error.response.status, error.response.statusText);
+    return res.status(error.response.status).send({ error: error.response.statusText });
   }
 
   res.sendStatus(200);
