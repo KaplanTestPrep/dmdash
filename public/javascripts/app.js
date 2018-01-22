@@ -100,17 +100,39 @@ $(document).ready(function () {
 
   $("#addCoHosts").click((e) => {
     e.preventDefault();
+    const emails = $("textarea").val().trim().split(/[\r\n,]+/);
 
-    const emails = $("textarea")
-      .val()
-      .trim()
-      .split(/[\r\n,]+/);
-    console.log(emails);
+    let percentDone = 0;
+    let completed = 0
+    let fail = 0;
+    let total = emails.length;
+
+    $('#resultsCard').removeClass('hidden');
+    $('ul#success').html(""); 
+    $('ul#fail').html(""); 
+
+    
 
     emails.forEach(email => {
       $.ajax({
-        url: `/zoomAltHost/${email}`,
+        url: `/setAlternateHosts/${email}`,
         type: "POST"
+      })
+      .done(res => {
+        console.log(res);
+        completed++;
+        $('.progress-bar').css("width", `${(completed/total)*100}%`);
+        $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+        $('ul#success').append(`<li>${email} Sucessfully processsed.</li>`);
+      })
+      .fail(err => {
+          completed++;
+          fail++;
+          
+          console.log(`${email} Failed: ${err.responseText}`, err);
+          $('.progress-bar').css("width", `${(completed/total)*100}%`);
+          $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+          $('ul#fail').append(`<li>${email} Failed: ${err.responseText}</li>`);
       });
     });
   });
@@ -236,18 +258,17 @@ $(document).ready(function () {
   $("#imageUploadForm").submit( (e) => {
     e.preventDefault();
     
-    let filename = $("#selectThumbnail").val().split('\\').pop();
-    $("#uploadedImage").val(filename);
-
     $("span#status").removeClass();
     $("span#status").addClass('text-warning');
     $("span#status").text("  Uploading...");
+
+    let filename = $("#selectThumbnail").val().split('\\').pop();
+    $("#uploadedImage").val(filename);
 
     let fileSelect = document.getElementById('selectThumbnail');
     let files = fileSelect.files;
     let form = new FormData();
 
-    console.log(files);
     form.append('thumbnail', files[0], files[0].name);
     
     $.ajax({
@@ -265,5 +286,50 @@ $(document).ready(function () {
 
   });
 
+
+  $('#thumbnailUpdateForm').submit((e) => {
+    e.preventDefault();
+    const accountId = $('#bcAcccount').val();
+    const videos = $('#vidoesToUpdate').val().trim().split(/[\r\n\s,]+/);
+    const idType = $('input[name=idType]:checked').val();
+    const thumbnailFileName = $('#uploadedImage').val();
+    let completed = 0
+    let fail = 0;
+    let total = videos.length; 
+
+    $('#resultsCard').removeClass('hidden');
+    $('ul#success').html(""); 
+    $('ul#fail').html(""); 
+
+    videos.forEach( video => {
+      $.ajax({
+        url: `/bcThumbnailUpdate`,
+        type: "POST",
+        data: {
+          accountId,
+          videoId: video,
+          idType,
+          thumbnailFileName
+        }
+      })
+      .done(res => {
+          console.log(res);
+          completed++;
+          $('.progress-bar').css("width", `${(completed/total)*100}%`);
+          $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+          $('ul#success').append(`<li>${video} Sucessfully processsed.</li>`);
+      })
+      .fail(err => {
+          completed++;
+          fail++;
+          
+          console.log(`${video} Failed: ${err.responseText}`, err);
+          $('.progress-bar').css("width", `${(completed/total)*100}%`);
+          $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+          $('ul#fail').append(`<li>${video} Failed: ${err.responseText}</li>`);
+
+      })
+    });
+  });
 
 }); // doc.ready
