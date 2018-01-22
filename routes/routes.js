@@ -46,7 +46,7 @@ router.get(
 );
 
 router.post(
-  "/zoomAltHost/:email",
+  "/setAlternateHosts/:email",
   authController.isLoggedIn,
   zoomController.setAlternateHosts
 );
@@ -86,6 +86,12 @@ router.post(
   authController.isLoggedIn,
   bcController.thumbnailUpload,
   bcController.thumbnailSave
+);
+
+router.post(
+  "/bcThumbnailUpdate",
+  authController.isLoggedIn,
+  catchErrors(bcController.bcThumbnailUpdate)
 );
 
 

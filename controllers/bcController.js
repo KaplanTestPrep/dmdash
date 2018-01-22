@@ -17,7 +17,7 @@ const multerOptions = {
   }
 }
 
-
+// --------- Page Renderers
 exports.videoRenditionsTool = (req, res) => {
   res.render("videoRenditionsTool", {
     pageTitle: "Video Renditions",
@@ -36,7 +36,7 @@ exports.batchRetranscodeTool = (req, res) => {
 };
 
 exports.thumbnailUpdateTool = (req, res) => {
-  res.render("bcThumbnailUpdater", {
+  res.render("thumbnailUpdateTool", {
     pageTitle: "Thumbnail Updater",
     active: "bc",
     bcAccounts: bc.accounts
@@ -57,6 +57,75 @@ exports.thumbnailSave = (req, res, next) => {
   });
 
   res.sendStatus(200);
+}
+
+exports.bcThumbnailUpdate = async (req, res) => {
+  const data = req.body;
+  let response = {};
+  let videoId = "";
+  let bcToken = await exports.getBcToken();
+  const headers = {
+    'Authorization': `Bearer ${bcToken.token}`,
+    'Content-Type': 'application/json'
+  };
+
+  if (data.idType === 'refId') {
+    let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountId}/videos/ref:${data.videoId}`
+    const options = {
+      method: 'get',
+      url,
+      headers
+    }
+
+    try {
+      response = await axios(options);
+    } catch (error) {
+      console.log(error.response.status);
+      res.status(error.response.status).send('RefId not found!');
+      return;
+    }
+
+    videoId = response.data.id;
+
+  } else {
+    videoId = data.videoId;
+  }
+
+  // Dev Hardcode
+  let tumbnailUrl = 'https://common.liveonlinetechnology.com/uploads/Rick.jpg';
+  console.log(`https://common.liveonlinetechnology.com/uploads/${data.thumbnailFileName}`);
+
+  let url = `https://ingest.api.brightcove.com/v1/accounts/${data.accountId}/videos/${videoId}/ingest-requests`;
+  const body = {
+    poster: {
+        // url: `https://common.liveonlinetechnology.com/uploads/${data.thumbnailFileName}`,
+        url: tumbnailUrl,
+        width: 1280,
+        height: 720
+    },
+    thumbnail: {
+        // url: "https://common.liveonlinetechnology.com/uploads/${data.thumbnailFileName}",
+        url: tumbnailUrl,
+        width: 160,
+        height: 90
+    }
+  }
+
+  const options = {
+    method: 'post',
+    url,
+    headers,
+    data: body
+  }
+
+  try {
+    response = await axios(options);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error.response.status, error.response.statusText);
+    res.status(error.response.status).send({ error: error.response.statusText });
+  }
+  
 }
 
 exports.retranscode = async (req, res) => {
@@ -113,8 +182,6 @@ exports.retranscode = async (req, res) => {
     res.status(error.response.status).send({ error: error.response.statusText });
   }
 };
-
-
 
 
 exports.getRenditions = async (req, res) => {
