@@ -41,24 +41,25 @@ html(lang='en')
           a.simple-text.logo-normal(href='/')
             | Digital Media
         .sidebar-wrapper
-          .user
-            .photo
-              img(src=user.picture)
-            .info
-              a.collapsed(data-toggle='collapse', href='#profile')
-                span=user.name               
-                  b.caret
-              .clearfix
-              #profile.collapse(class=( active === 'profile' ? 'in' : null ), aria-expanded=( active === 'profile' ? 'true' : 'false' ))
-                ul.nav
-                  li(class=( pageTitle === 'Profile' ? 'active' : null ))
-                    a(href='/profile')
-                      span.sidebar-mini P
-                      span.sidebar-normal Profile
-                  li
-                    a(href='/logout')
-                      span.sidebar-mini L
-                      span.sidebar-normal Logout
+          if user
+            .user
+              .photo
+                img(src=user.picture)
+              .info
+                a.collapsed(data-toggle='collapse', href='#profile')
+                  span=user.name               
+                    b.caret
+                .clearfix
+                #profile.collapse(class=( active === 'profile' ? 'in' : null ), aria-expanded=( active === 'profile' ? 'true' : 'false' ))
+                  ul.nav
+                    li(class=( pageTitle === 'Profile' ? 'active' : null ))
+                      a(href='/profile')
+                        span.sidebar-mini P
+                        span.sidebar-normal Profile
+                    li
+                      a(href='/logout')
+                        span.sidebar-mini L
+                        span.sidebar-normal Logout
           ul.nav
             li(class=( active === 'zoom' ? 'active' : null ))
               a(data-toggle='collapse', href='#zoom')
