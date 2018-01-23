@@ -10,13 +10,19 @@ exports.logout = (req, res) => {
 
 exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
+    if(!req.user.email.endsWith('@kaplan.com')){
+      req.flash("danger", "You must login with a Kaplan email address!");
+      req.logout();
+      res.redirect("/login");
+      return;
+    }
+    
     console.log("PATH:", req.route.path);
     if (req.route.path === "/login") {
       console.log("/login route and authenticated");
       res.redirect("/");
       return false;
     }
-
     next();
     return;
   } else if (req.route.path === "/login") {
