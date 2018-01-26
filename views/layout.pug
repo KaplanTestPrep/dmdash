@@ -9,16 +9,14 @@ html(lang='en')
     meta(content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0', name='viewport')
     meta(name='viewport', content='width=device-width')
     // Bootstrap core CSS
-    link(href='./css/bootstrap.min.css', rel='stylesheet')
+    link(href='/css/bootstrap.min.css', rel='stylesheet')
     // Paper Dashboard core CSS
-    link(href='./css/paper-dashboard.css', rel='stylesheet')
-    // Data Tables
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+    link(href='/css/paper-dashboard.css', rel='stylesheet')
   
     // Fonts and icons
     link(href='http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css', rel='stylesheet')
     link(href='https://fonts.googleapis.com/css?family=Muli:400,300', rel='stylesheet', type='text/css')
-    link(href='./css/themify-icons.css', rel='stylesheet')
+    link(href='/css/themify-icons.css', rel='stylesheet')
   body
     block messages
       if locals.flashes
@@ -70,11 +68,11 @@ html(lang='en')
               #zoom.collapse(class=( active === 'zoom' ? 'in' : null ), aria-expanded=( active === 'zoom' ? 'true' : 'false' ))
                 ul.nav
                   li(class=( pageTitle === 'Zoom Recordings' ? 'active' : null ))
-                    a(href='recordingsTool')
+                    a(href='/recordingsTool')
                       span.sidebar-mini ZR
                       span.sidebar-normal Recordings Tool
                   li(class=( pageTitle === 'Alternate Host Tool' ? 'active' : null ))
-                    a(href='alternateHostTool')
+                    a(href='/alternateHostTool')
                       span.sidebar-mini ZH
                       span.sidebar-normal Alternate Hosts Tool
             li(class=( active === 'bc' ? 'active' : null ))
@@ -86,15 +84,15 @@ html(lang='en')
               #bc.collapse(class=( active === 'bc' ? 'in' : null ), aria-expanded=( active === 'bc' ? 'true' : 'false' ))
                 ul.nav
                   li(class=( pageTitle === 'Video Renditions' ? 'active' : null ))
-                    a(href='videoRenditionsTool')
+                    a(href='/videoRenditionsTool')
                       span.sidebar-mini BV
                       span.sidebar-normal Video Renditions
                   li(class=( pageTitle === 'Batch Retranscode' ? 'active' : null ))
-                    a(href='batchRetranscodeTool')
+                    a(href='/batchRetranscodeTool')
                       span.sidebar-mini BR
                       span.sidebar-normal Batch Retranscode
                   li(class=( pageTitle === 'Thumbnail Updater' ? 'active' : null ))
-                    a(href='thumbnailUpdateTool')
+                    a(href='/thumbnailUpdateTool')
                       span.sidebar-mini BT
                       span.sidebar-normal Thumbnail Updater
       .main-panel
@@ -157,31 +155,31 @@ html(lang='en')
                 document.write(new Date().getFullYear())
               | , by Irman A.
   // Core JS Files. Extra: TouchPunch for touch library inside jquery-ui.min.js
-  script(src='./js/jquery-3.1.1.min.js', type='text/javascript')
-  script(src='./js/jquery-ui.min.js', type='text/javascript')
-  script(src='./js/perfect-scrollbar.min.js', type='text/javascript')
-  script(src='./js/bootstrap.min.js', type='text/javascript')
+  script(src='/js/jquery-3.1.1.min.js', type='text/javascript')
+  script(src='/js/jquery-ui.min.js', type='text/javascript')
+  script(src='/js/perfect-scrollbar.min.js', type='text/javascript')
+  script(src='/js/bootstrap.min.js', type='text/javascript')
   // Forms Validations Plugin
-  script(src='./js/jquery.validate.min.js')
+  script(src='/js/jquery.validate.min.js')
   // Bootstrap DateTimePicker
-  script(src="./js/moment.min.js")
-  script(src='./js/bootstrap-datetimepicker.js')
+  script(src="/js/moment.min.js")
+  script(src='/js/bootstrap-datetimepicker.js')
   // Bootstrap Tables
-  // script(src='./js/bootstrap-table.js')
+  // script(src='/js/bootstrap-table.js')
   // Bootstrap picker
-  script(src="./js/bootstrap-selectpicker.js")
+  script(src="/js/bootstrap-selectpicker.js")
   //  Plugin for DataTables.net
-  script(src='./js/jquery.datatables.js')
-  script(src='./js/dataTables.buttons.min.js')
-  script(src='./js/dataTables.buttons.html5.min.js')
+  script(src='/js/jquery.datatables.js')
+  script(src='/js/dataTables.buttons.min.js')
+  script(src='/js/dataTables.buttons.html5.min.js')
   // Sweet Alert 2 plugin
-  script(src='./js/sweetalert2.all.js')
+  script(src='/js/sweetalert2.all.js')
   // Promise Library for SweetAlert2 working on IE
-  script(src='./js/es6-promise-auto.min.js')
+  script(src='/js/es6-promise-auto.min.js')
   // Notifications Plugin
-  // script(src='./js/bootstrap-notify.js')
+  // script(src='/js/bootstrap-notify.js')
   // Paper Dashboard PRO Core javascript and methods for Demo purpose
-  script(src='./js/paper-dashboard.js')
+  script(src='/js/paper-dashboard.js')
   // Dashboard Core Javascript
-  script(src='./javascripts/app.js')
+  script(src='/javascripts/app.js')
   
