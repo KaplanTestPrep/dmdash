@@ -10,6 +10,7 @@ exports.logout = (req, res) => {
 
 exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
+    //This is not updated for whatever reason ???
     if(!req.user.email.endsWith('@kaplan.com')){
       req.flash("danger", "You must login with a Kaplan email address!");
       req.logout();
