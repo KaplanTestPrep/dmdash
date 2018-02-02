@@ -61,7 +61,7 @@ exports.getDailyReport = () => {
 exports.getRecordings = async (req, res) => {
   let recordings = [];
 
-  let page_size = 100;
+  let page_size = 5;
 
   //  Get list of all users
   // Get page count
