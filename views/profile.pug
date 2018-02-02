@@ -16,11 +16,11 @@ block content
                 a(href='#')
                   small #{user.email}
             p.description.text-center
-              | "I like the way you work it 
+              | Lorem ipsum dolor sit amet consectetur adipisicing elit. 
               br
-              | No diggity 
+              | Repellat, deserunt! Ullam, ab molestiae odio expedita nemo perferendis ipsa distinctio facilis impedit soluta?
               br
-              | I wanna bag it up"
+              | Odio expedita nemo perferendis ipsa distinctio 
           hr
           .text-center
             .row
@@ -49,33 +49,34 @@ block content
                 .col-md-5
                   .form-group
                     label Company
-                    input.form-control.border-input(type='text', disabled='', placeholder='Company', value='Creative Code Inc.')
+                    input.form-control.border-input(type='text', disabled='', placeholder='Company', value='DM Inc.')
                 .col-md-3
                   .form-group
                     label Username
-                    input.form-control.border-input(type='text', placeholder='Username', value='michael23')
+                    input.form-control.border-input(type='text', placeholder='Username', value='')
                 .col-md-4
                   .form-group
                     label(for='exampleInputEmail1') Email address
-                    input.form-control.border-input(type='email', placeholder='Email')
+                    input.form-control.border-input(type='email', placeholder='Email' value=user.email)
               .row
                 .col-md-6
                   .form-group
                     label First Name
-                    input.form-control.border-input(type='text', placeholder='Company', value='Chet')
+                    - firstName = user.name.split(" ")[0];
+                    input.form-control.border-input(type='text', placeholder='First Name', value=firstName)
                 .col-md-6
                   .form-group
                     label Last Name
-                    input.form-control.border-input(type='text', placeholder='Last Name', value='Faker')
+                    - lastName = user.name.split(" ")[1];
+                    input.form-control.border-input(type='text', placeholder='Last Name', value=lastName)
               .row
                 .col-md-12
                   .form-group
                     label About Me
                     textarea.form-control.border-input(rows='5', placeholder='Here can be your description', value='Mike')
-                      | Oh so, your weak rhyme
-                      | You doubt I'll bother, reading into it
-                      | I'll probably won't, left to my own devices
-                      | But that's the difference in our opinions.
+                      | Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa accusamus impedit obcaecati officiis doloribus possimus, 
+                      | reiciendis dicta, debitis delectus, error distinctio odio. 
+                      | Dolores commodi vel consequuntur unde voluptatum fuga qui!
               .text-center
                 button.btn.btn-info.btn-fill.btn-wd(type='submit') Update Profile
               .clearfix
