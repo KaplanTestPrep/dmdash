@@ -61,6 +61,8 @@ exports.getDailyReport = () => {
 exports.getRecordings = async (req, res) => {
   let recordings = [];
 
+  let page_size = 100;
+
   //  Get list of all users
   // Get page count
   const url = "https://api.zoom.us/v2/users";
@@ -68,7 +70,7 @@ exports.getRecordings = async (req, res) => {
   const response = await axios.get(url, {
     params: {
       access_token: token,
-      page_size: 10
+      page_size
     }
   });
 
@@ -82,7 +84,7 @@ exports.getRecordings = async (req, res) => {
     const response = await axios.get(url, {
       params: {
         access_token: token,
-        page_size: 10,
+        page_size,
         page_number: pageNumber
       }
     });
