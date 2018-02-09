@@ -1,3 +1,4 @@
+
 $(document).ready(function () {
   // Datatable init
   const table = $("#datatables").DataTable({
