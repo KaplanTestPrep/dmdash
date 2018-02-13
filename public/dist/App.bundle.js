@@ -246,7 +246,7 @@ new webpack.ProvidePlugin({
   });
 
   (0, _jquery2.default)('.selectpicker').selectpicker({
-    style: 'btn-info',
+    style: 'btn-default',
     size: 8
   });
 
