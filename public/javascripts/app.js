@@ -144,7 +144,7 @@ $(document).ready(function () {
   });
 
   $('.selectpicker').selectpicker({
-    style: 'btn-info',
+    style: 'btn-default',
     size: 8
   });
 
