@@ -1,3 +1,18 @@
+import $ from 'jquery';
+window.jQuery = $;
+window.$ = $;
+
+/*  OR webpack
+
+new webpack.ProvidePlugin({
+  $: 'jquery',
+  jQuery: 'jquery'
+})
+
+*/
+
+
+
 $(document).ready(function () {
   // Datatable init
   const table = $("#datatables").DataTable({
