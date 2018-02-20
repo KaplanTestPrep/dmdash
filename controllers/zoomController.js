@@ -1,6 +1,8 @@
-const jwt = require("jsonwebtoken");
-const axios = require("axios");
-const { moment } = require("../helpers");
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
+const { moment } = require('../helpers');
+const mongoose = require('mongoose');
+const ZoomRecording = mongoose.model('ZoomRecording');
 
 exports.recordingsTool = (req, res) => {
   res.render("zoomRecordingsTool", {
@@ -60,7 +62,6 @@ exports.getDailyReport = () => {
 
 exports.getRecordings = async (req, res) => {
   let recordings = [];
-
   let page_size = 5;
 
   //  Get list of all users
@@ -142,13 +143,30 @@ exports.getRecordings = async (req, res) => {
             recording.topic = topic;
 
             recordings.push(recording);
+            // console.log(recording);
+
+            
           });
         });
       })
     );
-
+    
     pageNumber++;
   } while (pageNumber <= pageCount);
+  
+  //write to DB. 
+  // ZoomRecording.collection.insert(recordings)
+  // .then(function(docs){ console.log("insertMeny Done.") })
+  // .catch(function(err) { console.log(err) });
+
+
+  recordings.forEach(recording => {
+    ZoomRecording.update({id: recording.id}, recording, {upsert:true, setDefaultsOnInsert: true})
+    .then(function(doc){ console.log("Updated: ", doc) })
+    .catch(function(err) { console.log(err) });
+  });
+ 
+
 
   const data = { data: recordings };
   //res.setHeader('Content-Type', 'application/json');
