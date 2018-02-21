@@ -17,6 +17,7 @@ const multerOptions = {
   }
 }
 
+
 // --------- Page Renderers
 exports.videoRenditionsTool = (req, res) => {
   res.render("videoRenditionsTool", {
@@ -98,13 +99,11 @@ exports.bcThumbnailUpdate = async (req, res) => {
   let url = `https://ingest.api.brightcove.com/v1/accounts/${data.accountId}/videos/${videoId}/ingest-requests`;
   const body = {
     poster: {
-        // url: `https://common.liveonlinetechnology.com/uploads/${data.thumbnailFileName}`,
         url: tumbnailUrl,
         width: 1280,
         height: 720
     },
     thumbnail: {
-        // url: "https://common.liveonlinetechnology.com/uploads/${data.thumbnailFileName}",
         url: tumbnailUrl,
         width: 160,
         height: 90
