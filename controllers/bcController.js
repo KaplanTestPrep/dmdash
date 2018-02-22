@@ -56,7 +56,6 @@ exports.refIdUpdateTool = (req, res) => {
 
 exports.refIdUpdateSingle = async (req, res) => {
   const data = req.body;   // { accountId, oldId, idType, newRefId }
-  console.log(data);
   let videoId = "";
   let response = {};
   let bcToken = await exports.getBcToken();
@@ -68,7 +67,6 @@ exports.refIdUpdateSingle = async (req, res) => {
 
   if (data.idType === 'refId') {
     let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountId}/videos/ref:${data.oldId}`
-    console.log(url);
     const options = {
       method: 'get',
       url,
@@ -119,29 +117,8 @@ exports.refIdUpdateBatch = async (req, res) => {
   csvArr.pop();
   csvArr.shift();
 
-  console.log(csvArr);
-
-  res.send(JSON.stringify(csvArr));
+  res.status(200).send(JSON.stringify(csvArr));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 exports.thumbnailUpload = multer(imageMulterOptions).single('thumbnail');
 
@@ -190,8 +167,8 @@ exports.bcThumbnailUpdate = async (req, res) => {
   }
 
   // Dev Hardcode
-  let tumbnailUrl = 'https://common.liveonlinetechnology.com/uploads/Rick.jpg';
-  console.log(`https://common.liveonlinetechnology.com/uploads/${data.thumbnailFileName}`);
+  // let tumbnailUrl = 'https://common.liveonlinetechnology.com/uploads/Rick.jpg';
+  let tumbnailUrl = `https://common.liveonlinetechnology.com/uploads/${data.thumbnailFileName}`;
 
   let url = `https://ingest.api.brightcove.com/v1/accounts/${data.accountId}/videos/${videoId}/ingest-requests`;
   const body = {
