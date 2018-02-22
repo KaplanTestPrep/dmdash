@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const { moment } = require('../helpers');
 const mongoose = require('mongoose');
-const ZoomRecording = mongoose.model('ZoomRecording');
+// const ZoomRecording = mongoose.model('ZoomRecording');
 
 exports.recordingsTool = (req, res) => {
   res.render("zoomRecordingsTool", {
@@ -154,17 +154,12 @@ exports.getRecordings = async (req, res) => {
     pageNumber++;
   } while (pageNumber <= pageCount);
   
-  //write to DB. 
-  // ZoomRecording.collection.insert(recordings)
-  // .then(function(docs){ console.log("insertMeny Done.") })
-  // .catch(function(err) { console.log(err) });
-
-
-  recordings.forEach(recording => {
-    ZoomRecording.update({id: recording.id}, recording, {upsert:true, setDefaultsOnInsert: true})
-    .then(function(doc){ console.log("Updated: ", doc) })
-    .catch(function(err) { console.log(err) });
-  });
+// WRITE TO DB CODE 
+  // recordings.forEach(recording => {
+  //   ZoomRecording.update({id: recording.id}, recording, {upsert:true, setDefaultsOnInsert: true})
+  //   .then(function(doc){ console.log("Updated: ", doc) })
+  //   .catch(function(err) { console.log(err) });
+  // });
  
 
 

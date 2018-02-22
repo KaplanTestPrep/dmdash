@@ -94,6 +94,28 @@ router.post(
   catchErrors(bcController.bcThumbnailUpdate)
 );
 
+router.get(
+  "/refIdUpdateTool",
+  authController.isLoggedIn,
+  bcController.refIdUpdateTool
+);
+
+router.post(
+  "/refIdUpdateTool",
+  authController.isLoggedIn,
+  catchErrors(bcController.refIdUpdateSingle)
+);
+
+router.post(
+  "/refIdUpdateBatch",
+  authController.isLoggedIn,
+  bcController.csvUpload,
+  bcController.refIdUpdateBatch
+);
+
+
+
+
 
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);

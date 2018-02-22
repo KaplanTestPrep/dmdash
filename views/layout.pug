@@ -69,11 +69,11 @@ html(lang='en')
                 ul.nav
                   li(class=( pageTitle === 'Zoom Recordings' ? 'active' : null ))
                     a(href='/recordingsTool')
-                      span.sidebar-mini ZR
+                      span.sidebar-mini RC
                       span.sidebar-normal Recordings Tool
                   li(class=( pageTitle === 'Alternate Host Tool' ? 'active' : null ))
                     a(href='/alternateHostTool')
-                      span.sidebar-mini ZH
+                      span.sidebar-mini AH
                       span.sidebar-normal Alternate Hosts Tool
             li(class=( active === 'bc' ? 'active' : null ))
               a(data-toggle='collapse', href='#bc')
@@ -85,7 +85,7 @@ html(lang='en')
                 ul.nav
                   li(class=( pageTitle === 'Video Renditions' ? 'active' : null ))
                     a(href='/videoRenditionsTool')
-                      span.sidebar-mini BV
+                      span.sidebar-mini VR
                       span.sidebar-normal Video Renditions
                   li(class=( pageTitle === 'Batch Retranscode' ? 'active' : null ))
                     a(href='/batchRetranscodeTool')
@@ -93,8 +93,12 @@ html(lang='en')
                       span.sidebar-normal Batch Retranscode
                   li(class=( pageTitle === 'Thumbnail Updater' ? 'active' : null ))
                     a(href='/thumbnailUpdateTool')
-                      span.sidebar-mini BT
+                      span.sidebar-mini TU
                       span.sidebar-normal Thumbnail Updater
+                  li(class=( pageTitle === 'RefID Updater' ? 'active' : null ))
+                    a(href='/refIdUpdateTool')
+                      span.sidebar-mini RU
+                      span.sidebar-normal RefID Updater
       .main-panel
         nav.navbar.navbar-default
           .container-fluid

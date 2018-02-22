@@ -271,16 +271,17 @@ $(document).ready(function () {
 
 
   $("#imageUploadForm").submit( (e) => {
-    e.preventDefault();
-    
     $("span#status").removeClass();
+    $("span#status").text("");
     $("span#status").addClass('text-warning');
     $("span#status").text("  Uploading...");
+    e.preventDefault();
 
-    let filename = $("#selectThumbnail").val().split('\\').pop();
+    let fileSelect = $("#selectThumbnail");
+    let filename = fileSelect.val().split('\\').pop();
     $("#uploadedImage").val(filename);
 
-    let fileSelect = document.getElementById('selectThumbnail');
+    //let fileSelect = document.getElementById('selectThumbnail');
     let files = fileSelect.files;
     let form = new FormData();
 
@@ -346,5 +347,168 @@ $(document).ready(function () {
       })
     });
   });
+
+
+  function updateSingleRefId (accountId, oldId, idType, newRefId) {
+    $('#resultsCard').removeClass('hidden');
+    $('ul#success').html(""); 
+    $('ul#fail').html(""); 
+
+    $.ajax({
+      url: `/refIdUpdateTool`,
+      type: "POST",
+      data: {
+        accountId,
+        oldId,
+        idType,
+        newRefId
+      }
+    })
+    .done(res => {
+        console.log(res);
+        completed++;
+        $('.progress-bar').css("width", `${(completed/total)*100}%`);
+        $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+        $('ul#success').append(`<li>${oldId} --> ${newRefId} Sucessfully processsed.</li>`);
+    })
+    .fail(err => {
+        completed++;
+        fail++;
+        
+        console.log(`${oldId} --> ${newRefId} Failed: ${err.responseText}`, err);
+        $('.progress-bar').css("width", `${(completed/total)*100}%`);
+        $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+        $('ul#fail').append(`<li>${oldId} > ${newRefId} Failed: ${err.responseText}</li>`);
+
+    })
+  }
+
+
+
+  $('#refIdUpdateSingleForm').submit((e) => {
+    e.preventDefault();
+
+    let completed = 0
+    let fail = 0;
+    let total = 1
+    
+    const accountId = $('#bcAcccount').val();
+    const oldId = $('#oldId').val().trim();
+    const idType = $('input[name=idType]:checked').val();
+    const newRefId = $('#newRefId').val().trim();
+
+    $('#resultsCard').removeClass('hidden');
+    $('ul#success').html(""); 
+    $('ul#fail').html(""); 
+
+    $.ajax({
+      url: `/refIdUpdateTool`,
+      type: "POST",
+      data: {
+        accountId,
+        oldId,
+        idType,
+        newRefId
+      }
+    })
+    .done(res => {
+      console.log(res);
+      completed++;
+      $('.progress-bar').css("width", `${(completed/total)*100}%`);
+      $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+      $('ul#success').append(`<li>${oldId} --> ${newRefId} Sucessfully processsed.</li>`);
+    })
+    .fail(err => {
+      completed++;
+      fail++;
+      
+      console.log(`${oldId} --> ${newRefId} Failed: ${err.responseText}`, err);
+      $('.progress-bar').css("width", `${(completed/total)*100}%`);
+      $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+      $('ul#fail').append(`<li>${oldId} > ${newRefId} Failed: ${err.responseText}</li>`);
+
+    })
+  });
+
+  $('#refIdUpdateBatchForm').submit((e) => {
+    $("span#status").removeClass();
+    $("span#status").text("");
+    $("span#status").addClass('text-warning');
+    $("span#status").text("  Uploading...");
+    e.preventDefault();
+
+
+    const accountId = $('#bcAcccountBatch').val();
+    const idType = $('input[name=idTypeBatch]:checked').val();
+
+    const fileSelect = document.getElementById('selectCSV');
+    console.log(fileSelect);
+
+    const files = fileSelect.files;
+    let form = new FormData();
+    form.append('csv', files[0], files[0].name);
+    
+    $.ajax({
+      url: '/refIdUpdateBatch',
+      data: form,
+      processData: false,
+      contentType: false,
+      type: 'POST',
+      success: function(data){
+        const dataArr = JSON.parse(data);
+
+        console.log("Upload complete:", dataArr);
+        $("span#status").removeClass();
+        $("span#status").addClass('text-success');
+        $("span#status").text("  Upload Completed!");
+
+        var completed = 0
+        var fail = 0;
+        var total = dataArr,length;
+
+        dataArr.forEach(item => {
+          let [oldId, newRefId] = item.split(",");
+          // updateSingleRefId(accountId, oldId, idType, newRefId);
+
+          let completed = 0
+          let fail = 0;
+          let total = 1
+     
+          $('#resultsCard').removeClass('hidden');
+          $('ul#success').html(""); 
+          $('ul#fail').html(""); 
+
+          $.ajax({
+            url: `/refIdUpdateTool`,
+            type: "POST",
+            data: {
+              accountId,
+              oldId,
+              idType,
+              newRefId
+            }
+          })
+          .done(res => {
+            console.log(res);
+            completed++;
+            $('.progress-bar').css("width", `${(completed/total)*100}%`);
+            $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+            $('ul#success').append(`<li>${oldId} --> ${newRefId} Sucessfully processsed.</li>`);
+          })
+          .fail(err => {
+            completed++;
+            fail++;
+            
+            console.log(`${oldId} --> ${newRefId} Failed: ${err.responseText}`, err);
+            $('.progress-bar').css("width", `${(completed/total)*100}%`);
+            $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+            $('ul#fail').append(`<li>${oldId} > ${newRefId} Failed: ${err.responseText}</li>`);
+
+          })
+        });
+      }
+    });
+  });
+
 
 }); // doc.ready

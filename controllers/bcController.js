@@ -4,7 +4,7 @@ const bc = require("../config/bcConfig");
 const multer = require("multer");
 const fs = require('fs');
 
-const multerOptions = {
+const imageMulterOptions = {
   storage: multer.memoryStorage(),
   fileFilter(req, file, next){
     const isPhoto = file.mimetype.startsWith('image/');
@@ -44,9 +44,106 @@ exports.thumbnailUpdateTool = (req, res) => {
   });
 };
 
+exports.refIdUpdateTool = (req, res) => {
+  res.render("refIdUpdateTool", {
+    pageTitle: "RefID Updater",
+    active: "bc",
+    bcAccounts: bc.accounts
+  });
+};
+
 // ----------- APIs
 
-exports.thumbnailUpload = multer(multerOptions).single('thumbnail');
+exports.refIdUpdateSingle = async (req, res) => {
+  const data = req.body;   // { accountId, oldId, idType, newRefId }
+  console.log(data);
+  let videoId = "";
+  let response = {};
+  let bcToken = await exports.getBcToken();
+
+  const headers = {
+    'Authorization': `Bearer ${bcToken.token}`,
+    'Content-Type': 'application/json'
+  };
+
+  if (data.idType === 'refId') {
+    let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountId}/videos/ref:${data.oldId}`
+    console.log(url);
+    const options = {
+      method: 'get',
+      url,
+      headers
+    }
+
+    try {
+      response = await axios(options);
+    } catch (error) {
+      console.log(error.response.status);
+      res.status(error.response.status).send('RefID not found!');
+      return;
+    }
+
+    videoId = response.data.id;
+
+  } else {
+    videoId = data.oldId;
+  }
+
+  let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountId}/videos/${videoId}`;
+  const body = {
+    reference_id : data.newRefId
+  }
+
+  const options = {
+    method: 'patch',
+    url,
+    headers,
+    data: body
+  }
+
+  try {
+    response = await axios(options);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error.response.status, error.response.statusText);
+    res.status(error.response.status).send({ error: error.response.statusText });
+  }
+}
+
+exports.csvUpload = multer({ inMemory: true}).single('csv');
+
+exports.refIdUpdateBatch = async (req, res) => {
+  let filename = req.file.originalname;
+  let csvString = req.file.buffer.toString();
+  let csvArr = csvString.split(/\r?\n/);
+  csvArr.pop();
+  csvArr.shift();
+
+  console.log(csvArr);
+
+  res.send(JSON.stringify(csvArr));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exports.thumbnailUpload = multer(imageMulterOptions).single('thumbnail');
 
 exports.thumbnailSave = (req, res, next) => {
   let filename = req.file.originalname;

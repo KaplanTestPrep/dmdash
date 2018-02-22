@@ -9905,6 +9905,8 @@ module.exports = function (module) {
 "use strict";
 
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
@@ -10127,16 +10129,17 @@ new webpack.ProvidePlugin({
   });
 
   (0, _jquery2.default)("#imageUploadForm").submit(function (e) {
-    e.preventDefault();
-
     (0, _jquery2.default)("span#status").removeClass();
+    (0, _jquery2.default)("span#status").text("");
     (0, _jquery2.default)("span#status").addClass('text-warning');
     (0, _jquery2.default)("span#status").text("  Uploading...");
+    e.preventDefault();
 
-    var filename = (0, _jquery2.default)("#selectThumbnail").val().split('\\').pop();
+    var fileSelect = (0, _jquery2.default)("#selectThumbnail");
+    var filename = fileSelect.val().split('\\').pop();
     (0, _jquery2.default)("#uploadedImage").val(filename);
 
-    var fileSelect = document.getElementById('selectThumbnail');
+    //let fileSelect = document.getElementById('selectThumbnail');
     var files = fileSelect.files;
     var form = new FormData();
 
@@ -10195,6 +10198,159 @@ new webpack.ProvidePlugin({
         (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
         (0, _jquery2.default)('ul#fail').append("<li>" + video + " Failed: " + err.responseText + "</li>");
       });
+    });
+  });
+
+  function updateSingleRefId(accountId, oldId, idType, newRefId) {
+    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+    (0, _jquery2.default)('ul#success').html("");
+    (0, _jquery2.default)('ul#fail').html("");
+
+    _jquery2.default.ajax({
+      url: "/refIdUpdateTool",
+      type: "POST",
+      data: {
+        accountId: accountId,
+        oldId: oldId,
+        idType: idType,
+        newRefId: newRefId
+      }
+    }).done(function (res) {
+      console.log(res);
+      completed++;
+      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
+      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+      (0, _jquery2.default)('ul#success').append("<li>" + oldId + " --> " + newRefId + " Sucessfully processsed.</li>");
+    }).fail(function (err) {
+      completed++;
+      fail++;
+
+      console.log(oldId + " --> " + newRefId + " Failed: " + err.responseText, err);
+      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
+      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+      (0, _jquery2.default)('ul#fail').append("<li>" + oldId + " > " + newRefId + " Failed: " + err.responseText + "</li>");
+    });
+  }
+
+  (0, _jquery2.default)('#refIdUpdateSingleForm').submit(function (e) {
+    e.preventDefault();
+
+    var completed = 0;
+    var fail = 0;
+    var total = 1;
+
+    var accountId = (0, _jquery2.default)('#bcAcccount').val();
+    var oldId = (0, _jquery2.default)('#oldId').val().trim();
+    var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
+    var newRefId = (0, _jquery2.default)('#newRefId').val().trim();
+
+    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+    (0, _jquery2.default)('ul#success').html("");
+    (0, _jquery2.default)('ul#fail').html("");
+
+    _jquery2.default.ajax({
+      url: "/refIdUpdateTool",
+      type: "POST",
+      data: {
+        accountId: accountId,
+        oldId: oldId,
+        idType: idType,
+        newRefId: newRefId
+      }
+    }).done(function (res) {
+      console.log(res);
+      completed++;
+      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
+      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+      (0, _jquery2.default)('ul#success').append("<li>" + oldId + " --> " + newRefId + " Sucessfully processsed.</li>");
+    }).fail(function (err) {
+      completed++;
+      fail++;
+
+      console.log(oldId + " --> " + newRefId + " Failed: " + err.responseText, err);
+      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
+      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+      (0, _jquery2.default)('ul#fail').append("<li>" + oldId + " > " + newRefId + " Failed: " + err.responseText + "</li>");
+    });
+  });
+
+  (0, _jquery2.default)('#refIdUpdateBatchForm').submit(function (e) {
+    (0, _jquery2.default)("span#status").removeClass();
+    (0, _jquery2.default)("span#status").text("");
+    (0, _jquery2.default)("span#status").addClass('text-warning');
+    (0, _jquery2.default)("span#status").text("  Uploading...");
+    e.preventDefault();
+
+    var accountId = (0, _jquery2.default)('#bcAcccountBatch').val();
+    var idType = (0, _jquery2.default)('input[name=idTypeBatch]:checked').val();
+
+    var fileSelect = document.getElementById('selectCSV');
+    console.log(fileSelect);
+
+    var files = fileSelect.files;
+    var form = new FormData();
+    form.append('csv', files[0], files[0].name);
+
+    _jquery2.default.ajax({
+      url: '/refIdUpdateBatch',
+      data: form,
+      processData: false,
+      contentType: false,
+      type: 'POST',
+      success: function success(data) {
+        var dataArr = JSON.parse(data);
+
+        console.log("Upload complete:", dataArr);
+        (0, _jquery2.default)("span#status").removeClass();
+        (0, _jquery2.default)("span#status").addClass('text-success');
+        (0, _jquery2.default)("span#status").text("  Upload Completed!");
+
+        var completed = 0;
+        var fail = 0;
+        var total = dataArr,
+            length;
+
+        dataArr.forEach(function (item) {
+          var _item$split = item.split(","),
+              _item$split2 = _slicedToArray(_item$split, 2),
+              oldId = _item$split2[0],
+              newRefId = _item$split2[1];
+          // updateSingleRefId(accountId, oldId, idType, newRefId);
+
+          var completed = 0;
+          var fail = 0;
+          var total = 1;
+
+          (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+          (0, _jquery2.default)('ul#success').html("");
+          (0, _jquery2.default)('ul#fail').html("");
+
+          _jquery2.default.ajax({
+            url: "/refIdUpdateTool",
+            type: "POST",
+            data: {
+              accountId: accountId,
+              oldId: oldId,
+              idType: idType,
+              newRefId: newRefId
+            }
+          }).done(function (res) {
+            console.log(res);
+            completed++;
+            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
+            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+            (0, _jquery2.default)('ul#success').append("<li>" + oldId + " --> " + newRefId + " Sucessfully processsed.</li>");
+          }).fail(function (err) {
+            completed++;
+            fail++;
+
+            console.log(oldId + " --> " + newRefId + " Failed: " + err.responseText, err);
+            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
+            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+            (0, _jquery2.default)('ul#fail').append("<li>" + oldId + " > " + newRefId + " Failed: " + err.responseText + "</li>");
+          });
+        });
+      }
     });
   });
 }); // doc.ready
