@@ -456,7 +456,6 @@ $(document).ready(function () {
       success: function(data){
         const dataArr = JSON.parse(data);
 
-        console.log("Upload complete:", dataArr);
         $("span#status").removeClass();
         $("span#status").addClass('text-success');
         $("span#status").text("  Upload Completed!");
@@ -488,7 +487,6 @@ $(document).ready(function () {
             }
           })
           .done(res => {
-            console.log(res);
             completed++;
             $('.progress-bar').css("width", `${(completed/total)*100}%`);
             $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);

@@ -10303,7 +10303,6 @@ new webpack.ProvidePlugin({
       success: function success(data) {
         var dataArr = JSON.parse(data);
 
-        console.log("Upload complete:", dataArr);
         (0, _jquery2.default)("span#status").removeClass();
         (0, _jquery2.default)("span#status").addClass('text-success');
         (0, _jquery2.default)("span#status").text("  Upload Completed!");
@@ -10338,7 +10337,6 @@ new webpack.ProvidePlugin({
               newRefId: newRefId
             }
           }).done(function (res) {
-            console.log(res);
             completed++;
             (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
             (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
