@@ -278,7 +278,6 @@ $(document).ready(function () {
     e.preventDefault();
 
     let fileSelect = $("#selectThumbnail");
-    console.log(fileSelect);
     let filename = fileSelect.val().split('\\').pop();
     $("#uploadedImage").val(filename);
 

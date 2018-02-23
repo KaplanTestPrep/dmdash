@@ -10136,7 +10136,6 @@ new webpack.ProvidePlugin({
     e.preventDefault();
 
     var fileSelect = (0, _jquery2.default)("#selectThumbnail");
-    console.log(fileSelect);
     var filename = fileSelect.val().split('\\').pop();
     (0, _jquery2.default)("#uploadedImage").val(filename);
 
