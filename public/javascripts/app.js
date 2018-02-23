@@ -278,11 +278,11 @@ $(document).ready(function () {
     e.preventDefault();
 
     let fileSelect = $("#selectThumbnail");
+    console.log(fileSelect);
     let filename = fileSelect.val().split('\\').pop();
     $("#uploadedImage").val(filename);
 
-    //let fileSelect = document.getElementById('selectThumbnail');
-    let files = fileSelect.files;
+    let files = fileSelect[0].files;
     let form = new FormData();
 
     form.append('thumbnail', files[0], files[0].name);
@@ -349,39 +349,39 @@ $(document).ready(function () {
   });
 
 
-  function updateSingleRefId (accountId, oldId, idType, newRefId) {
-    $('#resultsCard').removeClass('hidden');
-    $('ul#success').html(""); 
-    $('ul#fail').html(""); 
+  // function updateSingleRefId (accountId, oldId, idType, newRefId) {
+  //   $('#resultsCard').removeClass('hidden');
+  //   $('ul#success').html(""); 
+  //   $('ul#fail').html(""); 
 
-    $.ajax({
-      url: `/refIdUpdateTool`,
-      type: "POST",
-      data: {
-        accountId,
-        oldId,
-        idType,
-        newRefId
-      }
-    })
-    .done(res => {
-        console.log(res);
-        completed++;
-        $('.progress-bar').css("width", `${(completed/total)*100}%`);
-        $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
-        $('ul#success').append(`<li>${oldId} --> ${newRefId} Sucessfully processsed.</li>`);
-    })
-    .fail(err => {
-        completed++;
-        fail++;
+  //   $.ajax({
+  //     url: `/refIdUpdateTool`,
+  //     type: "POST",
+  //     data: {
+  //       accountId,
+  //       oldId,
+  //       idType,
+  //       newRefId
+  //     }
+  //   })
+  //   .done(res => {
+  //       console.log(res);
+  //       completed++;
+  //       $('.progress-bar').css("width", `${(completed/total)*100}%`);
+  //       $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+  //       $('ul#success').append(`<li>${oldId} --> ${newRefId} Sucessfully processsed.</li>`);
+  //   })
+  //   .fail(err => {
+  //       completed++;
+  //       fail++;
         
-        console.log(`${oldId} --> ${newRefId} Failed: ${err.responseText}`, err);
-        $('.progress-bar').css("width", `${(completed/total)*100}%`);
-        $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
-        $('ul#fail').append(`<li>${oldId} > ${newRefId} Failed: ${err.responseText}</li>`);
+  //       console.log(`${oldId} --> ${newRefId} Failed: ${err.responseText}`, err);
+  //       $('.progress-bar').css("width", `${(completed/total)*100}%`);
+  //       $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+  //       $('ul#fail').append(`<li>${oldId} > ${newRefId} Failed: ${err.responseText}</li>`);
 
-    })
-  }
+  //   })
+  // }
 
 
 

@@ -10136,11 +10136,11 @@ new webpack.ProvidePlugin({
     e.preventDefault();
 
     var fileSelect = (0, _jquery2.default)("#selectThumbnail");
+    console.log(fileSelect);
     var filename = fileSelect.val().split('\\').pop();
     (0, _jquery2.default)("#uploadedImage").val(filename);
 
-    //let fileSelect = document.getElementById('selectThumbnail');
-    var files = fileSelect.files;
+    var files = fileSelect[0].files;
     var form = new FormData();
 
     form.append('thumbnail', files[0], files[0].name);
@@ -10201,36 +10201,40 @@ new webpack.ProvidePlugin({
     });
   });
 
-  function updateSingleRefId(accountId, oldId, idType, newRefId) {
-    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-    (0, _jquery2.default)('ul#success').html("");
-    (0, _jquery2.default)('ul#fail').html("");
+  // function updateSingleRefId (accountId, oldId, idType, newRefId) {
+  //   $('#resultsCard').removeClass('hidden');
+  //   $('ul#success').html(""); 
+  //   $('ul#fail').html(""); 
 
-    _jquery2.default.ajax({
-      url: "/refIdUpdateTool",
-      type: "POST",
-      data: {
-        accountId: accountId,
-        oldId: oldId,
-        idType: idType,
-        newRefId: newRefId
-      }
-    }).done(function (res) {
-      console.log(res);
-      completed++;
-      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-      (0, _jquery2.default)('ul#success').append("<li>" + oldId + " --> " + newRefId + " Sucessfully processsed.</li>");
-    }).fail(function (err) {
-      completed++;
-      fail++;
+  //   $.ajax({
+  //     url: `/refIdUpdateTool`,
+  //     type: "POST",
+  //     data: {
+  //       accountId,
+  //       oldId,
+  //       idType,
+  //       newRefId
+  //     }
+  //   })
+  //   .done(res => {
+  //       console.log(res);
+  //       completed++;
+  //       $('.progress-bar').css("width", `${(completed/total)*100}%`);
+  //       $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+  //       $('ul#success').append(`<li>${oldId} --> ${newRefId} Sucessfully processsed.</li>`);
+  //   })
+  //   .fail(err => {
+  //       completed++;
+  //       fail++;
 
-      console.log(oldId + " --> " + newRefId + " Failed: " + err.responseText, err);
-      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-      (0, _jquery2.default)('ul#fail').append("<li>" + oldId + " > " + newRefId + " Failed: " + err.responseText + "</li>");
-    });
-  }
+  //       console.log(`${oldId} --> ${newRefId} Failed: ${err.responseText}`, err);
+  //       $('.progress-bar').css("width", `${(completed/total)*100}%`);
+  //       $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+  //       $('ul#fail').append(`<li>${oldId} > ${newRefId} Failed: ${err.responseText}</li>`);
+
+  //   })
+  // }
+
 
   (0, _jquery2.default)('#refIdUpdateSingleForm').submit(function (e) {
     e.preventDefault();
