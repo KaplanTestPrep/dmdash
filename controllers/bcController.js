@@ -52,7 +52,84 @@ exports.refIdUpdateTool = (req, res) => {
   });
 };
 
+exports.mediaShare = (req, res) => {
+  res.render("mediaShare", {
+    pageTitle: "Media Sharing",
+    active: "bc",
+    bcAccounts: bc.accounts
+  });
+};
+
+
 // ----------- APIs
+exports.csvUpload = multer({ inMemory: true}).single('csv');
+
+exports.mediaShareSingle = async (req, res) => {
+  const data = req.body;   // { accountId, oldId, idType, newRefId }
+  let videoId = "";
+  let response = {};
+  let bcToken = await exports.getBcToken();
+
+  const headers = {
+    'Authorization': `Bearer ${bcToken.token}`,
+    'Content-Type': 'application/x-www-form-urlencoded'
+  };
+
+  if (data.idType === 'refId') {
+    let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountIdSource}/videos/ref:${data.refId}`;
+
+  const options = {
+      method: 'get',
+      url,
+      headers
+    }
+
+    try {
+      response = await axios(options);
+    } catch (error) {
+      console.log(error.response.status);
+      res.status(error.response.status).send('RefID not found!');
+      return;
+    }
+
+    videoId = response.data.id;
+
+  } else {
+    videoId = data.refId;
+  }
+
+  let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountIdSource}/videos/${videoId}/shares`;
+
+  const body = [
+    {id : data.accountIdDest}
+  ];
+
+  const options = {
+    method: 'post',
+    url,
+    headers,
+    data: body
+  }
+
+  try {
+    response = await axios(options);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error.response.status, error.response.statusText);
+    res.status(error.response.status).send({ error: error.response.statusText });
+  }
+}
+
+exports.mediaShareBatch = async (req, res) => {
+  let filename = req.file.originalname;
+  let csvString = req.file.buffer.toString();
+  let csvArr = csvString.split(/\r?\n/);
+  csvArr.pop();
+  csvArr.shift();
+
+  res.status(200).send(JSON.stringify(csvArr));
+}
+
 
 exports.refIdUpdateSingle = async (req, res) => {
   const data = req.body;   // { accountId, oldId, idType, newRefId }
@@ -108,8 +185,6 @@ exports.refIdUpdateSingle = async (req, res) => {
   }
 }
 
-exports.csvUpload = multer({ inMemory: true}).single('csv');
-
 exports.refIdUpdateBatch = async (req, res) => {
   let filename = req.file.originalname;
   let csvString = req.file.buffer.toString();
@@ -119,6 +194,8 @@ exports.refIdUpdateBatch = async (req, res) => {
 
   res.status(200).send(JSON.stringify(csvArr));
 }
+
+
 
 exports.thumbnailUpload = multer(imageMulterOptions).single('thumbnail');
 

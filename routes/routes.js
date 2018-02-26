@@ -114,6 +114,26 @@ router.post(
 );
 
 
+router.get(
+  "/mediaShare",
+  authController.isLoggedIn,
+  bcController.mediaShare
+);
+
+router.post(
+  "/mediaShare",
+  authController.isLoggedIn,
+  catchErrors(bcController.mediaShareSingle)
+);
+
+router.post(
+  "/mediaShareBatch",
+  authController.isLoggedIn,
+  bcController.csvUpload,
+  bcController.mediaShareBatch
+);
+
+
 
 
 

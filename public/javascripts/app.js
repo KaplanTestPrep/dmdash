@@ -386,19 +386,18 @@ $(document).ready(function () {
 
   $('#refIdUpdateSingleForm').submit((e) => {
     e.preventDefault();
+    $('#resultsCard').removeClass('hidden');
+    $('ul#success').html(""); 
+    $('ul#fail').html(""); 
 
     let completed = 0
     let fail = 0;
     let total = 1
     
-    const accountId = $('#bcAcccount').val();
+    const accountId = $('#bcAccount').val();
     const oldId = $('#oldId').val().trim();
     const idType = $('input[name=idType]:checked').val();
     const newRefId = $('#newRefId').val().trim();
-
-    $('#resultsCard').removeClass('hidden');
-    $('ul#success').html(""); 
-    $('ul#fail').html(""); 
 
     $.ajax({
       url: `/refIdUpdateTool`,
@@ -429,6 +428,7 @@ $(document).ready(function () {
     })
   });
 
+
   $('#refIdUpdateBatchForm').submit((e) => {
     $("span#status").removeClass();
     $("span#status").text("");
@@ -437,7 +437,7 @@ $(document).ready(function () {
     e.preventDefault();
 
 
-    const accountId = $('#bcAcccountBatch').val();
+    const accountId = $('#bcAccountBatch').val();
     const idType = $('input[name=idTypeBatch]:checked').val();
 
     const fileSelect = document.getElementById('selectCSV');
@@ -500,6 +500,143 @@ $(document).ready(function () {
             $('.progress-bar').css("width", `${(completed/total)*100}%`);
             $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
             $('ul#fail').append(`<li>${oldId} > ${newRefId} Failed: ${err.responseText}</li>`);
+
+          })
+        });
+      }
+    });
+  });
+
+
+
+
+
+
+
+// Media Share
+
+  $('#mediaShareSingleForm').submit((e) => {
+    e.preventDefault();
+    $('#resultsCard').removeClass('hidden');
+    $('ul#success').html(""); 
+    $('ul#fail').html(""); 
+
+    let completed = 0
+    let fail = 0;
+    let total = 1
+    
+    const accountIdSource = $('#bcAccountSource').val();
+    const accountIdDest = $('#bcAccountDest').val();
+    const refId = $('#refId').val().trim();
+    const idType = $('input[name=idType]:checked').val();
+
+   
+
+    $.ajax({
+      url: `/mediaShare`,
+      type: "POST",
+      data: {
+        accountIdSource,
+        accountIdDest,
+        refId,
+        idType
+      }
+    })
+    .done(res => {
+      console.log(res);
+      completed++;
+      $('.progress-bar').css("width", `${(completed/total)*100}%`);
+      $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+      $('ul#success').append(`<li>Moved ${refId} from ${accountIdSource} to ${accountIdSource} - Sucessfully processsed.</li>`);
+    })
+    .fail(err => {
+      completed++;
+      fail++;
+      
+      console.log(`Moving ${refId} from ${accountIdSource} to ${accountIdSource} - Failed: ${err.responseText}`, err);
+      $('.progress-bar').css("width", `${(completed/total)*100}%`);
+      $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+      $('ul#fail').append(`<li>Moving ${refId} from ${accountIdSource} to ${accountIdDest} - Failed: ${err.responseText}</li>`);
+
+    })
+  });
+
+
+
+  $('#mediaShareBatchForm').submit((e) => {
+    $("span#status").removeClass();
+    $("span#status").text("");
+    $("span#status").addClass('text-warning');
+    $("span#status").text("  Uploading...");
+    e.preventDefault();
+
+
+    const accountIdSource = $('#bcAccountSourceBatch').val();
+    const accountIdDest = $('#bcAccountDestBatch').val();
+    // const refId = $('#refIdBatch').val().trim();
+    const idType = $('input[name=idTypeBatch]:checked').val();
+
+    const fileSelect = document.getElementById('selectCSVBatch');
+    console.log(fileSelect);
+
+    const files = fileSelect.files;
+    let form = new FormData();
+    form.append('csv', files[0], files[0].name);
+    
+    $.ajax({
+      url: '/mediaShareBatch',
+      data: form,
+      processData: false,
+      contentType: false,
+      type: 'POST',
+      success: function(data){
+        const dataArr = JSON.parse(data);
+
+        $("span#status").removeClass();
+        $("span#status").addClass('text-success');
+        $("span#status").text("  Upload Completed!");
+
+        var completed = 0
+        var fail = 0;
+        var total = dataArr.length;
+
+
+        console.log(dataArr);
+        dataArr.forEach(item => {
+
+        //   let [oldId, newRefId] = item.split(",");
+        //   // updateSingleRefId(accountId, oldId, idType, newRefId);
+
+          let refId = item;
+     
+          $('#resultsCard').removeClass('hidden');
+          $('ul#success').html(""); 
+          $('ul#fail').html(""); 
+
+          $.ajax({
+            url: `/mediaShare`,
+            type: "POST",
+            data: {
+              accountIdSource,
+              accountIdDest,
+              idType,
+              refId: item
+            }
+          })
+          .done(res => {
+            completed++;
+            $('.progress-bar').css("width", `${(completed/total)*100}%`);
+            $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+            $('ul#success').append(`<li>Moved ${refId} from ${accountIdSource} to ${accountIdDest} - Sucessfully processsed.</li>`);
+          })
+          .fail(err => {
+            completed++;
+            fail++;
+            
+            console.log(`Moving ${refId} from ${accountIdSource} to ${accountIdDest} - Failed: ${err.responseText}`, err);
+            $('.progress-bar').css("width", `${(completed/total)*100}%`);
+            $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+            $('ul#fail').append(`<li>Moving ${refId} from ${accountIdSource} to ${accountIdDest} - Failed: ${err.responseText}</li>`);
 
           })
         });
