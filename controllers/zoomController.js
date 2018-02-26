@@ -23,7 +23,7 @@ exports.getToken = () => {
     iss: process.env.ZOOMAPIKEY,
     exp: new Date().getTime() + 5000
   };
-  //Automatically creates header, and returns JWT
+
   var token = jwt.sign(payload, process.env.ZOOMAPISECRET);
 
   return token;
@@ -78,6 +78,10 @@ exports.getRecordings = async (req, res) => {
   const pageCount = response.data.page_count;
   let pageNumber = response.data.page_number;
 
+//DEV
+console.log("Page No:", pageNumber);
+
+
   do {
     // Get list of all users
     const url = "https://api.zoom.us/v2/users";
@@ -97,9 +101,12 @@ exports.getRecordings = async (req, res) => {
       .toISOString()
       .split("T")[0];
     const startDate = moment()
-      .subtract(6, "months")
+      .subtract(12, "months")                          // 6 months 
       .toISOString()
       .split("T")[0];
+
+//console.log("From: ", startDate, " To: ", endDate);
+
 
     await Promise.all(
       users.map(async user => {
@@ -120,9 +127,15 @@ exports.getRecordings = async (req, res) => {
         let recording = {};
 
         meetings.forEach(meeting => {
+console.log("meeting: ", meeting);
+
           const topic = meeting.topic;
 
           meeting.recording_files.forEach(rawRecording => {
+
+// console.log("rawRecording.recording_start: ", rawRecording.recording_start);
+
+
             recording = (({
               id,
               meeting_id,
@@ -139,11 +152,15 @@ exports.getRecordings = async (req, res) => {
                 file_type
               }))(rawRecording);
 
+// console.log("recording.recording_start: ", recording.recording_start);
+
+
             recording.user = userEmail;
             recording.topic = topic;
 
             recordings.push(recording);
-            // console.log(recording);
+            
+// console.log(recording);
 
             
           });
