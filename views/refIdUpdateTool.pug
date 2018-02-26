@@ -13,7 +13,7 @@ block content
                             label.col-md-3.control-label Select BC Account:
                             .col-md-3
                                 .bootstrap-select
-                                    select.selectpicker#bcAcccount(name="accountId")
+                                    select.selectpicker#bcAccount(name="accountId")
                                         each acc in bcAccounts
                                             option(value=acc.id)=acc.name
                     .form-group
@@ -52,7 +52,7 @@ block content
                             label.col-md-3.control-label Select BC Account:
                             .col-md-3
                                 .bootstrap-select
-                                    select.selectpicker#bcAcccountBatch(name="accountId")
+                                    select.selectpicker#bcAccountBatch(name="accountId")
                                         each acc in bcAccounts
                                             option(value=acc.id)=acc.name
                         .form-group
