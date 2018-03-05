@@ -45,16 +45,11 @@ exports.getDailyReport = () => {
         const todaysDate = new Date().toISOString().split("T")[0];
         console.log(todaysDate);
 
-        const dailyReportObj = response.data.dates.filter(
-          report => report.date === todaysDate
-        );
-        console.log("Resolve:", dailyReportObj[0]);
+        const dailyReportObj = response.data.dates.filter(report => report.date === todaysDate);
         resolve(dailyReportObj[0]);
       });
   });
 };
-
-
 
 
 // ---- APIs 
@@ -76,10 +71,8 @@ exports.getRecordings = async (req, res) => {
   });
 
   const pageCount = response.data.page_count;
-  let pageNumber = response.data.page_number;
+  let pageNumber = 1;              //response.data.page_number;
 
-//DEV
-console.log("Page No:", pageNumber);
 
 
   do {
@@ -96,17 +89,10 @@ console.log("Page No:", pageNumber);
 
     const users = response.data.users;
 
-    // Get list of recordings for each user
-    const endDate = moment()
-      .toISOString()
-      .split("T")[0];
-    const startDate = moment()
-      .subtract(12, "months")                          // 6 months 
-      .toISOString()
-      .split("T")[0];
-
-//console.log("From: ", startDate, " To: ", endDate);
-
+    // Get list of recordings for each user   
+    // date format: 2017-08-28
+    const startDate = moment().subtract(6, "months").format('YYYY-MM-DD'); 
+    const endDate = moment().format('YYYY-MM-DD');
 
     await Promise.all(
       users.map(async user => {
@@ -127,14 +113,10 @@ console.log("Page No:", pageNumber);
         let recording = {};
 
         meetings.forEach(meeting => {
-console.log("meeting: ", meeting);
 
           const topic = meeting.topic;
 
           meeting.recording_files.forEach(rawRecording => {
-
-// console.log("rawRecording.recording_start: ", rawRecording.recording_start);
-
 
             recording = (({
               id,
@@ -152,17 +134,11 @@ console.log("meeting: ", meeting);
                 file_type
               }))(rawRecording);
 
-// console.log("recording.recording_start: ", recording.recording_start);
-
 
             recording.user = userEmail;
             recording.topic = topic;
 
             recordings.push(recording);
-            
-// console.log(recording);
-
-            
           });
         });
       })
@@ -181,7 +157,7 @@ console.log("meeting: ", meeting);
 
 
   const data = { data: recordings };
-  //res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(data));
 };
 
