@@ -18,6 +18,8 @@ exports.alternateHostTool = (req, res) => {
   });
 };
 
+// ---- APIs 
+
 exports.getToken = () => {
   const payload = {
     iss: process.env.ZOOMAPIKEY,
@@ -51,7 +53,6 @@ exports.getDailyReport = () => {
 };
 
 
-// ---- APIs 
 
 
 exports.getRecordings = async (req, res) => {
