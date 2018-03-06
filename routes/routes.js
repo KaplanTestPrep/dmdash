@@ -5,6 +5,7 @@ const authController = require("../controllers/authController");
 const dashController = require("../controllers/dashController");
 const zoomController = require("../controllers/zoomController");
 const bcController = require("../controllers/bcController");
+const wowzaController = require("../controllers/wowzaController");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const { catchErrors } = require("../handlers/errorHandlers");
@@ -133,6 +134,11 @@ router.post(
   bcController.mediaShareBatch
 );
 
+router.get(
+  "/wowzaMonitor",
+  authController.isLoggedIn,
+  wowzaController.wowzaMonitor
+);
 
 
 

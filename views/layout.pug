@@ -103,6 +103,18 @@ html(lang='en')
                     a(href='/mediaShare')
                       span.sidebar-mini MS
                       span.sidebar-normal Media Sharing
+            li(class=( active === 'wowza' ? 'active' : null ))
+              a(data-toggle='collapse', href='#wowza')
+                i.ti-panel
+                p
+                  | Wowza
+                  b.caret
+              #wowza.collapse(class=( active === 'wowza' ? 'in' : null ), aria-expanded=( active === 'wowza' ? 'true' : 'false' ))
+                ul.nav
+                  li(class=( pageTitle === 'Wowza Monitor' ? 'active' : null ))
+                    a(href='/wowzaMonitor')
+                      span.sidebar-mini WM
+                      span.sidebar-normal Wowza Monitor
       .main-panel
         nav.navbar.navbar-default
           .container-fluid
