@@ -43,7 +43,6 @@ exports.getDailyReport = () => {
       .then(function (response) {
         // console.log("Response:", response.data);
         const todaysDate = new Date().toISOString().split("T")[0];
-        console.log(todaysDate);
 
         const dailyReportObj = response.data.dates.filter(report => report.date === todaysDate);
         resolve(dailyReportObj[0]);
