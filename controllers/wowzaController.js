@@ -22,7 +22,6 @@ exports.getStatus = async (req, res) => {
 
 let getServerStatus = server => {
   const url = `http://${server}.${wowzaHost}/v2/servers/_defaultServer_/vhosts/_defaultVHost_/applications/live/monitoring/current`;
-  console.log(url);
   return new Promise((resolve, reject) => {
     axios
       .get(url)
