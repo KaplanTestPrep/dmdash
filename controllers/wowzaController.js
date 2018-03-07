@@ -2,16 +2,7 @@ const axios = require("axios");
 const { moment } = require("../helpers");
 const { wowzerServers, wowzaHost } = require("../config/wowzaConfig");
 
-// --------- Page Renderers
-exports.wowzaMonitor = async (req, res) => {
-  const data = await exports.getStatus();
-  console.log(data);
-  res.render("wowzaMonitor", {
-    pageTitle: "Wowza Monitor",
-    active: "wowza",
-    data: data
-  });
-};
+// API
 
 exports.getStatus = async (req, res) => {
   let serversStatus = await Promise.all(

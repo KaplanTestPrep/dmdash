@@ -114,12 +114,7 @@ router.post(
   bcController.refIdUpdateBatch
 );
 
-
-router.get(
-  "/mediaShare",
-  authController.isLoggedIn,
-  bcController.mediaShare
-);
+router.get("/mediaShare", authController.isLoggedIn, bcController.mediaShare);
 
 router.post(
   "/mediaShare",
@@ -133,15 +128,6 @@ router.post(
   bcController.csvUpload,
   bcController.mediaShareBatch
 );
-
-router.get(
-  "/wowzaMonitor",
-  authController.isLoggedIn,
-  wowzaController.wowzaMonitor
-);
-
-
-
 
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);
@@ -158,7 +144,7 @@ router.get(
 router.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
-  function (req, res) {
+  function(req, res) {
     res.redirect("/");
   }
 );
