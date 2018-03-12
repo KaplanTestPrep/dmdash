@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -76,17 +76,17 @@
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 /*!
- * jQuery JavaScript Library v3.2.1
+ * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
  *
  * Includes Sizzle.js
  * https://sizzlejs.com/
  *
- * Copyright JS Foundation and other contributors
+ * Copyright jQuery Foundation and other contributors
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2017-03-20T18:59Z
+ * Date: 2016-09-22T22:30Z
  */
 (function (global, factory) {
 
@@ -159,7 +159,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	// unguarded in another place, it seems safer to define global only for this module
 
 
-	var version = "3.2.1",
+	var version = "3.1.1",
 
 
 	// Define a local copy of jQuery
@@ -315,11 +315,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 					}
 
 					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (jQuery.isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
+					if (deep && copy && (jQuery.isPlainObject(copy) || (copyIsArray = jQuery.isArray(copy)))) {
 
 						if (copyIsArray) {
 							copyIsArray = false;
-							clone = src && Array.isArray(src) ? src : [];
+							clone = src && jQuery.isArray(src) ? src : [];
 						} else {
 							clone = src && jQuery.isPlainObject(src) ? src : {};
 						}
@@ -356,6 +356,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		isFunction: function isFunction(obj) {
 			return jQuery.type(obj) === "function";
 		},
+
+		isArray: Array.isArray,
 
 		isWindow: function isWindow(obj) {
 			return obj != null && obj === obj.window;
@@ -427,6 +429,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		// Microsoft forgot to hump their vendor prefix (#9572)
 		camelCase: function camelCase(string) {
 			return string.replace(rmsPrefix, "ms-").replace(rdashAlpha, fcamelCase);
+		},
+
+		nodeName: function nodeName(elem, name) {
+			return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
 		},
 
 		each: function each(obj, callback) {
@@ -2801,10 +2807,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 	var rneedsContext = jQuery.expr.match.needsContext;
 
-	function nodeName(elem, name) {
-
-		return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
-	};
 	var rsingleTag = /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i;
 
 	var risSimple = /^.[^:#\[\.,]*$/;
@@ -3132,18 +3134,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			return _siblings(elem.firstChild);
 		},
 		contents: function contents(elem) {
-			if (nodeName(elem, "iframe")) {
-				return elem.contentDocument;
-			}
-
-			// Support: IE 9 - 11 only, iOS 7 only, Android Browser <=4.3 only
-			// Treat the template element as a regular one in browsers that
-			// don't support it.
-			if (nodeName(elem, "template")) {
-				elem = elem.content || elem;
-			}
-
-			return jQuery.merge([], elem.childNodes);
+			return elem.contentDocument || jQuery.merge([], elem.childNodes);
 		}
 	}, function (name, fn) {
 		jQuery.fn[name] = function (until, selector) {
@@ -3244,7 +3235,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		fire = function fire() {
 
 			// Enforce single-firing
-			_locked = _locked || options.once;
+			_locked = options.once;
 
 			// Execute callbacks for all pending executions,
 			// respecting firingIndex overrides and runtime changes
@@ -3410,7 +3401,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		throw ex;
 	}
 
-	function adoptValue(value, resolve, reject, noValue) {
+	function adoptValue(value, resolve, reject) {
 		var method;
 
 		try {
@@ -3426,10 +3417,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				// Other non-thenables
 			} else {
 
-				// Control `resolve` arguments by letting Array#slice cast boolean `noValue` to integer:
-				// * false: [ value ].slice( 0 ) => resolve( value )
-				// * true: [ value ].slice( 1 ) => resolve()
-				resolve.apply(undefined, [value].slice(noValue));
+				// Support: Android 4.0 only
+				// Strict mode functions invoked without .call/.apply get global-object context
+				resolve.call(undefined, value);
 			}
 
 			// For Promises/A+, convert exceptions into rejections
@@ -3439,7 +3429,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 			// Support: Android 4.0 only
 			// Strict mode functions invoked without .call/.apply get global-object context
-			reject.apply(undefined, [value]);
+			reject.call(undefined, value);
 		}
 	}
 
@@ -3715,7 +3705,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 			// Single- and empty arguments are adopted like Promise.resolve
 			if (remaining <= 1) {
-				adoptValue(singleValue, master.done(updateFunc(i)).resolve, master.reject, !remaining);
+				adoptValue(singleValue, master.done(updateFunc(i)).resolve, master.reject);
 
 				// Use .then() to unwrap secondary thenables (cf. gh-3000)
 				if (master.state() === "pending" || jQuery.isFunction(resolveValues[i] && resolveValues[i].then)) {
@@ -3777,6 +3767,15 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		// A counter to track how many items to wait for before
 		// the ready event fires. See #6781
 		readyWait: 1,
+
+		// Hold (or release) the ready event
+		holdReady: function holdReady(hold) {
+			if (hold) {
+				jQuery.readyWait++;
+			} else {
+				jQuery.ready(true);
+			}
+		},
 
 		// Handle when the DOM is ready
 		ready: function ready(wait) {
@@ -3999,7 +3998,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			if (key !== undefined) {
 
 				// Support array or space separated string of keys
-				if (Array.isArray(key)) {
+				if (jQuery.isArray(key)) {
 
 					// If key is an array of keys...
 					// We always set camelCase keys, so remove that.
@@ -4222,7 +4221,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 				// Speed up dequeue by getting out quickly if this is just a lookup
 				if (data) {
-					if (!queue || Array.isArray(data)) {
+					if (!queue || jQuery.isArray(data)) {
 						queue = dataPriv.access(elem, type, jQuery.makeArray(data));
 					} else {
 						queue.push(data);
@@ -4580,7 +4579,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			ret = [];
 		}
 
-		if (tag === undefined || tag && nodeName(context, tag)) {
+		if (tag === undefined || tag && jQuery.nodeName(context, tag)) {
 			return jQuery.merge([context], ret);
 		}
 
@@ -5190,7 +5189,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 				// For checkbox, fire native event so checked state will be right
 				trigger: function trigger() {
-					if (this.type === "checkbox" && this.click && nodeName(this, "input")) {
+					if (this.type === "checkbox" && this.click && jQuery.nodeName(this, "input")) {
 						this.click();
 						return false;
 					}
@@ -5198,7 +5197,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 				// For cross-browser consistency, don't fire native .click() on links
 				_default: function _default(event) {
-					return nodeName(event.target, "a");
+					return jQuery.nodeName(event.target, "a");
 				}
 			},
 
@@ -5465,11 +5464,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	    rscriptTypeMasked = /^true\/(.*)/,
 	    rcleanScript = /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g;
 
-	// Prefer a tbody over its parent table for containing new rows
 	function manipulationTarget(elem, content) {
-		if (nodeName(elem, "table") && nodeName(content.nodeType !== 11 ? content : content.firstChild, "tr")) {
+		if (jQuery.nodeName(elem, "table") && jQuery.nodeName(content.nodeType !== 11 ? content : content.firstChild, "tr")) {
 
-			return jQuery(">tbody", elem)[0] || elem;
+			return elem.getElementsByTagName("tbody")[0] || elem;
 		}
 
 		return elem;
@@ -5999,19 +5997,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		    minWidth,
 		    maxWidth,
 		    ret,
-
-
-		// Support: Firefox 51+
-		// Retrieving style before computed somehow
-		// fixes an issue with getting wrong values
-		// on detached elements
-		style = elem.style;
+		    style = elem.style;
 
 		computed = computed || getStyles(elem);
 
-		// getPropertyValue is needed for:
-		//   .css('filter') (IE 9 only, #12537)
-		//   .css('--customProperty) (#3144)
+		// Support: IE <=9 only
+		// getPropertyValue is only needed for .css('filter') (#12537)
 		if (computed) {
 			ret = computed.getPropertyValue(name) || computed[name];
 
@@ -6074,7 +6065,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	// except "table", "table-cell", or "table-caption"
 	// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
 	rdisplayswap = /^(none|table(?!-c[ea]).+)/,
-	    rcustomProp = /^--/,
 	    cssShow = { position: "absolute", visibility: "hidden", display: "block" },
 	    cssNormalTransform = {
 		letterSpacing: "0",
@@ -6101,16 +6091,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				return name;
 			}
 		}
-	}
-
-	// Return a property mapped along what jQuery.cssProps suggests or to
-	// a vendor prefixed property.
-	function finalPropName(name) {
-		var ret = jQuery.cssProps[name];
-		if (!ret) {
-			ret = jQuery.cssProps[name] = vendorPropName(name) || name;
-		}
-		return ret;
 	}
 
 	function setPositiveNumber(elem, value, subtract) {
@@ -6172,29 +6152,42 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 	function getWidthOrHeight(elem, name, extra) {
 
-		// Start with computed style
-		var valueIsBorderBox,
+		// Start with offset property, which is equivalent to the border-box value
+		var val,
+		    valueIsBorderBox = true,
 		    styles = getStyles(elem),
-		    val = curCSS(elem, name, styles),
 		    isBorderBox = jQuery.css(elem, "boxSizing", false, styles) === "border-box";
 
-		// Computed unit is not pixels. Stop here and return.
-		if (rnumnonpx.test(val)) {
-			return val;
+		// Support: IE <=11 only
+		// Running getBoundingClientRect on a disconnected node
+		// in IE throws an error.
+		if (elem.getClientRects().length) {
+			val = elem.getBoundingClientRect()[name];
 		}
 
-		// Check for style in case a browser which returns unreliable values
-		// for getComputedStyle silently falls back to the reliable elem.style
-		valueIsBorderBox = isBorderBox && (support.boxSizingReliable() || val === elem.style[name]);
+		// Some non-html elements return undefined for offsetWidth, so check for null/undefined
+		// svg - https://bugzilla.mozilla.org/show_bug.cgi?id=649285
+		// MathML - https://bugzilla.mozilla.org/show_bug.cgi?id=491668
+		if (val <= 0 || val == null) {
 
-		// Fall back to offsetWidth/Height when value is "auto"
-		// This happens for inline elements with no explicit setting (gh-3571)
-		if (val === "auto") {
-			val = elem["offset" + name[0].toUpperCase() + name.slice(1)];
+			// Fall back to computed then uncomputed css if necessary
+			val = curCSS(elem, name, styles);
+			if (val < 0 || val == null) {
+				val = elem.style[name];
+			}
+
+			// Computed unit is not pixels. Stop here and return.
+			if (rnumnonpx.test(val)) {
+				return val;
+			}
+
+			// Check for style in case a browser which returns unreliable values
+			// for getComputedStyle silently falls back to the reliable elem.style
+			valueIsBorderBox = isBorderBox && (support.boxSizingReliable() || val === elem.style[name]);
+
+			// Normalize "", auto, and prepare for extra
+			val = parseFloat(val) || 0;
 		}
-
-		// Normalize "", auto, and prepare for extra
-		val = parseFloat(val) || 0;
 
 		// Use the active box-sizing model to add/subtract irrelevant styles
 		return val + augmentWidthOrHeight(elem, name, extra || (isBorderBox ? "border" : "content"), valueIsBorderBox, styles) + "px";
@@ -6253,15 +6246,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			    type,
 			    hooks,
 			    origName = jQuery.camelCase(name),
-			    isCustomProp = rcustomProp.test(name),
 			    style = elem.style;
 
-			// Make sure that we're working with the right name. We don't
-			// want to query the value if it is a CSS custom property
-			// since they are user-defined.
-			if (!isCustomProp) {
-				name = finalPropName(origName);
-			}
+			name = jQuery.cssProps[origName] || (jQuery.cssProps[origName] = vendorPropName(origName) || origName);
 
 			// Gets hook for the prefixed version, then unprefixed version
 			hooks = jQuery.cssHooks[name] || jQuery.cssHooks[origName];
@@ -6296,11 +6283,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				// If a hook was provided, use that value, otherwise just set the specified value
 				if (!hooks || !("set" in hooks) || (value = hooks.set(elem, value, extra)) !== undefined) {
 
-					if (isCustomProp) {
-						style.setProperty(name, value);
-					} else {
-						style[name] = value;
-					}
+					style[name] = value;
 				}
 			} else {
 
@@ -6319,15 +6302,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			var val,
 			    num,
 			    hooks,
-			    origName = jQuery.camelCase(name),
-			    isCustomProp = rcustomProp.test(name);
+			    origName = jQuery.camelCase(name);
 
-			// Make sure that we're working with the right name. We don't
-			// want to modify the value if it is a CSS custom property
-			// since they are user-defined.
-			if (!isCustomProp) {
-				name = finalPropName(origName);
-			}
+			// Make sure that we're working with the right name
+			name = jQuery.cssProps[origName] || (jQuery.cssProps[origName] = vendorPropName(origName) || origName);
 
 			// Try prefixed name followed by the unprefixed name
 			hooks = jQuery.cssHooks[name] || jQuery.cssHooks[origName];
@@ -6352,7 +6330,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				num = parseFloat(val);
 				return extra === true || isFinite(num) ? num || 0 : val;
 			}
-
 			return val;
 		}
 	});
@@ -6439,7 +6416,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				    map = {},
 				    i = 0;
 
-				if (Array.isArray(name)) {
+				if (jQuery.isArray(name)) {
 					styles = getStyles(elem);
 					len = name.length;
 
@@ -6564,18 +6541,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	jQuery.fx.step = {};
 
 	var fxNow,
-	    inProgress,
+	    timerId,
 	    rfxtypes = /^(?:toggle|show|hide)$/,
 	    rrun = /queueHooks$/;
 
-	function schedule() {
-		if (inProgress) {
-			if (document.hidden === false && window.requestAnimationFrame) {
-				window.requestAnimationFrame(schedule);
-			} else {
-				window.setTimeout(schedule, jQuery.fx.interval);
-			}
-
+	function raf() {
+		if (timerId) {
+			window.requestAnimationFrame(raf);
 			jQuery.fx.tick();
 		}
 	}
@@ -6809,7 +6781,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			name = jQuery.camelCase(index);
 			easing = specialEasing[name];
 			value = props[index];
-			if (Array.isArray(value)) {
+			if (jQuery.isArray(value)) {
 				easing = value[1];
 				value = props[index] = value[0];
 			}
@@ -6869,19 +6841,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 			deferred.notifyWith(elem, [animation, percent, remaining]);
 
-			// If there's more to do, yield
 			if (percent < 1 && length) {
 				return remaining;
+			} else {
+				deferred.resolveWith(elem, [animation]);
+				return false;
 			}
-
-			// If this was an empty animation, synthesize a final progress notification
-			if (!length) {
-				deferred.notifyWith(elem, [animation, 1, 0]);
-			}
-
-			// Resolve the animation and report its conclusion
-			deferred.resolveWith(elem, [animation]);
-			return false;
 		},
 		    animation = deferred.promise({
 			elem: elem,
@@ -6945,16 +6910,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			animation.opts.start.call(elem, animation);
 		}
 
-		// Attach callbacks from options
-		animation.progress(animation.opts.progress).done(animation.opts.done, animation.opts.complete).fail(animation.opts.fail).always(animation.opts.always);
-
 		jQuery.fx.timer(jQuery.extend(tick, {
 			elem: elem,
 			anim: animation,
 			queue: animation.opts.queue
 		}));
 
-		return animation;
+		// attach callbacks from options
+		return animation.progress(animation.opts.progress).done(animation.opts.done, animation.opts.complete).fail(animation.opts.fail).always(animation.opts.always);
 	}
 
 	jQuery.Animation = jQuery.extend(Animation, {
@@ -7004,8 +6967,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			easing: fn && easing || easing && !jQuery.isFunction(easing) && easing
 		};
 
-		// Go to the end state if fx are off
-		if (jQuery.fx.off) {
+		// Go to the end state if fx are off or if document is hidden
+		if (jQuery.fx.off || document.hidden) {
 			opt.duration = 0;
 		} else {
 			if (typeof opt.duration !== "number") {
@@ -7190,7 +7153,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		for (; i < timers.length; i++) {
 			timer = timers[i];
 
-			// Run the timer and safely remove it when done (allowing for external removal)
+			// Checks the timer has not already been removed
 			if (!timer() && timers[i] === timer) {
 				timers.splice(i--, 1);
 			}
@@ -7204,21 +7167,28 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 	jQuery.fx.timer = function (timer) {
 		jQuery.timers.push(timer);
-		jQuery.fx.start();
+		if (timer()) {
+			jQuery.fx.start();
+		} else {
+			jQuery.timers.pop();
+		}
 	};
 
 	jQuery.fx.interval = 13;
 	jQuery.fx.start = function () {
-		if (inProgress) {
-			return;
+		if (!timerId) {
+			timerId = window.requestAnimationFrame ? window.requestAnimationFrame(raf) : window.setInterval(jQuery.fx.tick, jQuery.fx.interval);
 		}
-
-		inProgress = true;
-		schedule();
 	};
 
 	jQuery.fx.stop = function () {
-		inProgress = null;
+		if (window.cancelAnimationFrame) {
+			window.cancelAnimationFrame(timerId);
+		} else {
+			window.clearInterval(timerId);
+		}
+
+		timerId = null;
 	};
 
 	jQuery.fx.speeds = {
@@ -7330,7 +7300,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		attrHooks: {
 			type: {
 				set: function set(elem, value) {
-					if (!support.radioValue && value === "radio" && nodeName(elem, "input")) {
+					if (!support.radioValue && value === "radio" && jQuery.nodeName(elem, "input")) {
 						var val = elem.value;
 						elem.setAttribute("type", value);
 						if (val) {
@@ -7737,7 +7707,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 					val = "";
 				} else if (typeof val === "number") {
 					val += "";
-				} else if (Array.isArray(val)) {
+				} else if (jQuery.isArray(val)) {
 					val = jQuery.map(val, function (value) {
 						return value == null ? "" : value + "";
 					});
@@ -7794,7 +7764,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 						if ((option.selected || i === index) &&
 
 						// Don't return options that are disabled or in a disabled optgroup
-						!option.disabled && (!option.parentNode.disabled || !nodeName(option.parentNode, "optgroup"))) {
+						!option.disabled && (!option.parentNode.disabled || !jQuery.nodeName(option.parentNode, "optgroup"))) {
 
 							// Get the specific value for the option
 							value = jQuery(option).val();
@@ -7845,7 +7815,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	jQuery.each(["radio", "checkbox"], function () {
 		jQuery.valHooks[this] = {
 			set: function set(elem, value) {
-				if (Array.isArray(value)) {
+				if (jQuery.isArray(value)) {
 					return elem.checked = jQuery.inArray(jQuery(elem).val(), value) > -1;
 				}
 			}
@@ -8113,7 +8083,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	function buildParams(prefix, obj, traditional, add) {
 		var name;
 
-		if (Array.isArray(obj)) {
+		if (jQuery.isArray(obj)) {
 
 			// Serialize array item.
 			jQuery.each(obj, function (i, v) {
@@ -8154,7 +8124,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		};
 
 		// If an array was passed in, assume that it is an array of form elements.
-		if (Array.isArray(a) || a.jquery && !jQuery.isPlainObject(a)) {
+		if (jQuery.isArray(a) || a.jquery && !jQuery.isPlainObject(a)) {
 
 			// Serialize the form elements
 			jQuery.each(a, function () {
@@ -8195,7 +8165,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 					return null;
 				}
 
-				if (Array.isArray(val)) {
+				if (jQuery.isArray(val)) {
 					return jQuery.map(val, function (val) {
 						return { name: elem.name, value: val.replace(rCRLF, "\r\n") };
 					});
@@ -9577,6 +9547,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		}).length;
 	};
 
+	/**
+  * Gets a window from an element
+  */
+	function getWindow(elem) {
+		return jQuery.isWindow(elem) ? elem : elem.nodeType === 9 && elem.defaultView;
+	}
+
 	jQuery.offset = {
 		setOffset: function setOffset(elem, options, i) {
 			var curPosition,
@@ -9642,17 +9619,16 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				});
 			}
 
-			var doc,
-			    docElem,
-			    rect,
+			var docElem,
 			    win,
+			    rect,
+			    doc,
 			    elem = this[0];
 
 			if (!elem) {
 				return;
 			}
 
-			// Return zeros for disconnected and hidden (display: none) elements (gh-2310)
 			// Support: IE <=11 only
 			// Running getBoundingClientRect on a
 			// disconnected node in IE throws an error
@@ -9662,14 +9638,20 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 			rect = elem.getBoundingClientRect();
 
-			doc = elem.ownerDocument;
-			docElem = doc.documentElement;
-			win = doc.defaultView;
+			// Make sure element is not hidden (display: none)
+			if (rect.width || rect.height) {
+				doc = elem.ownerDocument;
+				win = getWindow(doc);
+				docElem = doc.documentElement;
 
-			return {
-				top: rect.top + win.pageYOffset - docElem.clientTop,
-				left: rect.left + win.pageXOffset - docElem.clientLeft
-			};
+				return {
+					top: rect.top + win.pageYOffset - docElem.clientTop,
+					left: rect.left + win.pageXOffset - docElem.clientLeft
+				};
+			}
+
+			// Return zeros for disconnected and hidden elements (gh-2310)
+			return rect;
 		},
 
 		position: function position() {
@@ -9695,7 +9677,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 				// Get correct offsets
 				offset = this.offset();
-				if (!nodeName(offsetParent[0], "html")) {
+				if (!jQuery.nodeName(offsetParent[0], "html")) {
 					parentOffset = offsetParent.offset();
 				}
 
@@ -9742,14 +9724,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 		jQuery.fn[method] = function (val) {
 			return access(this, function (elem, method, val) {
-
-				// Coalesce documents and windows
-				var win;
-				if (jQuery.isWindow(elem)) {
-					win = elem;
-				} else if (elem.nodeType === 9) {
-					win = elem.defaultView;
-				}
+				var win = getWindow(elem);
 
 				if (val === undefined) {
 					return win ? win[prop] : elem[method];
@@ -9839,16 +9814,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		}
 	});
 
-	jQuery.holdReady = function (hold) {
-		if (hold) {
-			jQuery.readyWait++;
-		} else {
-			jQuery.ready(true);
-		}
-	};
-	jQuery.isArray = Array.isArray;
 	jQuery.parseJSON = JSON.parse;
-	jQuery.nodeName = nodeName;
 
 	// Register as a named AMD module, since jQuery can be concatenated with other
 	// files that may use define, but not via a proper concatenation script that
@@ -9900,40 +9866,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 	return jQuery;
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function (module) {
-	if (!module.webpackPolyfill) {
-		module.deprecate = function () {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if (!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function get() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function get() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9950,14 +9886,426 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.jQuery = _jquery2.default;
 window.$ = _jquery2.default;
 
-/*  OR webpack
+(0, _jquery2.default)(document).ready(function () {
 
-new webpack.ProvidePlugin({
-  $: 'jquery',
-  jQuery: 'jquery'
-})
+    (0, _jquery2.default)('#videoRenditions').click(function (e) {
+        return handleVideoRenditions(e);
+    });
+    (0, _jquery2.default)('#batchRetranscode').click(function (e) {
+        return handleBatchRetranscode(e);
+    });
+    (0, _jquery2.default)("#imageUploadForm").submit(function (e) {
+        return handleImageUploadForm(e);
+    });
+    (0, _jquery2.default)('#thumbnailUpdateForm').submit(function (e) {
+        return handleThumbnailUpdateForm(e);
+    });
+    (0, _jquery2.default)('#refIdUpdateSingleForm').submit(function (e) {
+        return handleRefIdUpdateSingleForm(e);
+    });
+    (0, _jquery2.default)('#refIdUpdateBatchForm').submit(function (e) {
+        return handleRefIdUpdateBatchForm(e);
+    });
+    (0, _jquery2.default)('#mediaShareSingleForm').submit(function (e) {
+        return handleMediaShareSingleForm(e);
+    });
+    (0, _jquery2.default)('#mediaShareBatchForm').submit(function (e) {
+        return handleMediaShareBatchForm(e);
+    });
+});
 
-*/
+function handleVideoRenditions(e) {
+    e.preventDefault();
+    var accountId = (0, _jquery2.default)('#acccount').val();
+    var update = (0, _jquery2.default)('#datepicker').val();
+    var renditionsTable = (0, _jquery2.default)("#renditionsTable");
+
+    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+
+    if (!_jquery2.default.fn.DataTable.isDataTable('#renditionsTable')) {
+        renditionsTable.DataTable({
+            dom: 'lfrtBip',
+            buttons: [{
+                extend: 'csvHtml5',
+                text: 'Download CSV',
+                className: 'btn btn-default'
+            }],
+            ajax: '/bc/getRenditions/' + accountId + '/' + update,
+            columns: [{ data: "videoId" }, { data: "accountId" }, { data: "refId" }, { data: "videoName" }, { data: "description" }, { data: "state" }, { data: "createdAt" }, { data: "updatedAt" }, { data: "publishedAt" }, { data: "duration" }, { data: "folderId" }, { data: "digitalMasterId" }, { data: "tags" }, { data: "textTrackId" }, { data: "textTrackSrc" }, { data: "textTrackLang" }, { data: "textTrackLabel" }, { data: "textTrackKind" }, { data: "renditions" }, { data: "renditionCount" }],
+            columnDefs: [{
+                targets: [0, 1, 5, 6, 8, 10, 11, 13, 14, 15, 17, 18],
+                visible: false,
+                searchable: true
+            }],
+            pageLength: 25,
+            processing: true
+        });
+    } else {
+        renditionsTable = new _jquery2.default.fn.dataTable.Api("#renditionsTable");
+        renditionsTable.ajax.url('/bc/getRenditions/' + accountId + '/' + update).load();
+    }
+}
+
+function handleBatchRetranscode(e) {
+    e.preventDefault();
+    var accountId = (0, _jquery2.default)('#bcAcccount').val();
+    var videos = (0, _jquery2.default)('#vidoesToTranscode').val().trim().split(/[\r\n\s,]+/);
+    var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
+    var renditionProfile = (0, _jquery2.default)('#bcRenditionProfile').val();
+    var percentDone = 0;
+    var completed = 0;
+    var fail = 0;
+    var total = videos.length;
+
+    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+    (0, _jquery2.default)('ul#success').html("");
+    (0, _jquery2.default)('ul#fail').html("");
+
+    videos.forEach(function (video) {
+        _jquery2.default.ajax({
+            url: '/bcRetranscode',
+            type: "POST",
+            data: {
+                accountId: accountId,
+                videoId: video,
+                idType: idType,
+                renditionProfile: renditionProfile
+            }
+        }).done(function (res) {
+            console.log(res);
+            completed++;
+            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+            (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+            (0, _jquery2.default)('ul#success').append('<li>' + video + ' Sucessfully processsed.</li>');
+        }).fail(function (err) {
+            completed++;
+            fail++;
+
+            console.log(video + ' Failed: ' + err.responseText, err);
+            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+            (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+            (0, _jquery2.default)('ul#fail').append('<li>' + video + ' Failed: ' + err.responseText + '</li>');
+        });
+    });
+}
+
+function handleImageUploadForm(e) {
+    (0, _jquery2.default)("span#status").removeClass();
+    (0, _jquery2.default)("span#status").text("");
+    (0, _jquery2.default)("span#status").addClass('text-warning');
+    (0, _jquery2.default)("span#status").text("  Uploading...");
+    e.preventDefault();
+
+    var fileSelect = (0, _jquery2.default)("#selectThumbnail");
+    var filename = fileSelect.val().split('\\').pop();
+    (0, _jquery2.default)("#uploadedImage").val(filename);
+
+    var files = fileSelect[0].files;
+    var form = new FormData();
+    form.append('thumbnail', files[0], files[0].name);
+
+    _jquery2.default.ajax({
+        url: '/bcThumbnailUpload',
+        data: form,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        success: function success(data) {
+            (0, _jquery2.default)("span#status").removeClass();
+            (0, _jquery2.default)("span#status").addClass('text-success');
+            (0, _jquery2.default)("span#status").text("  Upload Completed!");
+        }
+    });
+}
+
+function handleThumbnailUpdateForm(e) {
+    e.preventDefault();
+    var accountId = (0, _jquery2.default)('#bcAcccount').val();
+    var videos = (0, _jquery2.default)('#vidoesToUpdate').val().trim().split(/[\r\n\s,]+/);
+    var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
+    var thumbnailFileName = (0, _jquery2.default)('#uploadedImage').val();
+    var completed = 0;
+    var fail = 0;
+    var total = videos.length;
+
+    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+    (0, _jquery2.default)('ul#success').html("");
+    (0, _jquery2.default)('ul#fail').html("");
+
+    videos.forEach(function (video) {
+        _jquery2.default.ajax({
+            url: '/bcThumbnailUpdate',
+            type: "POST",
+            data: {
+                accountId: accountId,
+                videoId: video,
+                idType: idType,
+                thumbnailFileName: thumbnailFileName
+            }
+        }).done(function (res) {
+            console.log(res);
+            completed++;
+            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+            (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+            (0, _jquery2.default)('ul#success').append('<li>' + video + ' Sucessfully processsed.</li>');
+        }).fail(function (err) {
+            completed++;
+            fail++;
+
+            console.log(video + ' Failed: ' + err.responseText, err);
+            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+            (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+            (0, _jquery2.default)('ul#fail').append('<li>' + video + ' Failed: ' + err.responseText + '</li>');
+        });
+    });
+}
+
+function handleRefIdUpdateSingleForm(e) {
+    e.preventDefault();
+    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+    (0, _jquery2.default)('ul#success').html("");
+    (0, _jquery2.default)('ul#fail').html("");
+
+    var completed = 0;
+    var fail = 0;
+    var total = 1;
+
+    var accountId = (0, _jquery2.default)('#bcAccount').val();
+    var oldId = (0, _jquery2.default)('#oldId').val().trim();
+    var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
+    var newRefId = (0, _jquery2.default)('#newRefId').val().trim();
+
+    _jquery2.default.ajax({
+        url: '/refIdUpdateTool',
+        type: "POST",
+        data: {
+            accountId: accountId,
+            oldId: oldId,
+            idType: idType,
+            newRefId: newRefId
+        }
+    }).done(function (res) {
+        console.log(res);
+        completed++;
+        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+        (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+        (0, _jquery2.default)('ul#success').append('<li>' + oldId + ' --> ' + newRefId + ' Sucessfully processsed.</li>');
+    }).fail(function (err) {
+        completed++;
+        fail++;
+
+        console.log(oldId + ' --> ' + newRefId + ' Failed: ' + err.responseText, err);
+        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+        (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+        (0, _jquery2.default)('ul#fail').append('<li>' + oldId + ' > ' + newRefId + ' Failed: ' + err.responseText + '</li>');
+    });
+}
+
+function handleRefIdUpdateBatchForm(e) {
+    (0, _jquery2.default)("span#status").removeClass();
+    (0, _jquery2.default)("span#status").text("");
+    (0, _jquery2.default)("span#status").addClass('text-warning');
+    (0, _jquery2.default)("span#status").text("  Uploading...");
+    e.preventDefault();
+
+    var accountId = (0, _jquery2.default)('#bcAccountBatch').val();
+    var idType = (0, _jquery2.default)('input[name=idTypeBatch]:checked').val();
+
+    var fileSelect = document.getElementById('selectCSV');
+    console.log(fileSelect);
+
+    var files = fileSelect.files;
+    var form = new FormData();
+    form.append('csv', files[0], files[0].name);
+
+    _jquery2.default.ajax({
+        url: '/refIdUpdateBatch',
+        data: form,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        success: function success(data) {
+            var dataArr = JSON.parse(data);
+
+            (0, _jquery2.default)("span#status").removeClass();
+            (0, _jquery2.default)("span#status").addClass('text-success');
+            (0, _jquery2.default)("span#status").text("  Upload Completed!");
+
+            var completed = 0;
+            var fail = 0;
+            var total = dataArr,
+                length;
+
+            dataArr.forEach(function (item) {
+                var _item$split = item.split(","),
+                    _item$split2 = _slicedToArray(_item$split, 2),
+                    oldId = _item$split2[0],
+                    newRefId = _item$split2[1];
+                // updateSingleRefId(accountId, oldId, idType, newRefId);
+
+                var completed = 0;
+                var fail = 0;
+                var total = 1;
+
+                (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+                (0, _jquery2.default)('ul#success').html("");
+                (0, _jquery2.default)('ul#fail').html("");
+
+                _jquery2.default.ajax({
+                    url: '/refIdUpdateTool',
+                    type: "POST",
+                    data: {
+                        accountId: accountId,
+                        oldId: oldId,
+                        idType: idType,
+                        newRefId: newRefId
+                    }
+                }).done(function (res) {
+                    completed++;
+                    (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+                    (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+                    (0, _jquery2.default)('ul#success').append('<li>' + oldId + ' --> ' + newRefId + ' Sucessfully processsed.</li>');
+                }).fail(function (err) {
+                    completed++;
+                    fail++;
+
+                    console.log(oldId + ' --> ' + newRefId + ' Failed: ' + err.responseText, err);
+                    (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+                    (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+                    (0, _jquery2.default)('ul#fail').append('<li>' + oldId + ' > ' + newRefId + ' Failed: ' + err.responseText + '</li>');
+                });
+            });
+        }
+    });
+}
+
+function handleMediaShareSingleForm(e) {
+    e.preventDefault();
+    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+    (0, _jquery2.default)('ul#success').html("");
+    (0, _jquery2.default)('ul#fail').html("");
+
+    var completed = 0;
+    var fail = 0;
+    var total = 1;
+
+    var accountIdSource = (0, _jquery2.default)('#bcAccountSource').val();
+    var accountIdDest = (0, _jquery2.default)('#bcAccountDest').val();
+    var refId = (0, _jquery2.default)('#refId').val().trim();
+    var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
+
+    _jquery2.default.ajax({
+        url: '/mediaShare',
+        type: "POST",
+        data: {
+            accountIdSource: accountIdSource,
+            accountIdDest: accountIdDest,
+            refId: refId,
+            idType: idType
+        }
+    }).done(function (res) {
+        console.log(res);
+        completed++;
+        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+        (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+        (0, _jquery2.default)('ul#success').append('<li>Moved ' + refId + ' from ' + accountIdSource + ' to ' + accountIdSource + ' - Sucessfully processsed.</li>');
+    }).fail(function (err) {
+        completed++;
+        fail++;
+
+        console.log('Moving ' + refId + ' from ' + accountIdSource + ' to ' + accountIdSource + ' - Failed: ' + err.responseText, err);
+        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+        (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+        (0, _jquery2.default)('ul#fail').append('<li>Moving ' + refId + ' from ' + accountIdSource + ' to ' + accountIdDest + ' - Failed: ' + err.responseText + '</li>');
+    });
+}
+
+function handleMediaShareBatchForm(e) {
+    (0, _jquery2.default)("span#status").removeClass();
+    (0, _jquery2.default)("span#status").text("");
+    (0, _jquery2.default)("span#status").addClass('text-warning');
+    (0, _jquery2.default)("span#status").text("  Uploading...");
+    e.preventDefault();
+
+    var accountIdSource = (0, _jquery2.default)('#bcAccountSourceBatch').val();
+    var accountIdDest = (0, _jquery2.default)('#bcAccountDestBatch').val();
+    var idType = (0, _jquery2.default)('input[name=idTypeBatch]:checked').val();
+
+    var fileSelect = document.getElementById('selectCSVBatch');
+    console.log(fileSelect);
+
+    var files = fileSelect.files;
+    var form = new FormData();
+    form.append('csv', files[0], files[0].name);
+
+    _jquery2.default.ajax({
+        url: '/mediaShareBatch',
+        data: form,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        success: function success(data) {
+            var dataArr = JSON.parse(data);
+
+            (0, _jquery2.default)("span#status").removeClass();
+            (0, _jquery2.default)("span#status").addClass('text-success');
+            (0, _jquery2.default)("span#status").text("  Upload Completed!");
+
+            var completed = 0;
+            var fail = 0;
+            var total = dataArr.length;
+
+            console.log(dataArr);
+            dataArr.forEach(function (item) {
+                var refId = item;
+
+                (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+                (0, _jquery2.default)('ul#success').html("");
+                (0, _jquery2.default)('ul#fail').html("");
+
+                _jquery2.default.ajax({
+                    url: '/mediaShare',
+                    type: "POST",
+                    data: {
+                        accountIdSource: accountIdSource,
+                        accountIdDest: accountIdDest,
+                        idType: idType,
+                        refId: item
+                    }
+                }).done(function (res) {
+                    completed++;
+                    (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+                    (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+                    (0, _jquery2.default)('ul#success').append('<li>Moved ' + refId + ' from ' + accountIdSource + ' to ' + accountIdDest + ' - Sucessfully processsed.</li>');
+                }).fail(function (err) {
+                    completed++;
+                    fail++;
+
+                    console.log('Moving ' + refId + ' from ' + accountIdSource + ' to ' + accountIdDest + ' - Failed: ' + err.responseText, err);
+                    (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+                    (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+                    (0, _jquery2.default)('ul#fail').append('<li>Moving ' + refId + ' from ' + accountIdSource + ' to ' + accountIdDest + ' - Failed: ' + err.responseText + '</li>');
+                });
+            });
+        }
+    });
+}
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+window.jQuery = _jquery2.default;
+window.$ = _jquery2.default;
 
 (0, _jquery2.default)(document).ready(function () {
   // Datatable init
@@ -10076,8 +10424,66 @@ new webpack.ProvidePlugin({
       });
     });
   });
+});
 
-  // Video Renditions
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function (module) {
+	if (!module.webpackPolyfill) {
+		module.deprecate = function () {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function get() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function get() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(2);
+
+__webpack_require__(1);
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+window.jQuery = _jquery2.default;
+window.$ = _jquery2.default;
+/*  OR webpack
+new webpack.ProvidePlugin({
+  $: 'jquery',
+  jQuery: 'jquery'
+})
+*/
+
+(0, _jquery2.default)(document).ready(function () {
+
   (0, _jquery2.default)('#datepicker').datetimepicker({
     format: 'YYYY-MM-DD'
   });
@@ -10086,427 +10492,7 @@ new webpack.ProvidePlugin({
     style: 'btn-default',
     size: 8
   });
-
-  (0, _jquery2.default)('#videoRenditions').click(function (e) {
-    e.preventDefault();
-    var accountId = (0, _jquery2.default)('#acccount').val();
-    var update = (0, _jquery2.default)('#datepicker').val();
-    var renditionsTable = (0, _jquery2.default)("#renditionsTable");
-
-    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-
-    if (!_jquery2.default.fn.DataTable.isDataTable('#renditionsTable')) {
-      renditionsTable.DataTable({
-        dom: 'lfrtBip',
-        buttons: [{
-          extend: 'csvHtml5',
-          text: 'Download CSV',
-          className: 'btn btn-default'
-        }],
-        ajax: "/bc/getRenditions/" + accountId + "/" + update,
-        columns: [{ data: "videoId" }, { data: "accountId" }, { data: "refId" }, { data: "videoName" }, { data: "description" }, { data: "state" }, { data: "createdAt" }, { data: "updatedAt" }, { data: "publishedAt" }, { data: "duration" }, { data: "folderId" }, { data: "digitalMasterId" }, { data: "tags" }, { data: "textTrackId" }, { data: "textTrackSrc" }, { data: "textTrackLang" }, { data: "textTrackLabel" }, { data: "textTrackKind" }, { data: "renditions" }, { data: "renditionCount" }],
-        columnDefs: [{
-          targets: [0, 1, 5, 6, 8, 10, 11, 13, 14, 15, 17, 18],
-          visible: false,
-          searchable: true
-        }],
-        pageLength: 25,
-        processing: true
-      });
-    } else {
-      renditionsTable = new _jquery2.default.fn.dataTable.Api("#renditionsTable");
-      renditionsTable.ajax.url("/bc/getRenditions/" + accountId + "/" + update).load();
-    }
-  });
-
-  (0, _jquery2.default)('#batchRetranscode').click(function (e) {
-    e.preventDefault();
-    var accountId = (0, _jquery2.default)('#bcAcccount').val();
-    var videos = (0, _jquery2.default)('#vidoesToTranscode').val().trim().split(/[\r\n\s,]+/);
-    var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
-    var renditionProfile = (0, _jquery2.default)('#bcRenditionProfile').val();
-    var percentDone = 0;
-    var completed = 0;
-    var fail = 0;
-    var total = videos.length;
-
-    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-    (0, _jquery2.default)('ul#success').html("");
-    (0, _jquery2.default)('ul#fail').html("");
-
-    videos.forEach(function (video) {
-      _jquery2.default.ajax({
-        url: "/bcRetranscode",
-        type: "POST",
-        data: {
-          accountId: accountId,
-          videoId: video,
-          idType: idType,
-          renditionProfile: renditionProfile
-        }
-      }).done(function (res) {
-        console.log(res);
-        completed++;
-        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)('ul#success').append("<li>" + video + " Sucessfully processsed.</li>");
-      }).fail(function (err) {
-        completed++;
-        fail++;
-
-        console.log(video + " Failed: " + err.responseText, err);
-        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)('ul#fail').append("<li>" + video + " Failed: " + err.responseText + "</li>");
-      });
-    });
-  });
-
-  (0, _jquery2.default)("#imageUploadForm").submit(function (e) {
-    (0, _jquery2.default)("span#status").removeClass();
-    (0, _jquery2.default)("span#status").text("");
-    (0, _jquery2.default)("span#status").addClass('text-warning');
-    (0, _jquery2.default)("span#status").text("  Uploading...");
-    e.preventDefault();
-
-    var fileSelect = (0, _jquery2.default)("#selectThumbnail");
-    var filename = fileSelect.val().split('\\').pop();
-    (0, _jquery2.default)("#uploadedImage").val(filename);
-
-    var files = fileSelect[0].files;
-    var form = new FormData();
-
-    form.append('thumbnail', files[0], files[0].name);
-
-    _jquery2.default.ajax({
-      url: '/bcThumbnailUpload',
-      data: form,
-      processData: false,
-      contentType: false,
-      type: 'POST',
-      success: function success(data) {
-        (0, _jquery2.default)("span#status").removeClass();
-        (0, _jquery2.default)("span#status").addClass('text-success');
-        (0, _jquery2.default)("span#status").text("  Upload Completed!");
-      }
-    });
-  });
-
-  (0, _jquery2.default)('#thumbnailUpdateForm').submit(function (e) {
-    e.preventDefault();
-    var accountId = (0, _jquery2.default)('#bcAcccount').val();
-    var videos = (0, _jquery2.default)('#vidoesToUpdate').val().trim().split(/[\r\n\s,]+/);
-    var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
-    var thumbnailFileName = (0, _jquery2.default)('#uploadedImage').val();
-    var completed = 0;
-    var fail = 0;
-    var total = videos.length;
-
-    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-    (0, _jquery2.default)('ul#success').html("");
-    (0, _jquery2.default)('ul#fail').html("");
-
-    videos.forEach(function (video) {
-      _jquery2.default.ajax({
-        url: "/bcThumbnailUpdate",
-        type: "POST",
-        data: {
-          accountId: accountId,
-          videoId: video,
-          idType: idType,
-          thumbnailFileName: thumbnailFileName
-        }
-      }).done(function (res) {
-        console.log(res);
-        completed++;
-        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)('ul#success').append("<li>" + video + " Sucessfully processsed.</li>");
-      }).fail(function (err) {
-        completed++;
-        fail++;
-
-        console.log(video + " Failed: " + err.responseText, err);
-        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)('ul#fail').append("<li>" + video + " Failed: " + err.responseText + "</li>");
-      });
-    });
-  });
-
-  // function updateSingleRefId (accountId, oldId, idType, newRefId) {
-  //   $('#resultsCard').removeClass('hidden');
-  //   $('ul#success').html(""); 
-  //   $('ul#fail').html(""); 
-
-  //   $.ajax({
-  //     url: `/refIdUpdateTool`,
-  //     type: "POST",
-  //     data: {
-  //       accountId,
-  //       oldId,
-  //       idType,
-  //       newRefId
-  //     }
-  //   })
-  //   .done(res => {
-  //       console.log(res);
-  //       completed++;
-  //       $('.progress-bar').css("width", `${(completed/total)*100}%`);
-  //       $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
-  //       $('ul#success').append(`<li>${oldId} --> ${newRefId} Sucessfully processsed.</li>`);
-  //   })
-  //   .fail(err => {
-  //       completed++;
-  //       fail++;
-
-  //       console.log(`${oldId} --> ${newRefId} Failed: ${err.responseText}`, err);
-  //       $('.progress-bar').css("width", `${(completed/total)*100}%`);
-  //       $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
-  //       $('ul#fail').append(`<li>${oldId} > ${newRefId} Failed: ${err.responseText}</li>`);
-
-  //   })
-  // }
-
-
-  (0, _jquery2.default)('#refIdUpdateSingleForm').submit(function (e) {
-    e.preventDefault();
-    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-    (0, _jquery2.default)('ul#success').html("");
-    (0, _jquery2.default)('ul#fail').html("");
-
-    var completed = 0;
-    var fail = 0;
-    var total = 1;
-
-    var accountId = (0, _jquery2.default)('#bcAccount').val();
-    var oldId = (0, _jquery2.default)('#oldId').val().trim();
-    var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
-    var newRefId = (0, _jquery2.default)('#newRefId').val().trim();
-
-    _jquery2.default.ajax({
-      url: "/refIdUpdateTool",
-      type: "POST",
-      data: {
-        accountId: accountId,
-        oldId: oldId,
-        idType: idType,
-        newRefId: newRefId
-      }
-    }).done(function (res) {
-      console.log(res);
-      completed++;
-      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-      (0, _jquery2.default)('ul#success').append("<li>" + oldId + " --> " + newRefId + " Sucessfully processsed.</li>");
-    }).fail(function (err) {
-      completed++;
-      fail++;
-
-      console.log(oldId + " --> " + newRefId + " Failed: " + err.responseText, err);
-      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-      (0, _jquery2.default)('ul#fail').append("<li>" + oldId + " > " + newRefId + " Failed: " + err.responseText + "</li>");
-    });
-  });
-
-  (0, _jquery2.default)('#refIdUpdateBatchForm').submit(function (e) {
-    (0, _jquery2.default)("span#status").removeClass();
-    (0, _jquery2.default)("span#status").text("");
-    (0, _jquery2.default)("span#status").addClass('text-warning');
-    (0, _jquery2.default)("span#status").text("  Uploading...");
-    e.preventDefault();
-
-    var accountId = (0, _jquery2.default)('#bcAccountBatch').val();
-    var idType = (0, _jquery2.default)('input[name=idTypeBatch]:checked').val();
-
-    var fileSelect = document.getElementById('selectCSV');
-    console.log(fileSelect);
-
-    var files = fileSelect.files;
-    var form = new FormData();
-    form.append('csv', files[0], files[0].name);
-
-    _jquery2.default.ajax({
-      url: '/refIdUpdateBatch',
-      data: form,
-      processData: false,
-      contentType: false,
-      type: 'POST',
-      success: function success(data) {
-        var dataArr = JSON.parse(data);
-
-        (0, _jquery2.default)("span#status").removeClass();
-        (0, _jquery2.default)("span#status").addClass('text-success');
-        (0, _jquery2.default)("span#status").text("  Upload Completed!");
-
-        var completed = 0;
-        var fail = 0;
-        var total = dataArr,
-            length;
-
-        dataArr.forEach(function (item) {
-          var _item$split = item.split(","),
-              _item$split2 = _slicedToArray(_item$split, 2),
-              oldId = _item$split2[0],
-              newRefId = _item$split2[1];
-          // updateSingleRefId(accountId, oldId, idType, newRefId);
-
-          var completed = 0;
-          var fail = 0;
-          var total = 1;
-
-          (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-          (0, _jquery2.default)('ul#success').html("");
-          (0, _jquery2.default)('ul#fail').html("");
-
-          _jquery2.default.ajax({
-            url: "/refIdUpdateTool",
-            type: "POST",
-            data: {
-              accountId: accountId,
-              oldId: oldId,
-              idType: idType,
-              newRefId: newRefId
-            }
-          }).done(function (res) {
-            completed++;
-            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-            (0, _jquery2.default)('ul#success').append("<li>" + oldId + " --> " + newRefId + " Sucessfully processsed.</li>");
-          }).fail(function (err) {
-            completed++;
-            fail++;
-
-            console.log(oldId + " --> " + newRefId + " Failed: " + err.responseText, err);
-            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-            (0, _jquery2.default)('ul#fail').append("<li>" + oldId + " > " + newRefId + " Failed: " + err.responseText + "</li>");
-          });
-        });
-      }
-    });
-  });
-
-  // Media Share
-
-  (0, _jquery2.default)('#mediaShareSingleForm').submit(function (e) {
-    e.preventDefault();
-    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-    (0, _jquery2.default)('ul#success').html("");
-    (0, _jquery2.default)('ul#fail').html("");
-
-    var completed = 0;
-    var fail = 0;
-    var total = 1;
-
-    var accountIdSource = (0, _jquery2.default)('#bcAccountSource').val();
-    var accountIdDest = (0, _jquery2.default)('#bcAccountDest').val();
-    var refId = (0, _jquery2.default)('#refId').val().trim();
-    var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
-
-    _jquery2.default.ajax({
-      url: "/mediaShare",
-      type: "POST",
-      data: {
-        accountIdSource: accountIdSource,
-        accountIdDest: accountIdDest,
-        refId: refId,
-        idType: idType
-      }
-    }).done(function (res) {
-      console.log(res);
-      completed++;
-      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-      (0, _jquery2.default)('ul#success').append("<li>Moved " + refId + " from " + accountIdSource + " to " + accountIdSource + " - Sucessfully processsed.</li>");
-    }).fail(function (err) {
-      completed++;
-      fail++;
-
-      console.log("Moving " + refId + " from " + accountIdSource + " to " + accountIdSource + " - Failed: " + err.responseText, err);
-      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-      (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-      (0, _jquery2.default)('ul#fail').append("<li>Moving " + refId + " from " + accountIdSource + " to " + accountIdDest + " - Failed: " + err.responseText + "</li>");
-    });
-  });
-
-  (0, _jquery2.default)('#mediaShareBatchForm').submit(function (e) {
-    (0, _jquery2.default)("span#status").removeClass();
-    (0, _jquery2.default)("span#status").text("");
-    (0, _jquery2.default)("span#status").addClass('text-warning');
-    (0, _jquery2.default)("span#status").text("  Uploading...");
-    e.preventDefault();
-
-    var accountIdSource = (0, _jquery2.default)('#bcAccountSourceBatch').val();
-    var accountIdDest = (0, _jquery2.default)('#bcAccountDestBatch').val();
-    // const refId = $('#refIdBatch').val().trim();
-    var idType = (0, _jquery2.default)('input[name=idTypeBatch]:checked').val();
-
-    var fileSelect = document.getElementById('selectCSVBatch');
-    console.log(fileSelect);
-
-    var files = fileSelect.files;
-    var form = new FormData();
-    form.append('csv', files[0], files[0].name);
-
-    _jquery2.default.ajax({
-      url: '/mediaShareBatch',
-      data: form,
-      processData: false,
-      contentType: false,
-      type: 'POST',
-      success: function success(data) {
-        var dataArr = JSON.parse(data);
-
-        (0, _jquery2.default)("span#status").removeClass();
-        (0, _jquery2.default)("span#status").addClass('text-success');
-        (0, _jquery2.default)("span#status").text("  Upload Completed!");
-
-        var completed = 0;
-        var fail = 0;
-        var total = dataArr.length;
-
-        console.log(dataArr);
-        dataArr.forEach(function (item) {
-
-          //   let [oldId, newRefId] = item.split(",");
-          //   // updateSingleRefId(accountId, oldId, idType, newRefId);
-
-          var refId = item;
-
-          (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-          (0, _jquery2.default)('ul#success').html("");
-          (0, _jquery2.default)('ul#fail').html("");
-
-          _jquery2.default.ajax({
-            url: "/mediaShare",
-            type: "POST",
-            data: {
-              accountIdSource: accountIdSource,
-              accountIdDest: accountIdDest,
-              idType: idType,
-              refId: item
-            }
-          }).done(function (res) {
-            completed++;
-            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-            (0, _jquery2.default)('ul#success').append("<li>Moved " + refId + " from " + accountIdSource + " to " + accountIdDest + " - Sucessfully processsed.</li>");
-          }).fail(function (err) {
-            completed++;
-            fail++;
-
-            console.log("Moving " + refId + " from " + accountIdSource + " to " + accountIdDest + " - Failed: " + err.responseText, err);
-            (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-            (0, _jquery2.default)('ul#fail').append("<li>Moving " + refId + " from " + accountIdSource + " to " + accountIdDest + " - Failed: " + err.responseText + "</li>");
-          });
-        });
-      }
-    });
-  });
-}); // doc.ready
+});
 
 /***/ })
 /******/ ]);
