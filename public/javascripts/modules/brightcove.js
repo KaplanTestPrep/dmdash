@@ -262,13 +262,7 @@ function handleRefIdUpdateBatchForm(e) {
       success: function(data){
         const dataArr = JSON.parse(data);
 
-        $("span#status").removeClass();
-        $("span#status").addClass('text-success');
-        $("span#status").text("  Upload Completed!");
 
-        var completed = 0
-        var fail = 0;
-        var total = dataArr,length;
 
         dataArr.forEach(item => {
           let [oldId, newRefId] = item.split(",");
