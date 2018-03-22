@@ -52,6 +52,14 @@ exports.refIdUpdateTool = (req, res) => {
   });
 };
 
+exports.metadataUpdateTool = (req, res) => {
+  res.render("metadataUpdateTool", {
+    pageTitle: "Metadata Updater",
+    active: "bc",
+    bcAccounts: bc.accounts
+  });
+};
+
 exports.mediaShare = (req, res) => {
   res.render("mediaShare", {
     pageTitle: "Media Sharing",
@@ -60,9 +68,92 @@ exports.mediaShare = (req, res) => {
   });
 };
 
+exports.removeTextTrackTool = (req, res) => {
+  res.render("removeTextTrack", {
+    pageTitle: "Remove TextTrack",
+    active: "bc",
+    bcAccounts: bc.accounts
+  });
+};
+
+// -----------
+
+async function getVideoIdFromRefID(accountId, ref, refType){
+  
+  if(refType === 'id') 
+    return ref
+  else if (refType === 'refId') {
+    const bcToken = await exports.getBcToken();
+    const headers = {
+      'Authorization': `Bearer ${bcToken.token}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+    const url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/ref:${ref}`;
+    const options = {
+      method: 'get',
+      url,
+      headers
+    }
+
+
+    console.log(accountId, ref, refType)
+    return await axios(options);
+  }
+}
+
+async function updateVideo(accountId, videoId, body) {
+  const bcToken = await exports.getBcToken();
+  let url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/${videoId}`;
+  const headers = {
+    'Authorization': `Bearer ${bcToken.token}`,
+    'Content-Type': 'application/x-www-form-urlencoded'
+  };
+  const options = {
+    method: 'patch',
+    url,
+    headers,
+    data: body
+  }
+
+  console.log("Updating video:", accountId, videoId, body);
+  return await axios(options);
+}
+
 
 // ----------- APIs
 exports.csvUpload = multer({ inMemory: true}).single('csv');
+
+exports.removeTextTrack = async (req, res) => {
+  const accountId = req.body.accountId;
+  const ref = req.body.ref;
+  const refType = req.body.refType;
+  const body = { "text_tracks": [] };
+  let videoId =  ""; 
+  let response = "";
+  
+
+  try {
+    response = await getVideoIdFromRefID(accountId, ref, refType);
+    videoId = response.data.id;
+    console.log("Response VideoID:", videoId);
+  } catch (error) {
+    console.log(error.response.status);
+    res.status(error.response.status).send('RefID not found!');
+    return;
+  }  
+
+  try {
+    console.log("Calling updateVideo");
+    response = await updateVideo(accountId, videoId, body);
+    console.log("Update Video Finished");
+    res.sendStatus(200);
+  } catch (error) {
+    console.log("Err:", error);
+    console.log(error.response.status);
+    res.status(error.response.status).send('Video Not Updated');
+    return;
+  } 
+}
 
 exports.mediaShareSingle = async (req, res) => {
   const data = req.body;   // { accountId, oldId, idType, newRefId }
@@ -127,11 +218,55 @@ exports.mediaShareBatch = async (req, res) => {
   csvArr.pop();
   csvArr.shift();
 
+  console.log(csvArr);
+
   res.status(200).send(JSON.stringify(csvArr));
 }
 
 
-exports.refIdUpdateSingle = async (req, res) => {
+exports.metadataUpdate = async (req, res) => {
+  const data = req.body;
+  const accountId = req.body.accountId;
+  const ref = req.body.ref;
+  const refType = req.body.refType;
+  let videoId =  ""; 
+  let response = "";
+  
+  try {
+    response = await getVideoIdFromRefID(accountId, ref, refType);
+    videoId = response.data.id;
+  } catch (error) {
+    console.log(error.response.status);
+    res.status(error.response.status).send('RefID not found!');
+    return;
+  }
+
+  const body = {}; 
+
+  if(data.reference_id && data.reference_id !== ""){
+    body.reference_id = data.reference_id;
+  }
+  if(data.name && data.name !== ""){
+    body.name = data.name;
+  }
+  if(data.tags && data.tags !== ""){
+    body.tags = data.tags;
+  }
+  if(data.description && data.description !== ""){
+    body.description = data.description;
+  }
+
+  try {
+    response = await updateVideo(accountId, videoId, body);
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(error.response.status).send('Video Not Updated');
+    return;
+  } 
+}
+
+
+exports.refIdUpdate = async (req, res) => {
   const data = req.body;   // { accountId, oldId, idType, newRefId }
   let videoId = "";
   let response = {};
@@ -178,12 +313,14 @@ exports.refIdUpdateSingle = async (req, res) => {
 
   try {
     response = await axios(options);
+    console.log(response);
     res.sendStatus(200);
   } catch (error) {
     console.log(error.response.status, error.response.statusText);
     res.status(error.response.status).send({ error: error.response.statusText });
   }
 }
+
 
 exports.refIdUpdateBatch = async (req, res) => {
   let filename = req.file.originalname;
@@ -482,3 +619,4 @@ exports.getBcToken = async () => {
   }
 
 }
+
