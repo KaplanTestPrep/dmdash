@@ -102,9 +102,9 @@ router.get(
 );
 
 router.post(
-  "/refIdUpdateTool",
+  "/refIdUpdate",
   authController.isLoggedIn,
-  catchErrors(bcController.refIdUpdateSingle)
+  catchErrors(bcController.refIdUpdate)
 );
 
 router.post(
@@ -112,6 +112,18 @@ router.post(
   authController.isLoggedIn,
   bcController.csvUpload,
   bcController.refIdUpdateBatch
+);
+
+router.get(
+  "/metadataUpdateTool",
+  authController.isLoggedIn,
+  bcController.metadataUpdateTool
+);
+
+router.post(
+  "/metadataUpdate",
+  authController.isLoggedIn,
+  bcController.metadataUpdate
 );
 
 router.get("/mediaShare", authController.isLoggedIn, bcController.mediaShare);
@@ -128,6 +140,19 @@ router.post(
   bcController.csvUpload,
   bcController.mediaShareBatch
 );
+
+router.get(
+  "/removeTextTrack",
+  authController.isLoggedIn,
+  bcController.removeTextTrackTool
+);
+
+router.post(
+  "/removeTextTrack",
+  authController.isLoggedIn,
+  bcController.removeTextTrack
+);
+
 
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);
