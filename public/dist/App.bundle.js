@@ -9891,7 +9891,7 @@ window.$ = _jquery2.default;
   (0, _jquery2.default)('#videoRenditions').click(function (e) {
     return handleVideoRenditions(e);
   });
-  (0, _jquery2.default)('#batchRetranscode').click(function (e) {
+  (0, _jquery2.default)('#batchRetranscodeForm').submit(function (e) {
     return handleBatchRetranscode(e);
   });
   (0, _jquery2.default)("#thumbnailUploadForm").submit(function (e) {
@@ -9989,9 +9989,10 @@ function handleVideoRenditions(e) {
 function handleBatchRetranscode(e) {
   e.preventDefault();
   var accountId = (0, _jquery2.default)('#bcAcccount').val();
-  var videos = (0, _jquery2.default)('#vidoesToTranscode').val().trim().split(/[\r\n\s,]+/);
-  var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
+  var videos = (0, _jquery2.default)('#vidoesToUpdate').val().trim().split(/[\r\n\s,]+/);
+  var refType = (0, _jquery2.default)('input[name=refType]:checked').val();
   var renditionProfile = (0, _jquery2.default)('#bcRenditionProfile').val();
+
   var percentDone = 0;
   var completed = 0;
   var fail = 0;
@@ -10001,14 +10002,14 @@ function handleBatchRetranscode(e) {
   (0, _jquery2.default)('ul#success').html("");
   (0, _jquery2.default)('ul#fail').html("");
 
-  videos.forEach(function (video) {
+  videos.forEach(function (ref) {
     _jquery2.default.ajax({
-      url: '/bcRetranscode',
+      url: '/retranscodeVideo',
       type: "POST",
       data: {
         accountId: accountId,
-        videoId: video,
-        idType: idType,
+        ref: ref,
+        refType: refType,
         renditionProfile: renditionProfile
       }
     }).done(function (res) {
@@ -10016,15 +10017,15 @@ function handleBatchRetranscode(e) {
       completed++;
       (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
       (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-      (0, _jquery2.default)('ul#success').append('<li>' + video + ' Sucessfully processsed.</li>');
+      (0, _jquery2.default)('ul#success').append('<li>' + ref + ' Sucessfully processsed.</li>');
     }).fail(function (err) {
       completed++;
       fail++;
 
-      console.log(video + ' Failed: ' + err.responseText, err);
+      console.log(ref + ' Failed: ' + err.responseText, err);
       (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
       (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-      (0, _jquery2.default)('ul#fail').append('<li>' + video + ' Failed: ' + err.responseText + '</li>');
+      (0, _jquery2.default)('ul#fail').append('<li>' + ref + ' Failed: ' + err.responseText + '</li>');
     });
   });
 }
