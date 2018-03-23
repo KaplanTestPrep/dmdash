@@ -9894,8 +9894,8 @@ window.$ = _jquery2.default;
   (0, _jquery2.default)('#batchRetranscode').click(function (e) {
     return handleBatchRetranscode(e);
   });
-  (0, _jquery2.default)("#imageUploadForm").submit(function (e) {
-    return handleImageUploadForm(e);
+  (0, _jquery2.default)("#thumbnailUploadForm").submit(function (e) {
+    return handleThumbnailUploadForm(e);
   });
   (0, _jquery2.default)('#thumbnailUpdateForm').submit(function (e) {
     return handleThumbnailUpdateForm(e);
@@ -9903,11 +9903,8 @@ window.$ = _jquery2.default;
   (0, _jquery2.default)('#refIdUpdateForm').submit(function (e) {
     return handleRefIdUpdateForm(e);
   });
-  (0, _jquery2.default)('#mediaShareSingleForm').submit(function (e) {
-    return handleMediaShareSingleForm(e);
-  });
-  (0, _jquery2.default)('#mediaShareBatchForm').submit(function (e) {
-    return handleMediaShareBatchForm(e);
+  (0, _jquery2.default)('#mediaShareForm').submit(function (e) {
+    return handleMediaShareForm(e);
   });
   (0, _jquery2.default)('#metadataUpdateForm').submit(function (e) {
     return handleMetadataCSV(e);
@@ -10032,7 +10029,7 @@ function handleBatchRetranscode(e) {
   });
 }
 
-function handleImageUploadForm(e) {
+function handleThumbnailUploadForm(e) {
   (0, _jquery2.default)("span#status").removeClass();
   (0, _jquery2.default)("span#status").text("");
   (0, _jquery2.default)("span#status").addClass('text-warning');
@@ -10065,7 +10062,7 @@ function handleThumbnailUpdateForm(e) {
   e.preventDefault();
   var accountId = (0, _jquery2.default)('#bcAcccount').val();
   var videos = (0, _jquery2.default)('#vidoesToUpdate').val().trim().split(/[\r\n\s,]+/);
-  var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
+  var refType = (0, _jquery2.default)('input[name=refType]:checked').val();
   var thumbnailFileName = (0, _jquery2.default)('#uploadedImage').val();
   var completed = 0;
   var fail = 0;
@@ -10081,8 +10078,8 @@ function handleThumbnailUpdateForm(e) {
       type: "POST",
       data: {
         accountId: accountId,
-        videoId: video,
-        idType: idType,
+        ref: video,
+        refType: refType,
         thumbnailFileName: thumbnailFileName
       }
     }).done(function (res) {
@@ -10103,9 +10100,8 @@ function handleThumbnailUpdateForm(e) {
   });
 }
 
-function handleRefIdUpdateForm(e) {
+async function handleRefIdUpdateForm(e) {
   e.preventDefault();
-
   (0, _jquery2.default)('#resultsCard').removeClass('hidden');
   (0, _jquery2.default)('ul#success').html("");
   (0, _jquery2.default)('ul#fail').html("");
@@ -10115,105 +10111,57 @@ function handleRefIdUpdateForm(e) {
   var total = 1;
 
   var accountId = (0, _jquery2.default)('#bcAccount').val();
-  var oldId = (0, _jquery2.default)('#oldId').val().trim();
-  var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
-  var newRefId = (0, _jquery2.default)('#newRefId').val().trim();
-
-  _jquery2.default.ajax({
-    url: '/metadataUpdateTool', //refIdUpdateTool 
-    type: "POST",
-    data: {
-      accountId: accountId,
-      idType: idType,
-      ref: oldId,
-      reference_id: newRefId
-    }
-  }).done(function (res) {
-    console.log(res);
-    completed++;
-    (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
-    (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-    (0, _jquery2.default)('ul#success').append('<li>' + oldId + ' --> ' + newRefId + ' Sucessfully processsed.</li>');
-  }).fail(function (err) {
-    completed++;
-    fail++;
-
-    console.log(oldId + ' --> ' + newRefId + ' Failed: ' + err.responseText, err);
-    (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
-    (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-    (0, _jquery2.default)('ul#fail').append('<li>' + oldId + ' > ' + newRefId + ' Failed: ' + err.responseText + '</li>');
-  });
-}
-
-async function handleRefIdUpdateBatchForm(e) {
-  (0, _jquery2.default)("span#status").removeClass();
-  (0, _jquery2.default)("span#status").text("");
-  e.preventDefault();
-
-  var percentDone = 0;
-  var completed = 0;
-  var fail = 0;
-  var total = 0;
-
-  var accountId = (0, _jquery2.default)('#bcAccountBatch').val();
-  var idType = (0, _jquery2.default)('input[name=idTypeBatch]:checked').val();
+  var refType = (0, _jquery2.default)('input[name=refType]:checked').val();
   var file = document.getElementById('selectCSV').files[0];
   if (!file) return;
 
   var results = await papaPromisified(file);
-  console.log("For real:", results);
-  total = results.length;
+  var videos = results.data;
+  videos.shift();
 
-  var data = results.data;
-  data.shift();
+  console.log(videos);
 
-  data.forEach(function (video) {
+  total = videos.length;
+
+  videos.forEach(function (video) {
     var _ref = [].concat(_toConsumableArray(video)),
-        refId = _ref[0],
-        title = _ref[1],
-        tags = _ref[2],
-        shortDescription = _ref[3];
-
-    var tagsArr = tags.split(",");
-    console.log(refId, title, tags, shortDescription, accountId, idType);
+        ref = _ref[0],
+        newRefId = _ref[1];
 
     (0, _jquery2.default)('#resultsCard').removeClass('hidden');
     (0, _jquery2.default)('ul#success').html("");
     (0, _jquery2.default)('ul#fail').html("");
 
     _jquery2.default.ajax({
-      url: '/metadataUpdateTool',
+      url: '/refIdUpdate',
       type: "POST",
       data: {
         accountId: accountId,
-        idType: idType,
-        ref: refId,
-        reference_id: refId,
-        name: title,
-        tags: tagsArr,
-        description: shortDescription
+        ref: ref,
+        refType: refType,
+        reference_id: newRefId
       }
     }).done(function (res) {
       console.log(res);
       completed++;
       (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
       (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-      (0, _jquery2.default)('ul#success').append('<li>' + refId + ' --> Sucessfully processsed.</li>');
+      (0, _jquery2.default)('ul#success').append('<li>' + ref + ' --> Sucessfully processsed.</li>');
     }).fail(function (err) {
       completed++;
       fail++;
 
-      console.log(refId + ' --> Failed: ' + err.responseText, err);
+      console.log(ref + ' --> Failed: ' + err.responseText, err);
       (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
       (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-      (0, _jquery2.default)('ul#fail').append('<li>' + refId + ' > Failed: ' + err.responseText + '</li>');
+      (0, _jquery2.default)('ul#fail').append('<li>' + ref + ' > Failed: ' + err.responseText + '</li>');
     });
   });
 
-  document.getElementById('refIdUpdateBatchForm').reset();
+  document.getElementById('refIdUpdateForm').reset();
 }
 
-function handleMediaShareSingleForm(e) {
+function handleMediaShareForm(e) {
   e.preventDefault();
   (0, _jquery2.default)('#resultsCard').removeClass('hidden');
   (0, _jquery2.default)('ul#success').html("");
@@ -10225,103 +10173,36 @@ function handleMediaShareSingleForm(e) {
 
   var accountIdSource = (0, _jquery2.default)('#bcAccountSource').val();
   var accountIdDest = (0, _jquery2.default)('#bcAccountDest').val();
-  var refId = (0, _jquery2.default)('#refId').val().trim();
-  var idType = (0, _jquery2.default)('input[name=idType]:checked').val();
+  var videos = (0, _jquery2.default)('#vidoesToUpdate').val().trim().split(/[\r\n\s,]+/);
+  var refType = (0, _jquery2.default)('input[name=refType]:checked').val();
+  var ref = "";
 
-  _jquery2.default.ajax({
-    url: '/mediaShare',
-    type: "POST",
-    data: {
-      accountIdSource: accountIdSource,
-      accountIdDest: accountIdDest,
-      refId: refId,
-      idType: idType
-    }
-  }).done(function (res) {
-    console.log(res);
-    completed++;
-    (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
-    (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-    (0, _jquery2.default)('ul#success').append('<li>Moved ' + refId + ' from ' + accountIdSource + ' to ' + accountIdSource + ' - Sucessfully processsed.</li>');
-  }).fail(function (err) {
-    completed++;
-    fail++;
+  videos.forEach(function (video) {
+    ref = video;
+    _jquery2.default.ajax({
+      url: '/mediaShare',
+      type: "POST",
+      data: {
+        accountIdSource: accountIdSource,
+        accountIdDest: accountIdDest,
+        ref: ref,
+        refType: refType
+      }
+    }).done(function (res) {
+      console.log(res);
+      completed++;
+      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+      (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+      (0, _jquery2.default)('ul#success').append('<li>Moved ' + ref + ' from ' + accountIdSource + ' to ' + accountIdSource + ' - Sucessfully processsed.</li>');
+    }).fail(function (err) {
+      completed++;
+      fail++;
 
-    console.log('Moving ' + refId + ' from ' + accountIdSource + ' to ' + accountIdSource + ' - Failed: ' + err.responseText, err);
-    (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
-    (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-    (0, _jquery2.default)('ul#fail').append('<li>Moving ' + refId + ' from ' + accountIdSource + ' to ' + accountIdDest + ' - Failed: ' + err.responseText + '</li>');
-  });
-}
-
-function handleMediaShareBatchForm(e) {
-  (0, _jquery2.default)("span#status").removeClass();
-  (0, _jquery2.default)("span#status").text("");
-  (0, _jquery2.default)("span#status").addClass('text-warning');
-  (0, _jquery2.default)("span#status").text("  Uploading...");
-  e.preventDefault();
-
-  var accountIdSource = (0, _jquery2.default)('#bcAccountSourceBatch').val();
-  var accountIdDest = (0, _jquery2.default)('#bcAccountDestBatch').val();
-  var idType = (0, _jquery2.default)('input[name=idTypeBatch]:checked').val();
-
-  var fileSelect = document.getElementById('selectCSVBatch');
-  console.log(fileSelect);
-
-  var files = fileSelect.files;
-  var form = new FormData();
-  form.append('csv', files[0], files[0].name);
-
-  _jquery2.default.ajax({
-    url: '/mediaShareBatch',
-    data: form,
-    processData: false,
-    contentType: false,
-    type: 'POST',
-    success: function success(data) {
-      var dataArr = JSON.parse(data);
-
-      (0, _jquery2.default)("span#status").removeClass();
-      (0, _jquery2.default)("span#status").addClass('text-success');
-      (0, _jquery2.default)("span#status").text("  Upload Completed!");
-
-      var completed = 0;
-      var fail = 0;
-      var total = dataArr.length;
-
-      console.log(dataArr);
-      dataArr.forEach(function (item) {
-        var refId = item;
-
-        (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-        (0, _jquery2.default)('ul#success').html("");
-        (0, _jquery2.default)('ul#fail').html("");
-
-        _jquery2.default.ajax({
-          url: '/mediaShare',
-          type: "POST",
-          data: {
-            accountIdSource: accountIdSource,
-            accountIdDest: accountIdDest,
-            idType: idType,
-            refId: item
-          }
-        }).done(function (res) {
-          completed++;
-          (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
-          (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-          (0, _jquery2.default)('ul#success').append('<li>Moved ' + refId + ' from ' + accountIdSource + ' to ' + accountIdDest + ' - Sucessfully processsed.</li>');
-        }).fail(function (err) {
-          completed++;
-          fail++;
-
-          console.log('Moving ' + refId + ' from ' + accountIdSource + ' to ' + accountIdDest + ' - Failed: ' + err.responseText, err);
-          (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
-          (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-          (0, _jquery2.default)('ul#fail').append('<li>Moving ' + refId + ' from ' + accountIdSource + ' to ' + accountIdDest + ' - Failed: ' + err.responseText + '</li>');
-        });
-      });
-    }
+      console.log('Moving ' + ref + ' from ' + accountIdSource + ' to ' + accountIdSource + ' - Failed: ' + err.responseText, err);
+      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+      (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+      (0, _jquery2.default)('ul#fail').append('<li>Moving ' + ref + ' from ' + accountIdSource + ' to ' + accountIdDest + ' - Failed: ' + err.responseText + '</li>');
+    });
   });
 }
 
@@ -10332,19 +10213,18 @@ async function handleMetadataCSV(e) {
   var fail = 0;
   var total = 0;
 
-  var accountId = (0, _jquery2.default)('#bcAccountBatch').val();
-  var refType = (0, _jquery2.default)('input[name=idTypeBatch]:checked').val();
-
+  var accountId = (0, _jquery2.default)('#bcAccount').val();
+  var refType = (0, _jquery2.default)('input[name=refType]:checked').val();
   var file = document.getElementById('selectCSV').files[0];
   if (!file) return;
 
   var results = await papaPromisified(file);
-  var data = results.data;
-  data.shift();
+  var videos = results.data;
+  videos.shift();
 
-  total = data.length;
+  total = videos.length;
 
-  data.forEach(function (video) {
+  videos.forEach(function (video) {
     var _ref2 = [].concat(_toConsumableArray(video)),
         ref = _ref2[0],
         name = _ref2[1],
