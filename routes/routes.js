@@ -71,9 +71,9 @@ router.get(
 );
 
 router.post(
-  "/bcRetranscode",
+  "/retranscodeVideo",
   authController.isLoggedIn,
-  catchErrors(bcController.retranscode)
+  catchErrors(bcController.retranscodeVideo)
 );
 
 router.get(
