@@ -5,7 +5,7 @@ window.$ = $;
 $(document).ready(function () {
 
     $('#videoRenditions').click((e) => handleVideoRenditions(e));
-    $('#batchRetranscode').click((e) => handleBatchRetranscode(e));
+    $('#batchRetranscodeForm').submit((e) => handleBatchRetranscode(e));
     $("#thumbnailUploadForm").submit((e) => handleThumbnailUploadForm(e));
     $('#thumbnailUpdateForm').submit((e) => handleThumbnailUpdateForm(e));
     $('#refIdUpdateForm').submit((e) => handleRefIdUpdateForm(e));
@@ -121,9 +121,10 @@ function handleVideoRenditions(e) {
 function handleBatchRetranscode(e) {
     e.preventDefault();
     const accountId = $('#bcAcccount').val();
-    const videos = $('#vidoesToTranscode').val().trim().split(/[\r\n\s,]+/);
-    const idType = $('input[name=idType]:checked').val();
+    const videos = $('#vidoesToUpdate').val().trim().split(/[\r\n\s,]+/);
+    const refType = $('input[name=refType]:checked').val();
     const renditionProfile = $('#bcRenditionProfile').val();
+    
     let percentDone = 0;
     let completed = 0
     let fail = 0;
@@ -133,14 +134,14 @@ function handleBatchRetranscode(e) {
     $('ul#success').html(""); 
     $('ul#fail').html(""); 
 
-    videos.forEach(video => {
+    videos.forEach(ref => {
       $.ajax({
-        url: `/bcRetranscode`,
+        url: `/retranscodeVideo`,
         type: "POST",
         data: {
           accountId,
-          videoId: video,
-          idType,
+          ref,
+          refType,
           renditionProfile
         }
       })
@@ -149,16 +150,16 @@ function handleBatchRetranscode(e) {
           completed++;
           $('.progress-bar').css("width", `${(completed/total)*100}%`);
           $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
-          $('ul#success').append(`<li>${video} Sucessfully processsed.</li>`);
+          $('ul#success').append(`<li>${ref} Sucessfully processsed.</li>`);
       })
       .fail(err => {
           completed++;
           fail++;
           
-          console.log(`${video} Failed: ${err.responseText}`, err);
+          console.log(`${ref} Failed: ${err.responseText}`, err);
           $('.progress-bar').css("width", `${(completed/total)*100}%`);
           $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
-          $('ul#fail').append(`<li>${video} Failed: ${err.responseText}</li>`);
+          $('ul#fail').append(`<li>${ref} Failed: ${err.responseText}</li>`);
         })
     });
 }

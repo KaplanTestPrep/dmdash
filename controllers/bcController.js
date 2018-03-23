@@ -337,41 +337,28 @@ exports.bcThumbnailUpdate = async (req, res) => {
   
 }
 
-exports.retranscode = async (req, res) => {
-  const data = req.body;
+exports.retranscodeVideo = async (req, res) => {
+  const data = req.body;  // accountId, ref, refType, renditionProfile
+  const accountId = req.body.accountId;
+  const ref = req.body.ref;
+  const refType = req.body.refType;
   let response = {};
   let videoId = "";
+
+  try {
+    response = await getVideoIdFromRefID(accountId, ref, refType);
+    videoId = response.data.id;
+  } catch (error) {
+    return res.status(error.response.status).send('RefID not found!');
+  }
+
+
   let bcToken = await exports.getBcToken();
   const headers = {
     'Authorization': `Bearer ${bcToken.token}`,
     'Content-Type': 'application/json'
   };
-
-
-  if (data.idType === 'refId') {
-    let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountId}/videos/ref:${data.videoId}`
-    const options = {
-      method: 'get',
-      url,
-      headers
-    }
-
-    try {
-      response = await axios(options);
-    } catch (error) {
-      console.log(error.response.status);
-      res.status(error.response.status).send('RefId not found!');
-      return;
-    }
-
-    videoId = response.data.id;
-
-  } else {
-    videoId = data.videoId;
-  }
-
-
-  let url = `https://ingest.api.brightcove.com/v1/accounts/${data.accountId}/videos/${videoId}/ingest-requests`
+  let url = `https://ingest.api.brightcove.com/v1/accounts/${accountId}/videos/${videoId}/ingest-requests`
   const body = {
     master: { "use_archived_master": true },
     profile: `${data.renditionProfile}`
@@ -385,10 +372,10 @@ exports.retranscode = async (req, res) => {
 
   try {
     response = await axios(options);
-    res.sendStatus(200);
+    return res.sendStatus(200);
   } catch (error) {
     console.log(error.response.status, error.response.statusText);
-    res.status(error.response.status).send({ error: error.response.statusText });
+    return res.status(error.response.status).send({ error: error.response.statusText });
   }
 };
 
