@@ -5,22 +5,22 @@ block content
     .row
         .col-lg-12.col-md-12
             .card
-                form.form-horizontal#refIdUpdateForm
+                form.form-horizontal#mediaShareForm
                     .card-header
                         h4.card-title
-                            | Batch RefID Update
+                            | Media Sharing Batch
                     .card-content
                         .form-group
-                            label.col-md-3.control-label Select BC Account:
+                            label.col-md-3.control-label Select Source BC Account:
                             .col-md-3
                                 .bootstrap-select
-                                    select.selectpicker#bcAccount(name="accountId")
+                                    select.selectpicker#bcAccountSource(name="accountId")
                                         each acc in bcAccounts
                                             option(value=acc.id)=acc.name
                         .form-group
-                                label.col-md-3.control-label Select CSV File
-                                .col-md-3
-                                    input.btn.btn-default#selectCSV(type="file" name="csv" accept="text/csv" required)
+                            label.col-md-3.control-label Videos to be shared:
+                            .col-md-3
+                                textarea.form-control.datepicker#vidoesToUpdate(placeholder='Videos to be shared.', rows='8' required)
                         .form-group
                             label.col-md-3.control-label Type of ID :
                             .col-md-3
@@ -32,11 +32,18 @@ block content
                                     input.form-control(type="radio", name="refType", value="id", id="listById")
                                     label(for='id')
                                         | Video ID
+                        .form-group
+                            label.col-md-3.control-label Select Destination BC Account:
+                            .col-md-3
+                                .bootstrap-select
+                                    select.selectpicker#bcAccountDest(name="accountId")
+                                        each acc in bcAccounts
+                                            option(value=acc.id)=acc.name
                     .card-footer
                         .form-group
                             label.col-md-3
                             .col-md-9
-                                button.btn.btn-fill.btn-default#refIdUpdateBtn(type='submit') Update RefID Batch
+                                button.btn.btn-fill.btn-default#mediaShareBtn(type='submit') Share Videos
                                 span#status
     .row
         .col-lg-12.col-md-12
@@ -53,5 +60,4 @@ block content
                             ul#success
                         .col-md-3
                             ul#fail
-    script(src='/js/papaparse.min.js')
-    
+
