@@ -107,13 +107,6 @@ router.post(
   catchErrors(bcController.refIdUpdate)
 );
 
-router.post(
-  "/refIdUpdateBatch",
-  authController.isLoggedIn,
-  bcController.csvUpload,
-  bcController.refIdUpdateBatch
-);
-
 router.get(
   "/metadataUpdateTool",
   authController.isLoggedIn,
@@ -126,23 +119,19 @@ router.post(
   bcController.metadataUpdate
 );
 
-router.get("/mediaShare", authController.isLoggedIn, bcController.mediaShare);
+router.get(
+  "/mediaShareTool", 
+  authController.isLoggedIn, 
+  bcController.mediaShareTool);
 
 router.post(
   "/mediaShare",
   authController.isLoggedIn,
-  catchErrors(bcController.mediaShareSingle)
-);
-
-router.post(
-  "/mediaShareBatch",
-  authController.isLoggedIn,
-  bcController.csvUpload,
-  bcController.mediaShareBatch
+  catchErrors(bcController.mediaShare)
 );
 
 router.get(
-  "/removeTextTrack",
+  "/removeTextTrackTool",
   authController.isLoggedIn,
   bcController.removeTextTrackTool
 );
