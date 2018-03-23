@@ -60,8 +60,8 @@ exports.metadataUpdateTool = (req, res) => {
   });
 };
 
-exports.mediaShare = (req, res) => {
-  res.render("mediaShare", {
+exports.mediaShareTool = (req, res) => {
+  res.render("mediaShareTool", {
     pageTitle: "Media Sharing",
     active: "bc",
     bcAccounts: bc.accounts
@@ -95,15 +95,14 @@ async function getVideoIdFromRefID(accountId, ref, refType){
       headers
     }
 
-
-    console.log(accountId, ref, refType)
+    console.log("Inside getVideoByRefID: ",accountId, ref, refType);
     return await axios(options);
   }
 }
 
 async function updateVideo(accountId, videoId, body) {
   const bcToken = await exports.getBcToken();
-  let url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/${videoId}`;
+  const url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/${videoId}`;
   const headers = {
     'Authorization': `Bearer ${bcToken.token}`,
     'Content-Type': 'application/x-www-form-urlencoded'
@@ -115,7 +114,6 @@ async function updateVideo(accountId, videoId, body) {
     data: body
   }
 
-  console.log("Updating video:", accountId, videoId, body);
   return await axios(options);
 }
 
@@ -135,66 +133,45 @@ exports.removeTextTrack = async (req, res) => {
   try {
     response = await getVideoIdFromRefID(accountId, ref, refType);
     videoId = response.data.id;
-    console.log("Response VideoID:", videoId);
   } catch (error) {
-    console.log(error.response.status);
-    res.status(error.response.status).send('RefID not found!');
-    return;
+    return res.status(error.response.status).send('RefID not found!');
   }  
 
   try {
     console.log("Calling updateVideo");
     response = await updateVideo(accountId, videoId, body);
-    console.log("Update Video Finished");
-    res.sendStatus(200);
+    return res.sendStatus(200);
   } catch (error) {
-    console.log("Err:", error);
-    console.log(error.response.status);
-    res.status(error.response.status).send('Video Not Updated');
-    return;
+    return res.status(error.response.status).send('Error Updating Video!');
+    
   } 
 }
 
-exports.mediaShareSingle = async (req, res) => {
-  const data = req.body;   // { accountId, oldId, idType, newRefId }
+exports.mediaShare = async (req, res) => {
+  // { accountIdSource, accountIdDest, ref, refType }
+  console.log(req.body);
+  const accountIdSource = req.body.accountIdSource;
+  const accountIdDest = req.body.accountIdDest;
+  const ref = req.body.ref;
+  const refType = req.body.refType;
   let videoId = "";
   let response = {};
-  let bcToken = await exports.getBcToken();
 
+  try {
+    response = await getVideoIdFromRefID(accountIdSource, ref, refType);
+    videoId = response.data.id;
+    console.log()
+  } catch (error) {
+    return res.status(error.response.status).send('RefID not found!');
+  }
+
+  const url = `https://cms.api.brightcove.com/v1/accounts/${accountIdSource}/videos/${videoId}/shares`;
+  const bcToken = await exports.getBcToken();
   const headers = {
     'Authorization': `Bearer ${bcToken.token}`,
     'Content-Type': 'application/x-www-form-urlencoded'
   };
-
-  if (data.idType === 'refId') {
-    let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountIdSource}/videos/ref:${data.refId}`;
-
-  const options = {
-      method: 'get',
-      url,
-      headers
-    }
-
-    try {
-      response = await axios(options);
-    } catch (error) {
-      console.log(error.response.status);
-      res.status(error.response.status).send('RefID not found!');
-      return;
-    }
-
-    videoId = response.data.id;
-
-  } else {
-    videoId = data.refId;
-  }
-
-  let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountIdSource}/videos/${videoId}/shares`;
-
-  const body = [
-    {id : data.accountIdDest}
-  ];
-
+  const body = [{ id : accountIdDest }];
   const options = {
     method: 'post',
     url,
@@ -211,19 +188,6 @@ exports.mediaShareSingle = async (req, res) => {
   }
 }
 
-exports.mediaShareBatch = async (req, res) => {
-  let filename = req.file.originalname;
-  let csvString = req.file.buffer.toString();
-  let csvArr = csvString.split(/\r?\n/);
-  csvArr.pop();
-  csvArr.shift();
-
-  console.log(csvArr);
-
-  res.status(200).send(JSON.stringify(csvArr));
-}
-
-
 exports.metadataUpdate = async (req, res) => {
   const data = req.body;
   const accountId = req.body.accountId;
@@ -236,9 +200,7 @@ exports.metadataUpdate = async (req, res) => {
     response = await getVideoIdFromRefID(accountId, ref, refType);
     videoId = response.data.id;
   } catch (error) {
-    console.log(error.response.status);
-    res.status(error.response.status).send('RefID not found!');
-    return;
+    return res.status(error.response.status).send('RefID not found!');
   }
 
   const body = {}; 
@@ -258,80 +220,50 @@ exports.metadataUpdate = async (req, res) => {
 
   try {
     response = await updateVideo(accountId, videoId, body);
-    res.sendStatus(200);
+    return res.sendStatus(200);
   } catch (error) {
-    res.status(error.response.status).send('Video Not Updated');
-    return;
+    return res.status(error.response.status).send('Error updating Video!');
+    
   } 
 }
 
-
 exports.refIdUpdate = async (req, res) => {
-  const data = req.body;   // { accountId, oldId, idType, newRefId }
-  let videoId = "";
-  let response = {};
-  let bcToken = await exports.getBcToken();
-
-  const headers = {
-    'Authorization': `Bearer ${bcToken.token}`,
-    'Content-Type': 'application/json'
-  };
-
-  if (data.idType === 'refId') {
-    let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountId}/videos/ref:${data.oldId}`
-    const options = {
-      method: 'get',
-      url,
-      headers
-    }
-
-    try {
-      response = await axios(options);
-    } catch (error) {
-      console.log(error.response.status);
-      res.status(error.response.status).send('RefID not found!');
-      return;
-    }
-
-    videoId = response.data.id;
-
-  } else {
-    videoId = data.oldId;
-  }
-
-  let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountId}/videos/${videoId}`;
-  const body = {
-    reference_id : data.newRefId
-  }
-
-  const options = {
-    method: 'patch',
-    url,
-    headers,
-    data: body
-  }
+  const data = req.body;   // accountId,  ref,  refType, reference_id
+  const accountId = req.body.accountId;
+  const ref = req.body.ref;
+  const refType = req.body.refType;
+  const reference_id = req.body.reference_id;
+  let videoId =  ""; 
+  let response = "";
 
   try {
-    response = await axios(options);
-    console.log(response);
-    res.sendStatus(200);
+    response = await getVideoIdFromRefID(accountId, ref, refType);
+    videoId = response.data.id;
+    console.log(videoId);
   } catch (error) {
-    console.log(error.response.status, error.response.statusText);
-    res.status(error.response.status).send({ error: error.response.statusText });
+    console.log(error.response.status);
+    res.status(error.response.status).send('RefID not found!');
+    return;
   }
+
+  console.log("Setting body");
+
+  const body = {
+    reference_id: reference_id
+  };
+
+  try {
+    console.log("Updating Video:  ", accountId, videoId, body);
+    response = await updateVideo(accountId, videoId, body);
+    console.log(response);
+    return res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    return res.status(error.response.status).send('Video Not Updated');
+    
+  }
+
 }
-
-
-exports.refIdUpdateBatch = async (req, res) => {
-  let filename = req.file.originalname;
-  let csvString = req.file.buffer.toString();
-  let csvArr = csvString.split(/\r?\n/);
-  csvArr.pop();
-  csvArr.shift();
-
-  res.status(200).send(JSON.stringify(csvArr));
-}
-
 
 
 exports.thumbnailUpload = multer(imageMulterOptions).single('thumbnail');
@@ -349,7 +281,11 @@ exports.thumbnailSave = (req, res, next) => {
 }
 
 exports.bcThumbnailUpdate = async (req, res) => {
-  const data = req.body;
+  console.log(req.body);
+  const accountId = req.body.accountId;
+  const ref = req.body.ref;
+  const refType = req.body.refType;
+  const thumbnailFileName = req.body.thumbnailFileName;
   let response = {};
   let videoId = "";
   let bcToken = await exports.getBcToken();
@@ -358,33 +294,19 @@ exports.bcThumbnailUpdate = async (req, res) => {
     'Content-Type': 'application/json'
   };
 
-  if (data.idType === 'refId') {
-    let url = `https://cms.api.brightcove.com/v1/accounts/${data.accountId}/videos/ref:${data.videoId}`
-    const options = {
-      method: 'get',
-      url,
-      headers
-    }
-
-    try {
-      response = await axios(options);
-    } catch (error) {
-      console.log(error.response.status);
-      res.status(error.response.status).send('RefId not found!');
-      return;
-    }
-
+  try {
+    response = await getVideoIdFromRefID(accountId, ref, refType);
     videoId = response.data.id;
-
-  } else {
-    videoId = data.videoId;
+  } catch (error) {
+    return res.status(error.response.status).send('RefID not found!');
   }
 
-  // Dev Hardcode
-  // let tumbnailUrl = 'https://common.liveonlinetechnology.com/uploads/Rick.jpg';
-  let tumbnailUrl = `https://common.liveonlinetechnology.com/uploads/${data.thumbnailFileName}`;
 
-  let url = `https://ingest.api.brightcove.com/v1/accounts/${data.accountId}/videos/${videoId}/ingest-requests`;
+  // Dev Hardcode
+   const tumbnailUrl = 'https://common.liveonlinetechnology.com/uploads/Rick.jpg';
+  //const tumbnailUrl = `https://common.liveonlinetechnology.com/uploads/${thumbnailFileName}`;
+
+  const url = `https://ingest.api.brightcove.com/v1/accounts/${accountId}/videos/${videoId}/ingest-requests`;
   const body = {
     poster: {
         url: tumbnailUrl,
@@ -407,10 +329,10 @@ exports.bcThumbnailUpdate = async (req, res) => {
 
   try {
     response = await axios(options);
-    res.sendStatus(200);
+    return res.sendStatus(200);
   } catch (error) {
     console.log(error.response.status, error.response.statusText);
-    res.status(error.response.status).send({ error: error.response.statusText });
+    return res.status(error.response.status).send({ error: error.response.statusText });
   }
   
 }
