@@ -9875,6 +9875,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 "use strict";
 
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
@@ -9911,6 +9913,9 @@ window.$ = _jquery2.default;
   });
   (0, _jquery2.default)('#removeTextTrackForm').submit(function (e) {
     return handleRemoveTextTrack(e);
+  });
+  (0, _jquery2.default)('#createPlaylistForm').submit(function (e) {
+    return handleCreatePlaylist(e);
   });
 });
 
@@ -10097,6 +10102,81 @@ function handleThumbnailUpdateForm(e) {
       (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
       (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
       (0, _jquery2.default)('ul#fail').append('<li>' + video + ' Failed: ' + err.responseText + '</li>');
+    });
+  });
+}
+
+async function handleCreatePlaylist(e) {
+  e.preventDefault();
+  (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+  (0, _jquery2.default)('ul#success').html("");
+  (0, _jquery2.default)('ul#fail').html("");
+
+  var completed = 0;
+  var fail = 0;
+  var total = 0;
+
+  var accountId = (0, _jquery2.default)('#bcAccount').val();
+  var refType = (0, _jquery2.default)('input[name=refType]:checked').val();
+  var file = document.getElementById('selectCSV').files[0];
+  if (!file) return;
+
+  var results = await papaPromisified(file);
+  var dataRows = results.data;
+  dataRows.shift();
+  console.log(dataRows);
+
+  var playlists = [];
+  var playlist = {};
+
+  for (var i = 0; i < dataRows.length; i++) {
+    var _dataRows$i = _slicedToArray(dataRows[i], 4),
+        playlistRefId = _dataRows$i[0],
+        playlistName = _dataRows$i[1],
+        playlistDesc = _dataRows$i[2],
+        videoRefId = _dataRows$i[3];
+
+    if (playlistRefId !== "") {
+      if (i !== 0) playlists.push(playlist);
+
+      playlist = {};
+      playlist.reference_id = playlistRefId;
+      playlist.name = playlistName;
+      playlist.description = playlistDesc;
+      playlist.type = "EXPLICIT";
+      playlist.video_ids = [];
+      playlist.video_ids.push(videoRefId);
+    } else {
+      playlist.video_ids.push(videoRefId);
+    }
+  }
+  playlists.push(playlist);
+  total = playlists.length;
+
+  playlists.forEach(function (play) {
+
+    _jquery2.default.ajax({
+      url: '/createPlaylist',
+      type: "POST",
+      data: {
+        accountId: accountId,
+        refType: refType,
+        playlist: play
+      }
+    }).done(function (res) {
+      console.log(res);
+      completed++;
+      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+      (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+      (0, _jquery2.default)('ul#success').append('<li>' + play.reference_id + ' --> Sucessfully processsed.</li>');
+    }).fail(function (err) {
+      completed++;
+      fail++;
+
+      console.log(play.reference_id + ' --> Failed: ' + err.responseText, err);
+      (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+      (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+      (0, _jquery2.default)('ul#fail').append('<li>' + play.reference_id + ' > Failed: ' + err.responseText + '</li>');
     });
   });
 }
