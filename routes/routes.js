@@ -142,7 +142,17 @@ router.post(
   bcController.removeTextTrack
 );
 
+router.get(
+  "/createPlaylistTool",
+  authController.isLoggedIn,
+  bcController.createPlaylistTool
+);
 
+router.post(
+  "/createPlaylist",
+  authController.isLoggedIn,
+  bcController.createPlaylist
+);
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);
 router.get(
