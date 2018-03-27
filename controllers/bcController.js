@@ -76,12 +76,21 @@ exports.removeTextTrackTool = (req, res) => {
   });
 };
 
+exports.createPlaylistTool = (req, res) => {
+  res.render("createPlaylistTool", {
+    pageTitle: "Create Playlist",
+    active: "bc",
+    bcAccounts: bc.accounts
+  });
+};
+
+
 // -----------
 
 async function getVideoIdFromRefID(accountId, ref, refType){
   
   if(refType === 'id') 
-    return ref
+    return Promise.resolve(ref);
   else if (refType === 'refId') {
     const bcToken = await exports.getBcToken();
     const headers = {
@@ -96,7 +105,7 @@ async function getVideoIdFromRefID(accountId, ref, refType){
     }
 
     console.log("Inside getVideoByRefID: ",accountId, ref, refType);
-    return await axios(options);
+    return axios(options);
   }
 }
 
@@ -114,12 +123,79 @@ async function updateVideo(accountId, videoId, body) {
     data: body
   }
 
-  return await axios(options);
+  return axios(options);
 }
 
 
 // ----------- APIs
 exports.csvUpload = multer({ inMemory: true}).single('csv');
+
+exports.createPlaylist = async (req, res) => {
+  console.log(req.body);
+  // { accountId: '5431089189001',
+  // playlist:
+  //  { reference_id: 'play4',
+  //    name: 'Playlist Test 3',
+  //    description: 'Description 456',
+  //    type: 'EXPLICIT',
+  //    video_ids: [ 'irman44' ] } }
+
+  const accountId = req.body.accountId;
+  const refType = req.body.refType;
+  const playlist = req.body.playlist;
+  
+  let response = {};
+  let videoId = "";
+  let bcToken = await exports.getBcToken();
+  const headers = {
+    'Authorization': `Bearer ${bcToken.token}`,
+    'Content-Type': 'application/json'
+  };
+
+  let video_ids = [];
+  let videoIdPromises = [];
+
+  console.log("ID array:", playlist.video_ids);
+ 
+  videoIdPromises = playlist.video_ids.map( ref => {
+    console.log("Ref: ", ref);
+    return getVideoIdFromRefID(accountId, ref, refType);
+  });
+
+  console.log("Promises Array:", videoIdPromises);
+
+  try {
+    video_ids = (await Promise.all(videoIdPromises)).map(response => {
+      if (typeof response !== 'object') return response;
+      else return response.data.id;
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(error.response.status).send('RefID not found!');
+  }
+
+
+  playlist.video_ids = video_ids;
+  
+  console.log("playlist", playlist);
+
+  let url = `https://ingest.api.brightcove.com/v1/accounts/${accountId}/playlists`
+  const options = {
+    method: 'post',
+    url,
+    headers,
+    data: playlist
+  }
+
+  try {
+    response = await axios(options);
+    return res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    console.log(error.response.status, error.response.statusText);
+    return res.status(error.response.status).send({ error: error.response.statusText });
+  }
+}
 
 exports.removeTextTrack = async (req, res) => {
   const accountId = req.body.accountId;
@@ -132,7 +208,8 @@ exports.removeTextTrack = async (req, res) => {
 
   try {
     response = await getVideoIdFromRefID(accountId, ref, refType);
-    videoId = response.data.id;
+    if (typeof response !== 'object') videoId = response;
+    else videoId = response.data.id;
   } catch (error) {
     return res.status(error.response.status).send('RefID not found!');
   }  
@@ -159,8 +236,8 @@ exports.mediaShare = async (req, res) => {
 
   try {
     response = await getVideoIdFromRefID(accountIdSource, ref, refType);
-    videoId = response.data.id;
-    console.log()
+    if (typeof response !== 'object') videoId = response;
+    else videoId = response.data.id;
   } catch (error) {
     return res.status(error.response.status).send('RefID not found!');
   }
@@ -198,7 +275,8 @@ exports.metadataUpdate = async (req, res) => {
   
   try {
     response = await getVideoIdFromRefID(accountId, ref, refType);
-    videoId = response.data.id;
+    if (typeof response !== 'object') videoId = response;
+    else videoId = response.data.id;
   } catch (error) {
     return res.status(error.response.status).send('RefID not found!');
   }
@@ -238,8 +316,8 @@ exports.refIdUpdate = async (req, res) => {
 
   try {
     response = await getVideoIdFromRefID(accountId, ref, refType);
-    videoId = response.data.id;
-    console.log(videoId);
+    if (typeof response !== 'object') videoId = response;
+    else videoId = response.data.id;
   } catch (error) {
     console.log(error.response.status);
     res.status(error.response.status).send('RefID not found!');
@@ -296,7 +374,8 @@ exports.bcThumbnailUpdate = async (req, res) => {
 
   try {
     response = await getVideoIdFromRefID(accountId, ref, refType);
-    videoId = response.data.id;
+    if (typeof response !== 'object') videoId = response;
+    else videoId = response.data.id;
   } catch (error) {
     return res.status(error.response.status).send('RefID not found!');
   }
@@ -347,7 +426,8 @@ exports.retranscodeVideo = async (req, res) => {
 
   try {
     response = await getVideoIdFromRefID(accountId, ref, refType);
-    videoId = response.data.id;
+    if (typeof response !== 'object') videoId = response;
+    else videoId = response.data.id;
   } catch (error) {
     return res.status(error.response.status).send('RefID not found!');
   }
