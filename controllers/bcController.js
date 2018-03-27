@@ -425,8 +425,6 @@ exports.refIdUpdate = async (req, res) => {
     return;
   }
 
-  console.log("Setting body");
-
   const body = {
     reference_id: reference_id
   };
