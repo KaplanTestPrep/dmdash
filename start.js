@@ -19,6 +19,14 @@ mongoose.connection.on("error", err => {
   console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`);
 });
 
+
+// Printing stack on  Unhandled Promise Rejection
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+  // application specific logging, throwing an error, or other logic here
+});
+
+
 // READY?! Let's go!
 // Import Models here
 require("./models/User");
