@@ -12,7 +12,8 @@ $(document).ready(function () {
     $('#mediaShareForm').submit((e) => handleMediaShareForm(e));
     $('#metadataUpdateForm').submit((e) => handleMetadataCSV(e));
     $('#removeTextTrackForm').submit((e) => handleRemoveTextTrack(e));
-
+    $('#createPlaylistForm').submit((e) => handleCreatePlaylist(e));
+    
 
 });
 
@@ -237,66 +238,141 @@ function handleThumbnailUpdateForm(e) {
     });
 }
 
+async function handleCreatePlaylist(e){
+  e.preventDefault();
+  $('#resultsCard').removeClass('hidden');
+  $('ul#success').html(""); 
+  $('ul#fail').html(""); 
+
+  let completed = 0
+  let fail = 0;
+  let total = 0;
+  
+  const accountId = $('#bcAccount').val();
+  const refType = $('input[name=refType]:checked').val();
+  const file = document.getElementById('selectCSV').files[0];
+  if (!file) return;
+
+  let results = await papaPromisified(file);
+  let dataRows = results.data
+  dataRows.shift();
+  console.log(dataRows);
+ 
+
+  let playlists = [];
+  let playlist = {};
+  
+  for(let i=0; i< dataRows.length;i ++){
+    let [playlistRefId, playlistName, playlistDesc, videoRefId] = dataRows[i];
+
+    if (playlistRefId !== ""){
+      if(i !== 0)
+        playlists.push(playlist);
+      
+      playlist = {};
+      playlist.reference_id = playlistRefId;
+      playlist.name = playlistName;
+      playlist.description = playlistDesc;
+      playlist.type = "EXPLICIT";
+      playlist.video_ids = [];
+      playlist.video_ids.push(videoRefId);
+    }
+    else{
+      playlist.video_ids.push(videoRefId);
+    }
+  }
+  playlists.push(playlist);
+  total = playlists.length;
+
+  playlists.forEach(play => {
+
+    $.ajax({
+      url: `/createPlaylist`,
+      type: "POST",
+      data: {
+        accountId,
+        refType,
+        playlist: play
+      }
+    })
+    .done(res => {
+      console.log(res);
+      completed++;
+      $('.progress-bar').css("width", `${(completed/total)*100}%`);
+      $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+      $('ul#success').append(`<li>${play.reference_id} --> Sucessfully processsed.</li>`);
+    })
+    .fail(err => {
+      completed++;
+      fail++;
+      
+      console.log(`${play.reference_id} --> Failed: ${err.responseText}`, err);
+      $('.progress-bar').css("width", `${(completed/total)*100}%`);
+      $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+      $('ul#fail').append(`<li>${play.reference_id} > Failed: ${err.responseText}</li>`);
+    });
+  })
+}
 
 async function handleRefIdUpdateForm(e) {
-    e.preventDefault();
+  e.preventDefault();
+  $('#resultsCard').removeClass('hidden');
+  $('ul#success').html(""); 
+  $('ul#fail').html(""); 
+
+  let completed = 0
+  let fail = 0;
+  let total = 1
+  
+  const accountId = $('#bcAccount').val();
+  const refType = $('input[name=refType]:checked').val();
+  const file = document.getElementById('selectCSV').files[0];
+  if (!file) return;
+
+  let results = await papaPromisified(file);
+  let videos = results.data
+  videos.shift();
+
+  console.log(videos);
+
+  total = videos.length;
+
+  videos.forEach(video => {
+    let [ref, newRefId] = [...video];
+    
     $('#resultsCard').removeClass('hidden');
     $('ul#success').html(""); 
     $('ul#fail').html(""); 
 
-    let completed = 0
-    let fail = 0;
-    let total = 1
-    
-    const accountId = $('#bcAccount').val();
-    const refType = $('input[name=refType]:checked').val();
-    const file = document.getElementById('selectCSV').files[0];
-    if (!file) return;
-
-    let results = await papaPromisified(file);
-    let videos = results.data
-    videos.shift();
-
-    console.log(videos);
-
-    total = videos.length;
-
-    videos.forEach(video => {
-      let [ref, newRefId] = [...video];
-      
-      $('#resultsCard').removeClass('hidden');
-      $('ul#success').html(""); 
-      $('ul#fail').html(""); 
-  
-      $.ajax({
-        url: `/refIdUpdate`,
-        type: "POST",
-        data: {
-          accountId,
-          ref,
-          refType,
-          reference_id: newRefId
-        }
-      })
-      .done(res => {
-        console.log(res);
-        completed++;
-        $('.progress-bar').css("width", `${(completed/total)*100}%`);
-        $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
-        $('ul#success').append(`<li>${ref} --> Sucessfully processsed.</li>`);
-      })
-      .fail(err => {
-        completed++;
-        fail++;
-        
-        console.log(`${ref} --> Failed: ${err.responseText}`, err);
-        $('.progress-bar').css("width", `${(completed/total)*100}%`);
-        $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
-        $('ul#fail').append(`<li>${ref} > Failed: ${err.responseText}</li>`);
-      });
+    $.ajax({
+      url: `/refIdUpdate`,
+      type: "POST",
+      data: {
+        accountId,
+        ref,
+        refType,
+        reference_id: newRefId
+      }
     })
-  
-    document.getElementById('refIdUpdateForm').reset();
+    .done(res => {
+      console.log(res);
+      completed++;
+      $('.progress-bar').css("width", `${(completed/total)*100}%`);
+      $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+      $('ul#success').append(`<li>${ref} --> Sucessfully processsed.</li>`);
+    })
+    .fail(err => {
+      completed++;
+      fail++;
+      
+      console.log(`${ref} --> Failed: ${err.responseText}`, err);
+      $('.progress-bar').css("width", `${(completed/total)*100}%`);
+      $("#percentage").text(`Progress: ${Math.round((completed/total)*100)}%`);
+      $('ul#fail').append(`<li>${ref} > Failed: ${err.responseText}</li>`);
+    });
+  })
+
+  document.getElementById('refIdUpdateForm').reset();
 }
 
 function handleMediaShareForm(e) {
