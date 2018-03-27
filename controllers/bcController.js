@@ -104,7 +104,6 @@ async function getVideoIdFromRefID(accountId, ref, refType){
       headers
     }
 
-    console.log("Inside getVideoByRefID: ",accountId, ref, refType);
     return axios(options);
   }
 }
@@ -131,15 +130,6 @@ async function updateVideo(accountId, videoId, body) {
 exports.csvUpload = multer({ inMemory: true}).single('csv');
 
 exports.createPlaylist = async (req, res) => {
-  console.log(req.body);
-  // { accountId: '5431089189001',
-  // playlist:
-  //  { reference_id: 'play4',
-  //    name: 'Playlist Test 3',
-  //    description: 'Description 456',
-  //    type: 'EXPLICIT',
-  //    video_ids: [ 'irman44' ] } }
-
   const accountId = req.body.accountId;
   const refType = req.body.refType;
   const playlist = req.body.playlist;
@@ -155,14 +145,9 @@ exports.createPlaylist = async (req, res) => {
   let video_ids = [];
   let videoIdPromises = [];
 
-  console.log("ID array:", playlist.video_ids);
- 
   videoIdPromises = playlist.video_ids.map( ref => {
-    console.log("Ref: ", ref);
     return getVideoIdFromRefID(accountId, ref, refType);
   });
-
-  console.log("Promises Array:", videoIdPromises);
 
   try {
     video_ids = (await Promise.all(videoIdPromises)).map(response => {
@@ -170,14 +155,10 @@ exports.createPlaylist = async (req, res) => {
       else return response.data.id;
     });
   } catch (error) {
-    console.log(error);
     return res.status(error.response.status).send('RefID not found!');
   }
 
-
   playlist.video_ids = video_ids;
-  
-  console.log("playlist", playlist);
 
   let url = `https://ingest.api.brightcove.com/v1/accounts/${accountId}/playlists`
   const options = {
@@ -191,7 +172,6 @@ exports.createPlaylist = async (req, res) => {
     response = await axios(options);
     return res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     console.log(error.response.status, error.response.statusText);
     return res.status(error.response.status).send({ error: error.response.statusText });
   }
@@ -215,7 +195,6 @@ exports.removeTextTrack = async (req, res) => {
   }  
 
   try {
-    console.log("Calling updateVideo");
     response = await updateVideo(accountId, videoId, body);
     return res.sendStatus(200);
   } catch (error) {
@@ -225,8 +204,6 @@ exports.removeTextTrack = async (req, res) => {
 }
 
 exports.mediaShare = async (req, res) => {
-  // { accountIdSource, accountIdDest, ref, refType }
-  console.log(req.body);
   const accountIdSource = req.body.accountIdSource;
   const accountIdDest = req.body.accountIdDest;
   const ref = req.body.ref;
@@ -331,12 +308,9 @@ exports.refIdUpdate = async (req, res) => {
   };
 
   try {
-    console.log("Updating Video:  ", accountId, videoId, body);
     response = await updateVideo(accountId, videoId, body);
-    console.log(response);
     return res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     return res.status(error.response.status).send('Video Not Updated');
     
   }
@@ -359,7 +333,6 @@ exports.thumbnailSave = (req, res, next) => {
 }
 
 exports.bcThumbnailUpdate = async (req, res) => {
-  console.log(req.body);
   const accountId = req.body.accountId;
   const ref = req.body.ref;
   const refType = req.body.refType;
@@ -382,8 +355,8 @@ exports.bcThumbnailUpdate = async (req, res) => {
 
 
   // Dev Hardcode
-   const tumbnailUrl = 'https://common.liveonlinetechnology.com/uploads/Rick.jpg';
-  //const tumbnailUrl = `https://common.liveonlinetechnology.com/uploads/${thumbnailFileName}`;
+  // const tumbnailUrl = 'https://common.liveonlinetechnology.com/uploads/Rick.jpg';
+  const tumbnailUrl = `https://common.liveonlinetechnology.com/uploads/${thumbnailFileName}`;
 
   const url = `https://ingest.api.brightcove.com/v1/accounts/${accountId}/videos/${videoId}/ingest-requests`;
   const body = {
@@ -461,7 +434,6 @@ exports.retranscodeVideo = async (req, res) => {
 
 
 exports.getRenditions = async (req, res) => {
-  console.log("getRenditions!!!");
   let offset = 0;
   const limit = 100;
 
@@ -584,7 +556,6 @@ exports.getRenditions = async (req, res) => {
 }
 
 exports.getBcToken = async () => {
-
   const url = `${process.env.BCSERVICEURL}?grant_type=client_credentials`;
   const auth64 = new Buffer(`${process.env.BCCLIENTID}:${process.env.BCCLIENTSECRET}`).toString('base64');
 
