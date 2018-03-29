@@ -117,8 +117,6 @@ function handleVideoRenditions(e) {
         renditionsTable = new $.fn.dataTable.Api("#renditionsTable");
         renditionsTable.ajax.url(`/bc/getRenditions/${accountId}/${update}`).load();
     }
-
-
 }
 
 function handleBatchRetranscode(e) {
