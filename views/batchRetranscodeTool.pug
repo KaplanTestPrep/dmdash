@@ -1,5 +1,9 @@
 extends layout
 
+include mixins/_progressBar
+include mixins/_bcAccountPicker
+include mixins/_bcRefTypeRadio
+include mixins/_bcVideoTextbox
 
 block content
     .row
@@ -10,28 +14,9 @@ block content
                         h4.card-title
                             | Brightcove Batch Retranscode
                     .card-content
-                        .form-group
-                            label.col-md-3.control-label Select BC Account:
-                            .col-md-3
-                                .btn-group.bootstrap-select
-                                    select.selectpicker#bcAcccount
-                                        each acc in bcAccounts
-                                            option(value=acc.id)=acc.name
-                        .form-group
-                            label.col-md-3.control-label Videos to be Transcoded:
-                            .col-md-3
-                                textarea.form-control.datepicker#vidoesToUpdate(placeholder='List to Retranscode', rows='8' required)
-                        .form-group
-                            label.col-md-3.control-label Type of ID :
-                            .col-md-3
-                                .radio
-                                    input.form-control(type="radio", name="refType", value="refId", id="listByRefID" checked)
-                                    label(for='refid')
-                                        | RefID
-                                .radio
-                                    input.form-control(type="radio", name="refType", value="id", id="listById")
-                                    label(for='id')
-                                        | ID
+                        +bcAccountPicker(bcAccounts)
+                        +videoTextbox()
+                        +refTypeRadio()
                         .form-group
                             label.col-md-3.control-label Select Rendition Profile:
                             .col-md-3
@@ -44,19 +29,5 @@ block content
                             label.col-md-3
                             .col-md-9
                                 button.btn.btn-fill.btn-default#batchRetranscodeBtn(type='submit') Start Batch Retranscode
-    .row
-        .col-lg-12.col-md-12
-            .card#resultsCard.hidden
-                .card-header
-                    h4.card-title#percentage
-                        | Progress: 0%
-                .card-content
-                    .progress
-                        .progress-bar.progress-bar-success(style='width: 0%')
-                            span.sr-only 0% Complete (success)
-                    .row
-                        .col-md-3
-                            ul#success
-                        .col-md-3
-                            ul#fail
+    +progressBar()
 

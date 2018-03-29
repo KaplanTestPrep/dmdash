@@ -1,5 +1,6 @@
 extends layout
 
+include mixins/_progressBar
 
 block content
     .row
@@ -23,18 +24,4 @@ block content
                             label.col-md-3
                             .col-md-3
                                 button.btn.btn-fill.btn-default#addCoHosts(type='submit') Add Co-Hosts
-    .row
-        .col-lg-12.col-md-12
-            .card#resultsCard.hidden
-                .card-header
-                    h4.card-title#percentage
-                        | Progress: 0%
-                .card-content
-                    .progress
-                        .progress-bar.progress-bar-success(style='width: 0%')
-                            span.sr-only 0% Complete (success)
-                    .row
-                        .col-md-3
-                            ul#success
-                        .col-md-3
-                            ul#fail
+    +progressBar()

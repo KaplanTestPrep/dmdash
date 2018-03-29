@@ -1,5 +1,7 @@
 extends layout
 
+include mixins/_progressBar
+include mixins/_bcAccountPicker
 
 block content
     .row
@@ -11,9 +13,9 @@ block content
                             | Step 1: Uplaod Thumbnail
                     .card-content
                         .form-group
-                                label.col-md-3.control-label Select Image to Upload:
-                                .col-md-3
-                                    input.btn.btn-default#selectThumbnail(type="file" name="thumbnail" accept="image/gif, image/png, image/jpeg")
+                            label.col-md-3.control-label Select Image to Upload:
+                            .col-md-3
+                                input.btn.btn-default#selectThumbnail(type="file" name="thumbnail" accept="image/gif, image/png, image/jpeg")
                     .card-footer
                         .form-group
                             label.col-md-3
@@ -32,13 +34,7 @@ block content
                             label.col-md-3.control-label Uploaded Image
                             .col-md-3
                                 input.form-control#uploadedImage(type="text" disabled)
-                        .form-group
-                            label.col-md-3.control-label Select BC Account:
-                            .col-md-3
-                                .bootstrap-select
-                                    select.selectpicker#bcAcccount
-                                        each acc in bcAccounts
-                                            option(value=acc.id)=acc.name
+                        +bcAccountPicker(bcAccounts)
                         .form-group
                             label.col-md-3.control-label Videos to be updated:
                             .col-md-3
@@ -59,19 +55,4 @@ block content
                             label.col-md-3
                             .col-md-9
                                 button.btn.btn-fill.btn-default#updateThumbnails(type='submit') Update Thumbnails
-    .row
-        .col-lg-12.col-md-12
-            .card#resultsCard.hidden
-                .card-header
-                    h4.card-title#percentage
-                        | Progress: 0%
-                .card-content
-                    .progress
-                        .progress-bar.progress-bar-success(style='width: 0%')
-                            span.sr-only 0% Complete (success)
-                    .row
-                        .col-md-3
-                            ul#success
-                        .col-md-3
-                            ul#fail
-
+    +progressBar()

@@ -1,5 +1,8 @@
 extends layout
 
+include mixins/_bcAccountPicker
+include mixins/_bcAccountPicker
+include mixins/_bcDatePicker
 
 block content
     .row
@@ -10,17 +13,8 @@ block content
                         h4.card-title
                             | Brightcove Video Renditions List
                     .card-content
-                        .form-group
-                            label.col-md-3.control-label Select BC Account:
-                            .col-md-3
-                                .btn-group.bootstrap-select
-                                    select.selectpicker#acccount
-                                        each acc in bcAccounts
-                                            option(value=acc.id)=acc.name
-                        .form-group
-                            label.col-md-3.control-label Videos Updated After:
-                            .col-md-3
-                                input.form-control.datepicker#datepicker(type='text', placeholder='Date Picker Here')
+                        +bcAccountPicker(bcAccounts)
+                        +datePicker(label="Videos Updated After")
                     .card-footer
                         .form-group
                             label.col-md-3
