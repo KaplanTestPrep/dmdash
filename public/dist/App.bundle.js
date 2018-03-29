@@ -9931,7 +9931,9 @@ function handleRemoveTextTrack(e) {
   var fail = 0;
   var total = videosArr.length;
 
-  console.log(accountId, refType, videosArr);
+  (0, _jquery2.default)('#resultsCard').removeClass('hidden');
+  (0, _jquery2.default)('ul#success').html("");
+  (0, _jquery2.default)('ul#fail').html("");
 
   videosArr.forEach(function (ref) {
     _jquery2.default.ajax({
@@ -9963,7 +9965,7 @@ function handleVideoRenditions(e) {
   e.preventDefault();
   (0, _jquery2.default)('#resultsCard').removeClass('hidden');
 
-  var accountId = (0, _jquery2.default)('#acccount').val();
+  var accountId = (0, _jquery2.default)('#bcAccount').val();
   var update = (0, _jquery2.default)('#datepicker').val();
   var renditionsTable = (0, _jquery2.default)("#renditionsTable");
 

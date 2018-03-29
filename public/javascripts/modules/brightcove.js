@@ -29,7 +29,9 @@ function handleRemoveTextTrack(e) {
   let fail = 0;
   let total = videosArr.length;
 
-  console.log(accountId, refType, videosArr);
+  $('#resultsCard').removeClass('hidden');
+  $('ul#success').html(""); 
+  $('ul#fail').html(""); 
 
   videosArr.forEach( ref => {
     $.ajax({
@@ -63,7 +65,7 @@ function handleVideoRenditions(e) {
     e.preventDefault();
     $('#resultsCard').removeClass('hidden');
 
-    const accountId = $('#acccount').val();
+    const accountId = $('#bcAccount').val();
     const update = $('#datepicker').val();
     let renditionsTable = $("#renditionsTable");
 
