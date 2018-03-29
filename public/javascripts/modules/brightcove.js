@@ -123,7 +123,7 @@ function handleVideoRenditions(e) {
 
 function handleBatchRetranscode(e) {
     e.preventDefault();
-    const accountId = $('#bcAcccount').val();
+    const accountId = $('#bcAccount').val();
     const videos = $('#vidoesToUpdate').val().trim().split(/[\r\n\s,]+/);
     const refType = $('input[name=refType]:checked').val();
     const renditionProfile = $('#bcRenditionProfile').val();

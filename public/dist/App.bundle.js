@@ -9995,7 +9995,7 @@ function handleVideoRenditions(e) {
 
 function handleBatchRetranscode(e) {
   e.preventDefault();
-  var accountId = (0, _jquery2.default)('#bcAcccount').val();
+  var accountId = (0, _jquery2.default)('#bcAccount').val();
   var videos = (0, _jquery2.default)('#vidoesToUpdate').val().trim().split(/[\r\n\s,]+/);
   var refType = (0, _jquery2.default)('input[name=refType]:checked').val();
   var renditionProfile = (0, _jquery2.default)('#bcRenditionProfile').val();
