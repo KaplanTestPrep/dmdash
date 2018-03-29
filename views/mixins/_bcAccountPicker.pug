@@ -1,0 +1,8 @@
+mixin bcAccountPicker(bcAccounts = {}, elemId="bcAccount", label="Select Source BC Account:")
+    .form-group
+        label.col-md-3.control-label #{label}
+        .col-md-3
+            .bootstrap-select
+                select.selectpicker(id=elemId, name="accountId")
+                    each acc in bcAccounts
+                        option(value=acc.id)=acc.name
