@@ -2,8 +2,8 @@ const zoom = require("./zoomController");
 const wowza = require("./wowzaController");
 
 exports.getDashboard = async (req, res) => {
-  // const dailyZoomReport = await zoom.getDailyReport();
-  const dailyZoomReport = {};
+  const dailyZoomReport = await zoom.getDailyReport();
+  // const dailyZoomReport = {};
  
 
   const wowzaServerStatus = await wowza.getStatus(); 
