@@ -3,7 +3,11 @@ const wowza = require("./wowzaController");
 
 exports.getDashboard = async (req, res) => {
   const dailyZoomReport = await zoom.getDailyReport();
-  const wowzaServerStatus = await wowza.getStatus();
+  
+  
+  // const wowzaServerStatus = await wowza.getStatus(); 
+  const wowzaServerStatus = {};
+
 
   res.render("dashboard", {
     title: "Dashboard",
