@@ -18,7 +18,8 @@ exports.isLoggedIn = (req, res, next) => {
       return;
     }
     
-    console.log("PATH:", req.route.path);
+    console.log(`${req.method}: ${req.route.path}`);
+    
     if (req.route.path === "/login") {
       console.log("/login route and authenticated");
       res.redirect("/");
