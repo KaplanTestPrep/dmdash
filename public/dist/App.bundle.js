@@ -10385,18 +10385,16 @@ window.$ = _jquery2.default;
 (0, _jquery2.default)(document).ready(function () {
   // Datatable init
   var table = (0, _jquery2.default)("#datatables").DataTable({
-    // dom: 'lfrtBip',
-    // buttons: [
-    //   {
-    //     extend: 'csvHtml5',
-    //     text: 'Download CSV',
-    //     className: 'btn btn-default'
-    //    }
-    // ],
-    ajax: "/getRecordings",
-    columns: [{ data: "id" }, { data: "meeting_id" }, { data: "user" }, { data: "topic" }, { data: "recording_start" }, { data: "recording_end" }, { data: "file_size" }, { data: "file_type" }],
+    dom: 'lfrtBip',
+    buttons: [{
+      extend: 'csvHtml5',
+      text: 'Download CSV',
+      className: 'btn btn-default'
+    }],
+    ajax: "/getTutorRecordings",
+    columns: [{ data: "id" }, { data: "meeting_id" }, { data: "user" }, { data: "topic" }, { data: "recording_start" }, { data: "file_type" }, { data: "download_url" }],
     columnDefs: [{
-      targets: [0, 1],
+      targets: [0, 1, 5],
       visible: false,
       searchable: true
     }],
@@ -10409,7 +10407,7 @@ window.$ = _jquery2.default;
 
   (0, _jquery2.default)("#delete").click(function () {
     var recordings = table.rows(".selected").data();
-    var msg = "Are you sure you want to delete " + recordings.length + " recordings?";
+    var msg = 'Are you sure you want to delete ' + recordings.length + ' recordings?';
 
     swal({
       title: "Are you sure?",
@@ -10480,22 +10478,22 @@ window.$ = _jquery2.default;
 
     emails.forEach(function (email) {
       _jquery2.default.ajax({
-        url: "/setAlternateHosts/" + email,
+        url: '/setAlternateHosts/' + email,
         type: "POST"
       }).done(function (res) {
         console.log(res);
         completed++;
-        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)('ul#success').append("<li>" + email + " Sucessfully processsed.</li>");
+        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+        (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+        (0, _jquery2.default)('ul#success').append('<li>' + email + ' Sucessfully processsed.</li>');
       }).fail(function (err) {
         completed++;
         fail++;
 
-        console.log(email + " Failed: " + err.responseText, err);
-        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + "%");
-        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)('ul#fail').append("<li>" + email + " Failed: " + err.responseText + "</li>");
+        console.log(email + ' Failed: ' + err.responseText, err);
+        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
+        (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
+        (0, _jquery2.default)('ul#fail').append('<li>' + email + ' Failed: ' + err.responseText + '</li>');
       });
     });
   });
