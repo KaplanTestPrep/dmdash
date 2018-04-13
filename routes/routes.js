@@ -34,6 +34,12 @@ router.get(
   catchErrors(zoomController.getRecordings)
 );
 
+router.get(
+  "/getTutorRecordings",
+  authController.isLoggedIn,
+  catchErrors(zoomController.getTutorRecordings)
+);
+
 router.post(
   "/deleteRecordings",
   authController.isLoggedIn,
