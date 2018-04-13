@@ -6,28 +6,27 @@ window.$ = $;
 $(document).ready(function () {
     // Datatable init
     const table = $("#datatables").DataTable({
-      // dom: 'lfrtBip',
-      // buttons: [
-      //   {
-      //     extend: 'csvHtml5',
-      //     text: 'Download CSV',
-      //     className: 'btn btn-default'
-      //    }
-      // ],
-      ajax: "/getRecordings",
+      dom: 'lfrtBip',
+      buttons: [
+        {
+          extend: 'csvHtml5',
+          text: 'Download CSV',
+          className: 'btn btn-default'
+         }
+      ],
+      ajax: "/getTutorRecordings",
       columns: [
         { data: "id" },
         { data: "meeting_id" },
         { data: "user" },
         { data: "topic" },
         { data: "recording_start" },
-        { data: "recording_end" },
-        { data: "file_size" },
-        { data: "file_type" }
+        { data: "file_type" },
+        { data: "download_url" }
       ],
       columnDefs: [
         {
-          targets: [0, 1],
+          targets: [0, 1, 5],
           visible: false,
           searchable: true
         }

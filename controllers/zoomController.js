@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const { moment } = require('../helpers');
-const mongoose = require('mongoose');
-// const ZoomRecording = mongoose.model('ZoomRecording');
+
+
+const TUTORS_GROUP_ID = 'W3d-qqpNTX6bnzuKhP5zCg';
+
 
 exports.recordingsTool = (req, res) => {
   res.render("zoomRecordingsTool", {
@@ -52,7 +54,99 @@ exports.getDailyReport = () => {
   });
 };
 
+exports.getTutorRecordings = async (req, res) => {
+  let recordings = [];
+  let page_size = 10;
 
+  // Get page count for all Tutors group members
+  const url = `https://api.zoom.us/v2/groups/${TUTORS_GROUP_ID}/members`;
+  const token = exports.getToken();
+  const response = await axios.get(url, {
+    params: {
+      access_token: token,
+      page_size
+    }
+  });
+
+  const pageCount = response.data.page_count;
+  let pageNumber = 1;
+
+  do {
+    const url = `https://api.zoom.us/v2/groups/${TUTORS_GROUP_ID}/members`;
+    const token = exports.getToken();
+    const response = await axios.get(url, {
+      params: {
+        access_token: token,
+        page_size,
+        page_number: pageNumber
+      }
+    });
+
+    const users = response.data.members;
+
+    // Get list of recordings for each user   
+    // date format: 2017-08-28
+    const startDate = moment().subtract(1, "months").format('YYYY-MM-DD'); 
+    const endDate = moment().format('YYYY-MM-DD');
+
+    await Promise.all(
+      users.map(async user => {
+        const url = `https://api.zoom.us/v2/users/${user.id}/recordings`;
+        const token = exports.getToken();
+        const userEmail = user.email;
+
+        const response = await axios.get(url, {
+          params: {
+            access_token: token,
+            userId: user.id,
+            from: startDate,
+            to: endDate
+          }
+        });
+
+        const meetings = response.data.meetings;
+        let recording = {};
+
+        meetings.forEach(meeting => {
+
+          const topic = meeting.topic;
+
+          meeting.recording_files.forEach(rawRecording => {
+
+            recording = (({
+              id,
+              meeting_id,
+              recording_start,
+              file_type,
+              download_url
+            }) => ({
+                id,
+                meeting_id,
+                recording_start,
+                file_type,
+                download_url
+              }))(rawRecording);
+
+
+            recording.user = userEmail;
+            recording.topic = topic;
+
+            recordings.push(recording);
+          });
+        });
+      })
+    );
+    
+    pageNumber++;
+  } while (pageNumber <= pageCount);
+
+
+  let filteredRecordings = recordings.filter(rec => rec.file_type === 'MP4');
+
+  const data = { data: filteredRecordings };
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(data));
+}
 
 
 exports.getRecordings = async (req, res) => {
@@ -72,8 +166,6 @@ exports.getRecordings = async (req, res) => {
 
   const pageCount = response.data.page_count;
   let pageNumber = 1;              //response.data.page_number;
-
-
 
   do {
     // Get list of all users
@@ -146,15 +238,6 @@ exports.getRecordings = async (req, res) => {
     
     pageNumber++;
   } while (pageNumber <= pageCount);
-  
-// WRITE TO DB CODE 
-  // recordings.forEach(recording => {
-  //   ZoomRecording.update({id: recording.id}, recording, {upsert:true, setDefaultsOnInsert: true})
-  //   .then(function(doc){ console.log("Updated: ", doc) })
-  //   .catch(function(err) { console.log(err) });
-  // });
- 
-
 
   const data = { data: recordings };
   res.setHeader('Content-Type', 'application/json');
