@@ -114,14 +114,10 @@ exports.getTutorRecordings = async (req, res) => {
           meeting.recording_files.forEach(rawRecording => {
 
             recording = (({
-              id,
-              meeting_id,
               recording_start,
               file_type,
               download_url
             }) => ({
-                id,
-                meeting_id,
                 recording_start,
                 file_type,
                 download_url

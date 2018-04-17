@@ -11,13 +11,12 @@ $(document).ready(function () {
         {
           extend: 'csvHtml5',
           text: 'Download CSV',
-          className: 'btn btn-default'
+          className: 'btn btn-default',
+          filename: 'Tutor-recordings-report'
          }
       ],
       ajax: "/getTutorRecordings",
       columns: [
-        { data: "id" },
-        { data: "meeting_id" },
         { data: "user" },
         { data: "topic" },
         { data: "recording_start" },
@@ -26,7 +25,7 @@ $(document).ready(function () {
       ],
       columnDefs: [
         {
-          targets: [0, 1, 5],
+          targets: [3],
           visible: false,
           searchable: true
         }
