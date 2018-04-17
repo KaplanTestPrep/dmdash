@@ -10389,12 +10389,13 @@ window.$ = _jquery2.default;
     buttons: [{
       extend: 'csvHtml5',
       text: 'Download CSV',
-      className: 'btn btn-default'
+      className: 'btn btn-default',
+      filename: 'Tutor-recordings-report'
     }],
     ajax: "/getTutorRecordings",
-    columns: [{ data: "id" }, { data: "meeting_id" }, { data: "user" }, { data: "topic" }, { data: "recording_start" }, { data: "file_type" }, { data: "download_url" }],
+    columns: [{ data: "user" }, { data: "topic" }, { data: "recording_start" }, { data: "file_type" }, { data: "download_url" }],
     columnDefs: [{
-      targets: [0, 1, 5],
+      targets: [3],
       visible: false,
       searchable: true
     }],
