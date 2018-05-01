@@ -12,8 +12,9 @@ const expressValidator = require("express-validator");
 const routes = require("./routes/routes");
 const helpers = require("./helpers");
 const errorHandlers = require("./handlers/errorHandlers");
-// const User = require("./models/User");
 const User = mongoose.model("User");
+const morgan = require('morgan');
+const logger = require('./controllers/loggingController');
 
 // create our Express app
 const app = express();
@@ -52,6 +53,28 @@ app.use(passport.initialize());
 app.use(passport.session());
 // Import passport config file
 require("./auth/authentication");
+
+
+morgan.token('id', function getId (req) {
+  if (req.user){
+    return req.user.email;
+  }
+  else return "Logged Out";
+});
+
+morgan.token('body', function getId (req) {
+  return JSON.stringify(req.body);
+});
+
+app.use(morgan(':date[iso] -- :id -- :method :url :req[header] :status :body :remote-addr :referrer :response-time', {
+  stream: logger.stream, 
+  skip: function (req, res) {
+        return req.originalUrl.startsWith("/js/") 
+          || req.originalUrl.startsWith("/css/") 
+          || req.originalUrl.startsWith("/fonts/") 
+          || req.originalUrl.startsWith("/dist/")
+        }
+}));
 
 // // The flash middleware let's us use req.flash('error', 'Shit!'), which will then pass that message to the next page the user requests
 app.use(flash());

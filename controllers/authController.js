@@ -1,6 +1,7 @@
 const passport = require("passport");
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
+const logger = require('./loggingController');
 
 exports.logout = (req, res) => {
   req.flash("success", "You are now logged out!");
