@@ -10355,6 +10355,7 @@ async function handleMetadataCSV(e) {
 function papaPromisified(file) {
   return new Promise(function (resolve, reject) {
     var config = {
+      encoding: "ISO-8859-1",
       delimiter: ",",
       download: false,
       skipEmptyLines: true,
