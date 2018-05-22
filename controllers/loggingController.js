@@ -11,7 +11,8 @@ const date = moment().format('YYYY-MM-DD');
 // define the custom settings for each transport (file, console)
 const options = {
   file: {
-    level: process.env.ENV === 'development' ? 'debug' : 'info',
+    // level: process.env.ENV === 'development' ? 'debug' : 'info',
+    level: 'debug',
     filename: `./logs/%DATE%-dmtools.log`,
     datePattern: 'YYYY-MM-DD',
   },
