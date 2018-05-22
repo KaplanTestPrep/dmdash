@@ -1,5 +1,7 @@
 const path = require('path');
 const winston = require('winston');
+require('winston-daily-rotate-file');
+
 const moment = require("moment");
 
 
@@ -9,26 +11,22 @@ const date = moment().format('YYYY-MM-DD');
 // define the custom settings for each transport (file, console)
 const options = {
   file: {
-    level: 'info',
-    filename: `./logs/${date}-dmtools.log`,
-    handleExceptions: true,
-    json: true,
-    maxsize: 10485760, // 10MB
-    maxFiles: 10,
-    colorize: false,
+    level: process.env.ENV === 'development' ? 'debug' : 'info',
+    filename: `./logs/%DATE%-dmtools.log`,
+    datePattern: 'YYYY-MM-DD',
   },
   console: {
     level: 'debug',
     handleExceptions: true,
     json: false,
-    colorize: true,
+    colorize: true
   },
 };
 
 // instantiate a new Winston Logger with the settings defined above
 const logger = new winston.Logger({
   transports: [
-    new winston.transports.File(options.file),
+    new winston.transports.DailyRotateFile(options.file),
     new winston.transports.Console(options.console)
   ],
   exitOnError: false, // do not exit on handled exceptions
