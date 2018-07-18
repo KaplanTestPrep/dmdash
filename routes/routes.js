@@ -126,9 +126,10 @@ router.post(
 );
 
 router.get(
-  "/mediaShareTool", 
-  authController.isLoggedIn, 
-  bcController.mediaShareTool);
+  "/mediaShareTool",
+  authController.isLoggedIn,
+  bcController.mediaShareTool
+);
 
 router.post(
   "/mediaShare",
@@ -159,6 +160,15 @@ router.post(
   authController.isLoggedIn,
   bcController.createPlaylist
 );
+
+router.get(
+  "/refIdToIdTool",
+  authController.isLoggedIn,
+  bcController.refIdToIdTool
+);
+
+router.post("/refIdToId", authController.isLoggedIn, bcController.refIdToId);
+
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);
 router.get(
