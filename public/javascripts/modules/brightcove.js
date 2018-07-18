@@ -47,7 +47,7 @@ function handleRefIdtoId(e) {
         $("#percentage").text(
           `Progress: ${Math.round((completed / total) * 100)}%`
         );
-        $("ul#success").append(`<li>${video}: ${res} .</li>`);
+        $("ul#success").append(`<li>${video}: ${res}</li>`);
       })
       .fail(err => {
         completed++;
