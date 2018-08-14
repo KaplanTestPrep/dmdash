@@ -26,6 +26,7 @@
     "hoek": "^5.0.4",
     "jquery": "^3.3.1",
     "jsonwebtoken": "^8.3.0",
+    "lodash": "^4.17.10",
     "moment": "2.19.3",
     "mongoose": "4.8.7",
     "mongoose-mongodb-errors": "0.0.2",
