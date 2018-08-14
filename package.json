@@ -23,6 +23,7 @@
     "express": "4.15.2",
     "express-session": "1.15.1",
     "express-validator": "3.1.2",
+    "hoek": "^5.0.4",
     "jquery": "^3.3.1",
     "jsonwebtoken": "^8.3.0",
     "moment": "2.19.3",
