@@ -1,7 +1,8 @@
 import "./modules/zoom";
 import "./modules/brightcove";
+import "./modules/hapyak";
 
-import $ from 'jquery';
+import $ from "jquery";
 window.jQuery = $;
 window.$ = $;
 /*  OR webpack
@@ -11,16 +12,13 @@ new webpack.ProvidePlugin({
 })
 */
 
-
-$(document).ready(function () {
-
-  $('#datepicker').datetimepicker({
-    format: 'YYYY-MM-DD'
+$(document).ready(function() {
+  $("#datepicker").datetimepicker({
+    format: "YYYY-MM-DD"
   });
 
-  $('.selectpicker').selectpicker({
-    style: 'btn-default',
+  $(".selectpicker").selectpicker({
+    style: "btn-default",
     size: 8
   });
-  
 });
