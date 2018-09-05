@@ -454,8 +454,6 @@ async function handleRefIdUpdateForm(e) {
 }
 
 function handleMediaShareForm(e) {
-  console.log("FUCK OFFFFFFF");
-
   e.preventDefault();
   $("#resultsCard").removeClass("hidden");
   $("ul#success").html("");
