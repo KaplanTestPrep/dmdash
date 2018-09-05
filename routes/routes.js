@@ -182,6 +182,12 @@ router.get(
   hapyakController.getProject
 );
 
+router.get(
+  "/listProjects",
+  authController.isLoggedIn,
+  hapyakController.listProjects
+);
+
 router.post(
   "/createProject",
   authController.isLoggedIn,
