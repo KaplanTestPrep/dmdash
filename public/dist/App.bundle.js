@@ -10410,8 +10410,6 @@ async function handleRefIdUpdateForm(e) {
 }
 
 function handleMediaShareForm(e) {
-  console.log("FUCK OFFFFFFF");
-
   e.preventDefault();
   (0, _jquery2.default)("#resultsCard").removeClass("hidden");
   (0, _jquery2.default)("ul#success").html("");
@@ -10557,38 +10555,100 @@ window.$ = _jquery2.default;
   (0, _jquery2.default)("#hapyDeleteProj").click(function (e) {
     return handleDeleteProject(e);
   });
+  (0, _jquery2.default)("#hapyakProjects").on("click", "tr", function () {
+    (0, _jquery2.default)(this).toggleClass("selected");
+  });
 
-  var handleCreateProject = function handleCreateProject(e) {
+  var projectList = (0, _jquery2.default)("#hapyakProjects").DataTable({
+    dom: "lfrtBip",
+    buttons: [{
+      extend: "csvHtml5",
+      text: "Download CSV",
+      className: "btn btn-default",
+      filename: "Hapyak_Projects"
+    }],
+    ajax: "/listProjects",
+    columns: [{ data: "_id" }, { data: "id" }, { data: "title" }, { data: "video" }, { data: "brightcoveId" }, { data: "track" }, { data: "created" }],
+    columnDefs: [{
+      targets: [0],
+      visible: false,
+      searchable: true
+    }],
+    pageLength: 25
+  });
+
+  function handleCreateProject(e) {
     console.log("Project Created!");
+
+    var videoId = (0, _jquery2.default)("#bcVideoId").val();
 
     _jquery2.default.ajax({
       url: "/createProject",
       type: "POST",
       data: {
-        say: "Hello"
+        video_source_id: videoId
       }
     }).done(function (res) {
       console.log(res);
     }).fail(function (err) {
       console.log(err);
     });
-  };
 
-  var handleDeleteProject = function handleDeleteProject(e) {
+    projectList.ajax.reload();
+  }
+
+  function handleDeleteProject(e) {
     console.log("Project Deleted!");
 
-    _jquery2.default.ajax({
-      url: "/deleteProject",
-      type: "DELETE",
-      data: {
-        say: "Hello"
+    var projects = projectList.rows(".selected").data();
+    var msg = "Are you sure you want to delete " + projects.length + " projects?";
+
+    swal({
+      title: "Are you sure?",
+      text: msg,
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
+    }).then(function (result) {
+      if (result.value) {
+        for (var i = 0; i < projects.length; i++) {
+          _jquery2.default.ajax({
+            url: "/deleteProject",
+            dataType: "json",
+            type: "DELETE",
+            contentType: "application/json",
+            data: JSON.stringify({ toBeDeleted: projects[i].id })
+          });
+        }
+
+        swal({
+          position: "top",
+          type: "success",
+          title: "Recording(s) deleted!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        }).then(function (result) {
+          projectList.rows(".selected").remove().draw(false);
+        });
+        // result.dismiss can be 'cancel', 'overlay',
+        // 'close', and 'timer'
+      } else if (result.dismiss) {
+        swal({
+          position: "top",
+          type: "error",
+          title: "Canceled!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        });
       }
-    }).done(function (res) {
-      console.log(res);
-    }).fail(function (err) {
-      console.log(err);
     });
-  };
+  }
 });
 
 /***/ }),
