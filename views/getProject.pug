@@ -6,8 +6,12 @@ block content
     .card
         .card-content
             .toolbar
-                button.btn.btn-default#hapyCreateProj Create Project
-                button.btn.btn-default#hapyDeleteProj Delete Project
+                .row
+                    .col-md-3
+                        input.form-control#bcVideoId(type='text', placeholder='BC Video ID.')
+                    .col-md-3
+                        button.btn.btn-default#hapyCreateProj Create Project
+                        button.btn.btn-default#hapyDeleteProj Delete Project
             .fresh-datatables
                 table#hapyakProjects.table.table-striped.table-no-bordered.table-hover
                     thead
