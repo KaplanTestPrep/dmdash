@@ -15,12 +15,22 @@ exports.getProjectTool = (req, res) => {
 // -----------
 
 // ----------- APIs
+exports.listProjects = async (req, res) => {
+  try {
+    const response = await Hapyak.Project.find({});
+    return res.send({ data: response });
+  } catch (error) {
+    return res.status(error.response.status).send("Error");
+  }
+};
+
 exports.getProject = async (req, res) => {
   const hapyToken = await exports.getHapyakToken();
+  const videoId = req.body.videoId;
 
   // ******
   //https://api.hapyak.com/api/customer/project/225547/
-  const url = `${HAPYAKSERVICEURL}customer/project/230232/`;
+  const url = `${HAPYAKSERVICEURL}customer/project/${videoId}/`;
   // ******
 
   const options = {
@@ -45,10 +55,13 @@ exports.createProject = async (req, res) => {
   const hapyToken = await exports.getHapyakToken();
   const url = `${HAPYAKSERVICEURL}customer/project/`;
 
+  const video_source_id = req.body.video_source_id;
+  console.log(video_source_id);
+
   const body = {
     video_source: "brightcove",
-    video_source_id: "5826040391001",
-    title: "irman test 1 "
+    video_source_id,
+    title: "Irman Test 5"
   };
 
   const options = {
@@ -64,8 +77,21 @@ exports.createProject = async (req, res) => {
   try {
     const response = await axios(options);
     console.log(response.data);
+    console.log("Track: ", response.data.project.track);
 
-    return res.send(response.data);
+    //Write response to DB.
+    const project = new Hapyak.Project({
+      id: response.data.project.id,
+      title: response.data.project.title,
+      brightcoveId: video_source_id,
+      video: response.data.project.video,
+      track: response.data.project.track,
+      created: Date.now()
+    });
+
+    await project.save();
+
+    return res.status(200).send(response.data);
   } catch (error) {
     return res.status(error.response.status).send("Error");
   }
@@ -73,7 +99,11 @@ exports.createProject = async (req, res) => {
 
 exports.deleteProject = async (req, res) => {
   const hapyToken = await exports.getHapyakToken();
-  const url = `${HAPYAKSERVICEURL}customer/project/231179/`;
+  // const id = 232307;
+  const id = req.body.toBeDeleted;
+  console.log("Project to be delete:", id);
+
+  const url = `${HAPYAKSERVICEURL}customer/project/${id}/`;
 
   const options = {
     method: "delete",
@@ -86,13 +116,15 @@ exports.deleteProject = async (req, res) => {
 
   try {
     const response = await axios(options);
-    console.log(response.data);
+    await Hapyak.Project.findOneAndRemove({ id });
+
     return response.data;
   } catch (error) {
     console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };
+
 exports.getAnnotation = async (req, res) => {
   const hapyToken = await exports.getHapyakToken();
 
