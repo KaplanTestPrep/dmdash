@@ -6,21 +6,33 @@ const mongoddbErrorHandler = require("mongoose-mongodb-errors");
 const projectSchema = new Schema({
   id: {
     type: Number,
-    unique: true
+    unique: true,
+    required: true
   },
   title: {
-    type: String
+    type: String,
+    required: true
   },
-  trackId: {
-    type: Number
+  track: {
+    type: Number,
+    required: true
   },
   video: {
-    type: Number
+    type: Number,
+    required: true
+  },
+  brightcoveId: {
+    type: Number,
+    required: true
+  },
+  created: {
+    type: Date,
+    required: true
   }
 });
 
 projectSchema.plugin(mongoddbErrorHandler);
-let HapyProj = mongoose.model("HapyProj", projectSchema);
+let Project = mongoose.model("Project", projectSchema);
 
 const annotationSchema = new Schema({
   id: {
@@ -33,9 +45,9 @@ const annotationSchema = new Schema({
 });
 
 annotationSchema.plugin(mongoddbErrorHandler);
-let HapyAnno = mongoose.model("HapyAnno", annotationSchema);
+let Annotation = mongoose.model("Annotation", annotationSchema);
 
 module.exports = {
-  HapyProj,
-  HapyAnno
+  Project,
+  Annotation
 };
