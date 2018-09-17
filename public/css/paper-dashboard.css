@@ -11567,6 +11567,7 @@ star {
 
 /*Custom*/
 
+
 @keyframes slideIn {
   0% {
     transform: translateX(-10px);
@@ -11649,7 +11650,7 @@ star {
   padding: 10px;
 }
 .toolbar .btn {
-  margin: 5px;
+  margin: 0 5px;
 }
 
 
