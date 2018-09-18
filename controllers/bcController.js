@@ -155,13 +155,15 @@ exports.getRenditions = async (req, res) => {
 
   const bcToken = await exports.getBcToken();
   const accountId = req.params.accountId;
-  const updatedAt = req.params.update;
+  const dateFrom = req.params.dateFrom;
+  const dateTo = req.params.dateTo;
   var response = "";
   var renditions = "";
   let videos = [];
 
   //Get Counts for Video Renditions search
-  let url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/counts/videos?q=updated_at:${updatedAt}&to=1d&limit=${limit}`;
+  let url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/counts/videos?q=updated_at:${dateFrom}..${dateTo}&limit=${limit}`;
+  console.log("URL: ", url);
   const options = {
     method: "get",
     url,
@@ -185,7 +187,7 @@ exports.getRenditions = async (req, res) => {
       bcToken = await exports.getBcToken();
     }
 
-    url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos?q=updated_at:${updatedAt}&to=1d&limit=${limit}&offset=${offset}`;
+    url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos?q=updated_at:${dateFrom}..${dateTo}&limit=${limit}&offset=${offset}`;
     const options = {
       method: "get",
       url,

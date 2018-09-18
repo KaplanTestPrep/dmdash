@@ -13,7 +13,7 @@ new webpack.ProvidePlugin({
 */
 
 $(document).ready(function() {
-  $("#datepicker").datetimepicker({
+  $(".datepicker").datetimepicker({
     format: "YYYY-MM-DD"
   });
 

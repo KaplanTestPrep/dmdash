@@ -14,7 +14,8 @@ block content
                             | Brightcove Video Renditions List
                     .card-content
                         +bcAccountPicker(bcAccounts)
-                        +datePicker(label="Videos Updated After")
+                        +datePicker("Videos Updated From", "dateFrom")
+                        +datePicker("Videos Updated To", "dateTo" )
                     .card-footer
                         .form-group
                             label.col-md-3

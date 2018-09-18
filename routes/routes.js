@@ -66,7 +66,7 @@ router.get(
 );
 
 router.get(
-  "/bc/getRenditions/:accountId/:update",
+  "/bc/getRenditions/:accountId/:dateFrom/:dateTo",
   authController.isLoggedIn,
   catchErrors(bcController.getRenditions)
 );

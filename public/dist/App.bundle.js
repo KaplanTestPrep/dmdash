@@ -10134,7 +10134,8 @@ function handleVideoRenditions(e) {
   (0, _jquery2.default)("#resultsCard").removeClass("hidden");
 
   var accountId = (0, _jquery2.default)("#bcAccount").val();
-  var update = (0, _jquery2.default)("#datepicker").val();
+  var dateFrom = (0, _jquery2.default)("#dateFrom").val();
+  var dateTo = (0, _jquery2.default)("#dateTo").val();
   var renditionsTable = (0, _jquery2.default)("#renditionsTable");
 
   if (!_jquery2.default.fn.DataTable.isDataTable("#renditionsTable")) {
@@ -10145,7 +10146,7 @@ function handleVideoRenditions(e) {
         text: "Download CSV",
         className: "btn btn-default"
       }],
-      ajax: "/bc/getRenditions/" + accountId + "/" + update,
+      ajax: "/bc/getRenditions/" + accountId + "/" + dateFrom + "/" + dateTo,
       columns: [{ data: "videoId" }, { data: "accountId" }, { data: "refId" }, { data: "videoName" }, { data: "description" }, { data: "state" }, { data: "createdAt" }, { data: "updatedAt" }, { data: "publishedAt" }, { data: "duration" }, { data: "folderId" }, { data: "digitalMasterId" }, { data: "tags" }, { data: "textTrackId" }, { data: "textTrackSrc" }, { data: "textTrackLang" }, { data: "textTrackLabel" }, { data: "textTrackKind" }, { data: "renditions" }, { data: "renditionCount" }],
       columnDefs: [{
         targets: [0, 1, 5, 6, 8, 10, 11, 13, 14, 15, 17, 18],
@@ -10157,7 +10158,7 @@ function handleVideoRenditions(e) {
     });
   } else {
     renditionsTable = new _jquery2.default.fn.dataTable.Api("#renditionsTable");
-    renditionsTable.ajax.url("/bc/getRenditions/" + accountId + "/" + update).load();
+    renditionsTable.ajax.url("/bc/getRenditions/" + accountId + "/" + dateFrom + "/" + dateTo).load();
   }
 }
 
@@ -10844,7 +10845,7 @@ new webpack.ProvidePlugin({
 */
 
 (0, _jquery2.default)(document).ready(function () {
-  (0, _jquery2.default)("#datepicker").datetimepicker({
+  (0, _jquery2.default)(".datepicker").datetimepicker({
     format: "YYYY-MM-DD"
   });
 
