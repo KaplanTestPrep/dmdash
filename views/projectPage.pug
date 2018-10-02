@@ -1,0 +1,30 @@
+extends layout
+
+include mixins/_progressBar
+
+block content
+    .card
+        .card-content
+            .toolbar
+                .row
+                    .col-md-3
+                        input.form-control#bcVideoId(type='text', placeholder='Annotations Start Time')
+                    .col-md-3
+                        button.btn.btn-default#hapyCreateAnno Create Annotation
+                        button.btn.btn-default Delete Annotation
+            .fresh-datatables
+                table#hapyakProjectDetails.table.table-striped.table-no-bordered.table-hover
+                    thead
+                        tr
+                            th Start
+                            th Id
+                            th Project Id
+                            th Type
+                            th Created
+                    tfoot
+                        tr
+                            th Start
+                            th Id
+                            th Project Id
+                            th Type
+                            th Created
