@@ -177,6 +177,12 @@ router.get(
 );
 
 router.get(
+  "/getProjectTool/:projectId",
+  authController.isLoggedIn,
+  hapyakController.projectPage
+);
+
+router.get(
   "/getProject",
   authController.isLoggedIn,
   hapyakController.getProject
@@ -198,6 +204,17 @@ router.delete(
   "/deleteProject",
   authController.isLoggedIn,
   hapyakController.deleteProject
+);
+
+router.post(
+  "/createAnnotation",
+  authController.isLoggedIn,
+  hapyakController.createAnnotation
+);
+router.get(
+  "/listAnnotations/:projectId",
+  authController.isLoggedIn,
+  hapyakController.listAnnotations
 );
 
 // router.get("/auth/google", authController.authenticate);

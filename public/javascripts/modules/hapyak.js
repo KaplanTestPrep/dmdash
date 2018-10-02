@@ -5,9 +5,12 @@ window.$ = $;
 $(document).ready(function() {
   $("#hapyCreateProj").click(e => handleCreateProject(e));
   $("#hapyDeleteProj").click(e => handleDeleteProject(e));
+  $("#hapyCreateAnno").click(e => handleCreateAnno(e));
   $("#hapyakProjects").on("click", "tr", function() {
     $(this).toggleClass("selected");
   });
+
+  $("#hapyakProjects").on("dblclick", "tr", e => handleProjectDetails(e));
 
   const projectList = $("#hapyakProjects").DataTable({
     dom: "lfrtBip",
@@ -33,6 +36,38 @@ $(document).ready(function() {
       {
         targets: [0],
         visible: false,
+        searchable: true
+      }
+    ],
+    pageLength: 25
+  });
+
+  const pathName = window.location.pathname;
+  const pathNameSplit = pathName.split("/");
+  const slug = pathNameSplit[pathNameSplit.length - 1];
+
+  const projectDetailsList = $("#hapyakProjectDetails").DataTable({
+    dom: "lfrtBip",
+    buttons: [
+      {
+        extend: "csvHtml5",
+        text: "Download CSV",
+        className: "btn btn-default",
+        filename: "ProjectAnnotations"
+      }
+    ],
+    ajax: `/listAnnotations/${slug}`,
+    columns: [
+      { data: "startTime" },
+      { data: "id" },
+      { data: "projectId" },
+      { data: "type" },
+      { data: "created" }
+    ],
+    columnDefs: [
+      {
+        targets: [0],
+        visible: true,
         searchable: true
       }
     ],
@@ -117,3 +152,36 @@ $(document).ready(function() {
     });
   }
 });
+
+function handleProjectDetails(e) {
+  console.log("Project Details!");
+  const projectId = e.currentTarget.children[0].innerText;
+
+  const url = `/projects/${projectId}`;
+
+  console.log(url);
+  window.location.href = `/getProjectTool/${projectId}`;
+}
+
+function handleCreateAnno(e) {
+  console.log("Create Annotation");
+
+  const pathName = window.location.pathname.split("/");
+  const projectId = pathName[pathName.length - 1];
+
+  console.log(projectId);
+
+  $.ajax({
+    url: `/createAnnotation`,
+    type: "POST",
+    data: {
+      projectId
+    }
+  })
+    .done(res => {
+      console.log(res);
+    })
+    .fail(err => {
+      console.log(err);
+    });
+}

@@ -1,5 +1,6 @@
 const Hapyak = require("../models/Hapyak");
 const axios = require("axios");
+const { getBcToken, getBcVideo } = require("./bcController");
 
 // CONFIGS - to be moved into config file
 let HAPYAKSERVICEURL = `https://api.hapyak.com/api/`;
@@ -12,6 +13,12 @@ exports.getProjectTool = (req, res) => {
   });
 };
 
+exports.projectPage = (req, res) => {
+  res.render("projectPage", {
+    pageTitle: "Project Page",
+    active: "hap"
+  });
+};
 // -----------
 
 // ----------- APIs
@@ -54,14 +61,19 @@ exports.getProject = async (req, res) => {
 exports.createProject = async (req, res) => {
   const hapyToken = await exports.getHapyakToken();
   const url = `${HAPYAKSERVICEURL}customer/project/`;
+  const videoId = req.body.video_source_id;
 
-  const video_source_id = req.body.video_source_id;
-  console.log(video_source_id);
+  const bcToken = await getBcToken();
+  console.log("Token: ", bcToken.token);
+
+  //hardcode ATOM BC account for now
+  const videoInfo = await getBcVideo(1107601866001, videoId, bcToken);
+  const title = videoInfo.name;
 
   const body = {
     video_source: "brightcove",
-    video_source_id,
-    title: "Irman Test 5"
+    video_source_id: videoId,
+    title
   };
 
   const options = {
@@ -83,26 +95,23 @@ exports.createProject = async (req, res) => {
     const project = new Hapyak.Project({
       id: response.data.project.id,
       title: response.data.project.title,
-      brightcoveId: video_source_id,
+      brightcoveId: videoId,
       video: response.data.project.video,
       track: response.data.project.track,
       created: Date.now()
     });
-
     await project.save();
 
     return res.status(200).send(response.data);
   } catch (error) {
+    console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };
 
 exports.deleteProject = async (req, res) => {
   const hapyToken = await exports.getHapyakToken();
-  // const id = 232307;
   const id = req.body.toBeDeleted;
-  console.log("Project to be delete:", id);
-
   const url = `${HAPYAKSERVICEURL}customer/project/${id}/`;
 
   const options = {
@@ -118,7 +127,7 @@ exports.deleteProject = async (req, res) => {
     const response = await axios(options);
     await Hapyak.Project.findOneAndRemove({ id });
 
-    return response.data;
+    return res.status(200).send(response.data);
   } catch (error) {
     console.log(error);
     return res.status(error.response.status).send("Error");
@@ -153,8 +162,12 @@ exports.getAnnotation = async (req, res) => {
 };
 
 exports.createAnnotation = async (req, res) => {
+  console.log(req.body.projectId);
+
+  const projectId = req.body.projectId;
+
   const hapyToken = await exports.getHapyakToken();
-  const url = `${HAPYAKSERVICEURL}customer/project/225545/annotation/`;
+  const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/annotation/`;
 
   const body = {
     type: "quiz",
@@ -191,8 +204,8 @@ exports.createAnnotation = async (req, res) => {
       }
     ],
     passing_mark: 51,
-    start: 30,
-    end: 35
+    start: 4,
+    end: 15
   };
 
   const options = {
@@ -208,8 +221,22 @@ exports.createAnnotation = async (req, res) => {
   try {
     const response = await axios(options);
     console.log(response.data);
-    return response.data;
+
+    //Write response to DB.
+    const project = new Hapyak.Annotation({
+      id: response.data.annotation.id,
+      projectId,
+      type: response.data.annotation.type,
+      startTime: body.start,
+      created: Date.now()
+    });
+
+    await project.save();
+
+    return res.status(200).send(response.data);
   } catch (error) {
+    console.log(error);
+
     return res.status(error.response.status).send("Error");
   }
 };
@@ -232,6 +259,18 @@ exports.deleteAnnotation = async (req, res) => {
     console.log(response.data);
     return response.data;
   } catch (error) {
+    return res.status(error.response.status).send("Error");
+  }
+};
+
+exports.listAnnotations = async (req, res) => {
+  let projectId = parseInt(req.params.projectId);
+
+  try {
+    const response = await Hapyak.Annotation.find({ projectId });
+    return res.send({ data: response });
+  } catch (error) {
+    console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };

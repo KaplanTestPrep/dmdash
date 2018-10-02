@@ -10556,8 +10556,15 @@ window.$ = _jquery2.default;
   (0, _jquery2.default)("#hapyDeleteProj").click(function (e) {
     return handleDeleteProject(e);
   });
+  (0, _jquery2.default)("#hapyCreateAnno").click(function (e) {
+    return handleCreateAnno(e);
+  });
   (0, _jquery2.default)("#hapyakProjects").on("click", "tr", function () {
     (0, _jquery2.default)(this).toggleClass("selected");
+  });
+
+  (0, _jquery2.default)("#hapyakProjects").on("dblclick", "tr", function (e) {
+    return handleProjectDetails(e);
   });
 
   var projectList = (0, _jquery2.default)("#hapyakProjects").DataTable({
@@ -10573,6 +10580,28 @@ window.$ = _jquery2.default;
     columnDefs: [{
       targets: [0],
       visible: false,
+      searchable: true
+    }],
+    pageLength: 25
+  });
+
+  var pathName = window.location.pathname;
+  var pathNameSplit = pathName.split("/");
+  var slug = pathNameSplit[pathNameSplit.length - 1];
+
+  var projectDetailsList = (0, _jquery2.default)("#hapyakProjectDetails").DataTable({
+    dom: "lfrtBip",
+    buttons: [{
+      extend: "csvHtml5",
+      text: "Download CSV",
+      className: "btn btn-default",
+      filename: "ProjectAnnotations"
+    }],
+    ajax: "/listAnnotations/" + slug,
+    columns: [{ data: "startTime" }, { data: "id" }, { data: "projectId" }, { data: "type" }, { data: "created" }],
+    columnDefs: [{
+      targets: [0],
+      visible: true,
       searchable: true
     }],
     pageLength: 25
@@ -10651,6 +10680,37 @@ window.$ = _jquery2.default;
     });
   }
 });
+
+function handleProjectDetails(e) {
+  console.log("Project Details!");
+  var projectId = e.currentTarget.children[0].innerText;
+
+  var url = "/projects/" + projectId;
+
+  console.log(url);
+  window.location.href = "/getProjectTool/" + projectId;
+}
+
+function handleCreateAnno(e) {
+  console.log("Create Annotation");
+
+  var pathName = window.location.pathname.split("/");
+  var projectId = pathName[pathName.length - 1];
+
+  console.log(projectId);
+
+  _jquery2.default.ajax({
+    url: "/createAnnotation",
+    type: "POST",
+    data: {
+      projectId: projectId
+    }
+  }).done(function (res) {
+    console.log(res);
+  }).fail(function (err) {
+    console.log(err);
+  });
+}
 
 /***/ }),
 /* 3 */
