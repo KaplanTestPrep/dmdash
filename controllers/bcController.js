@@ -234,38 +234,38 @@ exports.getRenditions = async (req, res) => {
         }
 
         // Get Video Renditions
-        if (bcToken.token <= Date.now()) {
-          bcToken = await exports.getBcToken();
-        }
+        // if (bcToken.token <= Date.now()) {
+        //   bcToken = await exports.getBcToken();
+        // }
 
-        url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/${
-          video.videoId
-        }/assets/renditions`;
-        const options = {
-          method: "get",
-          url,
-          headers: {
-            Authorization: `Bearer ${bcToken.token}`,
-            "Content-Type": "application/json"
-          }
-        };
+        // url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/${
+        //   video.videoId
+        // }/assets/renditions`;
+        // const options = {
+        //   method: "get",
+        //   url,
+        //   headers: {
+        //     Authorization: `Bearer ${bcToken.token}`,
+        //     "Content-Type": "application/json"
+        //   }
+        // };
 
-        try {
-          renditions = await axios(options);
-        } catch (error) {
-          console.log(error);
-        }
+        // try {
+        //   renditions = await axios(options);
+        // } catch (error) {
+        //   console.log(error);
+        // }
 
         let renditionCount = 0;
         video.renditions = "";
-        renditions.data.forEach(rendition => {
-          video.renditions += `${rendition.video_codec}-${
-            rendition.video_container
-          } ${rendition.frame_width}x${rendition.frame_height} ${
-            rendition.encoding_rate
-          } \n`;
-          renditionCount++;
-        });
+        // renditions.data.forEach(rendition => {
+        //   video.renditions += `${rendition.video_codec}-${
+        //     rendition.video_container
+        //   } ${rendition.frame_width}x${rendition.frame_height} ${
+        //     rendition.encoding_rate
+        //   } \n`;
+        //   renditionCount++;
+        // });
 
         video.renditionCount = renditionCount;
 
@@ -577,6 +577,33 @@ exports.retranscodeVideo = async (req, res) => {
     return res
       .status(error.response.status)
       .send({ error: error.response.statusText });
+  }
+};
+
+// Utils
+
+exports.getBcVideo = async (accountId, videoId, token) => {
+  const url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/${videoId}`;
+  const bcToken = token || (await exports.getBcToken());
+
+  const headers = {
+    Authorization: `Bearer ${bcToken.token}`,
+    "Content-Type": "application/x-www-form-urlencoded"
+  };
+
+  const options = {
+    method: "get",
+    url,
+    headers
+  };
+
+  try {
+    response = await axios(options);
+    console.log("Response", response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error.response.status, error.response.statusText);
+    return error;
   }
 };
 
