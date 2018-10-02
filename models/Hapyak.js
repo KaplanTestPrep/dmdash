@@ -37,10 +37,24 @@ let Project = mongoose.model("Project", projectSchema);
 const annotationSchema = new Schema({
   id: {
     type: Number,
-    unique: true
+    unique: true,
+    required: true
+  },
+  projectId: {
+    type: Number,
+    required: true
   },
   type: {
-    type: String
+    type: String,
+    required: true
+  },
+  startTime: {
+    type: Number,
+    required: true
+  },
+  created: {
+    type: Date,
+    required: true
   }
 });
 
