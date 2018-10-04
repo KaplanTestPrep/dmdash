@@ -6,7 +6,11 @@ $(document).ready(function() {
   $("#hapyCreateProj").click(e => handleCreateProject(e));
   $("#hapyDeleteProj").click(e => handleDeleteProject(e));
   $("#hapyCreateAnno").click(e => handleCreateAnno(e));
+  $("#hapyDeleteAnno").click(e => handleDeleteAnno(e));
   $("#hapyakProjects").on("click", "tr", function() {
+    $(this).toggleClass("selected");
+  });
+  $("#hapyakProjectDetails").on("click", "tr", function() {
     $(this).toggleClass("selected");
   });
 
@@ -151,37 +155,100 @@ $(document).ready(function() {
       }
     });
   }
-});
 
-function handleProjectDetails(e) {
-  console.log("Project Details!");
-  const projectId = e.currentTarget.children[0].innerText;
+  function handleProjectDetails(e) {
+    console.log("Project Details!");
+    const projectId = e.currentTarget.children[0].innerText;
 
-  const url = `/projects/${projectId}`;
+    const url = `/projects/${projectId}`;
 
-  console.log(url);
-  window.location.href = `/getProjectTool/${projectId}`;
-}
+    console.log(url);
+    window.location.href = `/getProjectTool/${projectId}`;
+  }
 
-function handleCreateAnno(e) {
-  console.log("Create Annotation");
+  function handleCreateAnno(e) {
+    console.log("Create Annotation");
 
-  const pathName = window.location.pathname.split("/");
-  const projectId = pathName[pathName.length - 1];
+    const pathName = window.location.pathname.split("/");
+    const projectId = pathName[pathName.length - 1];
 
-  console.log(projectId);
+    console.log(projectId);
 
-  $.ajax({
-    url: `/createAnnotation`,
-    type: "POST",
-    data: {
-      projectId
-    }
-  })
-    .done(res => {
-      console.log(res);
+    $.ajax({
+      url: `/createAnnotation`,
+      type: "POST",
+      data: {
+        projectId
+      }
     })
-    .fail(err => {
-      console.log(err);
+      .done(res => {
+        console.log(res);
+      })
+      .fail(err => {
+        console.log(err);
+      });
+  }
+
+  function handleDeleteAnno(e) {
+    console.log("Anno Deleted!");
+
+    const annotations = projectDetailsList.rows(".selected").data();
+    console.log(annotations);
+
+    const msg = `Are you sure you want to delete ${
+      annotations.length
+    } projects?`;
+
+    swal({
+      title: "Are you sure?",
+      text: msg,
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
+    }).then(result => {
+      if (result.value) {
+        for (let i = 0; i < annotations.length; i++) {
+          $.ajax({
+            url: "/deleteAnnotation",
+            dataType: "json",
+            type: "DELETE",
+            contentType: "application/json",
+            data: JSON.stringify({
+              projectId: annotations[i].projectId,
+              annotationId: annotations[i].id
+            })
+          });
+        }
+
+        swal({
+          position: "top",
+          type: "success",
+          title: "Recording(s) deleted!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        }).then(result => {
+          projectDetailsList
+            .rows(".selected")
+            .remove()
+            .draw(false);
+        });
+        // result.dismiss can be 'cancel', 'overlay',
+        // 'close', and 'timer'
+      } else if (result.dismiss) {
+        swal({
+          position: "top",
+          type: "error",
+          title: "Canceled!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        });
+      }
     });
-}
+  }
+});

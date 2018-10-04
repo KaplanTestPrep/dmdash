@@ -10559,7 +10559,13 @@ window.$ = _jquery2.default;
   (0, _jquery2.default)("#hapyCreateAnno").click(function (e) {
     return handleCreateAnno(e);
   });
+  (0, _jquery2.default)("#hapyDeleteAnno").click(function (e) {
+    return handleDeleteAnno(e);
+  });
   (0, _jquery2.default)("#hapyakProjects").on("click", "tr", function () {
+    (0, _jquery2.default)(this).toggleClass("selected");
+  });
+  (0, _jquery2.default)("#hapyakProjectDetails").on("click", "tr", function () {
     (0, _jquery2.default)(this).toggleClass("selected");
   });
 
@@ -10679,38 +10685,96 @@ window.$ = _jquery2.default;
       }
     });
   }
+
+  function handleProjectDetails(e) {
+    console.log("Project Details!");
+    var projectId = e.currentTarget.children[0].innerText;
+
+    var url = "/projects/" + projectId;
+
+    console.log(url);
+    window.location.href = "/getProjectTool/" + projectId;
+  }
+
+  function handleCreateAnno(e) {
+    console.log("Create Annotation");
+
+    var pathName = window.location.pathname.split("/");
+    var projectId = pathName[pathName.length - 1];
+
+    console.log(projectId);
+
+    _jquery2.default.ajax({
+      url: "/createAnnotation",
+      type: "POST",
+      data: {
+        projectId: projectId
+      }
+    }).done(function (res) {
+      console.log(res);
+    }).fail(function (err) {
+      console.log(err);
+    });
+  }
+
+  function handleDeleteAnno(e) {
+    console.log("Anno Deleted!");
+
+    var annotations = projectDetailsList.rows(".selected").data();
+    console.log(annotations);
+
+    var msg = "Are you sure you want to delete " + annotations.length + " projects?";
+
+    swal({
+      title: "Are you sure?",
+      text: msg,
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
+    }).then(function (result) {
+      if (result.value) {
+        for (var i = 0; i < annotations.length; i++) {
+          _jquery2.default.ajax({
+            url: "/deleteAnnotation",
+            dataType: "json",
+            type: "DELETE",
+            contentType: "application/json",
+            data: JSON.stringify({
+              projectId: annotations[i].projectId,
+              annotationId: annotations[i].id
+            })
+          });
+        }
+
+        swal({
+          position: "top",
+          type: "success",
+          title: "Recording(s) deleted!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        }).then(function (result) {
+          projectDetailsList.rows(".selected").remove().draw(false);
+        });
+        // result.dismiss can be 'cancel', 'overlay',
+        // 'close', and 'timer'
+      } else if (result.dismiss) {
+        swal({
+          position: "top",
+          type: "error",
+          title: "Canceled!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        });
+      }
+    });
+  }
 });
-
-function handleProjectDetails(e) {
-  console.log("Project Details!");
-  var projectId = e.currentTarget.children[0].innerText;
-
-  var url = "/projects/" + projectId;
-
-  console.log(url);
-  window.location.href = "/getProjectTool/" + projectId;
-}
-
-function handleCreateAnno(e) {
-  console.log("Create Annotation");
-
-  var pathName = window.location.pathname.split("/");
-  var projectId = pathName[pathName.length - 1];
-
-  console.log(projectId);
-
-  _jquery2.default.ajax({
-    url: "/createAnnotation",
-    type: "POST",
-    data: {
-      projectId: projectId
-    }
-  }).done(function (res) {
-    console.log(res);
-  }).fail(function (err) {
-    console.log(err);
-  });
-}
 
 /***/ }),
 /* 3 */
