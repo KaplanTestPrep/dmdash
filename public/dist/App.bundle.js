@@ -10004,6 +10004,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
+var _utils = __webpack_require__(6);
+
 var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
@@ -10292,7 +10294,7 @@ async function handleCreatePlaylist(e) {
   var file = document.getElementById("selectCSV").files[0];
   if (!file) return;
 
-  var results = await papaPromisified(file);
+  var results = await (0, _utils.papaPromisified)(file);
   var dataRows = results.data;
   dataRows.shift();
   console.log(dataRows);
@@ -10366,7 +10368,7 @@ async function handleRefIdUpdateForm(e) {
   var file = document.getElementById("selectCSV").files[0];
   if (!file) return;
 
-  var results = await papaPromisified(file);
+  var results = await (0, _utils.papaPromisified)(file);
   var videos = results.data;
   videos.shift();
 
@@ -10467,7 +10469,7 @@ async function handleMetadataCSV(e) {
   var file = document.getElementById("selectCSV").files[0];
   if (!file) return;
 
-  var results = await papaPromisified(file);
+  var results = await (0, _utils.papaPromisified)(file);
   var videos = results.data;
   videos.shift();
 
@@ -10518,20 +10520,20 @@ async function handleMetadataCSV(e) {
   document.getElementById("metadataUpdateForm").reset();
 }
 
-function papaPromisified(file) {
-  return new Promise(function (resolve, reject) {
-    var config = {
-      encoding: "ISO-8859-1",
-      delimiter: ",",
-      download: false,
-      skipEmptyLines: true,
-      error: reject,
-      complete: resolve
-    };
+// function papaPromisified(file) {
+//   return new Promise(function(resolve, reject) {
+//     let config = {
+//       encoding: "ISO-8859-1",
+//       delimiter: ",",
+//       download: false,
+//       skipEmptyLines: true,
+//       error: reject,
+//       complete: resolve
+//     };
 
-    Papa.parse(file, config);
-  });
-}
+//     Papa.parse(file, config);
+//   });
+// }
 
 /***/ }),
 /* 2 */
@@ -10539,6 +10541,8 @@ function papaPromisified(file) {
 
 "use strict";
 
+
+var _utils = __webpack_require__(6);
 
 var _jquery = __webpack_require__(0);
 
@@ -10561,6 +10565,9 @@ window.$ = _jquery2.default;
   });
   (0, _jquery2.default)("#hapyDeleteAnno").click(function (e) {
     return handleDeleteAnno(e);
+  });
+  (0, _jquery2.default)("#annotationsImportForm").submit(function (e) {
+    return handleAnnotationsImport(e);
   });
   (0, _jquery2.default)("#hapyakProjects").on("click", "tr", function () {
     (0, _jquery2.default)(this).toggleClass("selected");
@@ -10774,6 +10781,23 @@ window.$ = _jquery2.default;
       }
     });
   }
+
+  async function handleAnnotationsImport(e) {
+    e.preventDefault();
+
+    var completed = 0;
+    var fail = 0;
+    var total = 0;
+
+    var file = document.getElementById("selectCSV").files[0];
+    if (!file) return;
+
+    var results = await (0, _utils.papaPromisified)(file);
+    var videos = results.data;
+    videos.shift();
+
+    console.log(videos);
+  }
 });
 
 /***/ }),
@@ -10978,6 +11002,33 @@ new webpack.ProvidePlugin({
     size: 8
   });
 });
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function papaPromisified(file) {
+  return new Promise(function (resolve, reject) {
+    var config = {
+      encoding: "ISO-8859-1",
+      delimiter: ",",
+      download: false,
+      skipEmptyLines: true,
+      error: reject,
+      complete: resolve
+    };
+
+    Papa.parse(file, config);
+  });
+}
+
+exports.papaPromisified = papaPromisified;
 
 /***/ })
 /******/ ]);
