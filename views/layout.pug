@@ -127,10 +127,14 @@ html(lang='en')
                   b.caret
               #hap.collapse(class=( active === 'hap' ? 'in' : null ), aria-expanded=( active === 'hap' ? 'true' : 'false' ))
                 ul.nav
-                  li(class=( pageTitle === 'Get Project' ? 'active' : null ))
+                  li(class=( pageTitle === 'Project List' ? 'active' : null ))
                     a(href='/getProjectTool')
                       span.sidebar-mini GP
-                      span.sidebar-normal Get Project
+                      span.sidebar-normal Project List
+                  li(class=( pageTitle === 'Import Annotations' ? 'active' : null ))
+                    a(href='/importAnnotations')
+                      span.sidebar-mini IA
+                      span.sidebar-normal Import Annotations
       .main-panel
         nav.navbar.navbar-default
           .container-fluid
