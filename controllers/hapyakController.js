@@ -253,7 +253,7 @@ exports.deleteAnnotation = async (req, res) => {
   try {
     const response = await axios(options);
     await Hapyak.Annotation.findOneAndRemove({ id: annotationId });
-    return response.data;
+    return res.status(200).send(response.data);
   } catch (error) {
     return res.status(error.response.status).send("Error");
   }
