@@ -1,3 +1,4 @@
+import { papaPromisified } from "./utils";
 import $ from "jquery";
 window.jQuery = $;
 window.$ = $;
@@ -585,17 +586,17 @@ async function handleMetadataCSV(e) {
   document.getElementById("metadataUpdateForm").reset();
 }
 
-function papaPromisified(file) {
-  return new Promise(function(resolve, reject) {
-    let config = {
-      encoding: "ISO-8859-1",
-      delimiter: ",",
-      download: false,
-      skipEmptyLines: true,
-      error: reject,
-      complete: resolve
-    };
+// function papaPromisified(file) {
+//   return new Promise(function(resolve, reject) {
+//     let config = {
+//       encoding: "ISO-8859-1",
+//       delimiter: ",",
+//       download: false,
+//       skipEmptyLines: true,
+//       error: reject,
+//       complete: resolve
+//     };
 
-    Papa.parse(file, config);
-  });
-}
+//     Papa.parse(file, config);
+//   });
+// }

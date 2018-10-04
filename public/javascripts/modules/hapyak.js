@@ -1,3 +1,4 @@
+import { papaPromisified } from "./utils";
 import $ from "jquery";
 window.jQuery = $;
 window.$ = $;
@@ -7,6 +8,7 @@ $(document).ready(function() {
   $("#hapyDeleteProj").click(e => handleDeleteProject(e));
   $("#hapyCreateAnno").click(e => handleCreateAnno(e));
   $("#hapyDeleteAnno").click(e => handleDeleteAnno(e));
+  $("#annotationsImportForm").submit(e => handleAnnotationsImport(e));
   $("#hapyakProjects").on("click", "tr", function() {
     $(this).toggleClass("selected");
   });
@@ -250,5 +252,22 @@ $(document).ready(function() {
         });
       }
     });
+  }
+
+  async function handleAnnotationsImport(e) {
+    e.preventDefault();
+
+    let completed = 0;
+    let fail = 0;
+    let total = 0;
+
+    const file = document.getElementById("selectCSV").files[0];
+    if (!file) return;
+
+    let results = await papaPromisified(file);
+    let videos = results.data;
+    videos.shift();
+
+    console.log(videos);
   }
 });
