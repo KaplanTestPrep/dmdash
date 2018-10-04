@@ -177,6 +177,12 @@ router.get(
 );
 
 router.get(
+  "/importAnnotations",
+  authController.isLoggedIn,
+  hapyakController.importAnnotations
+);
+
+router.get(
   "/getProjectTool/:projectId",
   authController.isLoggedIn,
   hapyakController.projectPage
@@ -210,6 +216,12 @@ router.post(
   "/createAnnotation",
   authController.isLoggedIn,
   hapyakController.createAnnotation
+);
+
+router.delete(
+  "/deleteAnnotation",
+  authController.isLoggedIn,
+  hapyakController.deleteAnnotation
 );
 router.get(
   "/listAnnotations/:projectId",

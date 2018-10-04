@@ -8,7 +8,14 @@ let HAPYAKSERVICEURL = `https://api.hapyak.com/api/`;
 // --------- Page Renderers
 exports.getProjectTool = (req, res) => {
   res.render("getProject", {
-    pageTitle: "Get Project",
+    pageTitle: "Project List",
+    active: "hap"
+  });
+};
+
+exports.importAnnotations = (req, res) => {
+  res.render("importAnnotations", {
+    pageTitle: "Import Annotations",
     active: "hap"
   });
 };
@@ -51,7 +58,6 @@ exports.getProject = async (req, res) => {
 
   try {
     const response = await axios(options);
-    console.log(response.data);
     return res.send(response.data);
   } catch (error) {
     return res.status(error.response.status).send("Error");
@@ -64,7 +70,6 @@ exports.createProject = async (req, res) => {
   const videoId = req.body.video_source_id;
 
   const bcToken = await getBcToken();
-  console.log("Token: ", bcToken.token);
 
   //hardcode ATOM BC account for now
   const videoInfo = await getBcVideo(1107601866001, videoId, bcToken);
@@ -88,8 +93,6 @@ exports.createProject = async (req, res) => {
 
   try {
     const response = await axios(options);
-    console.log(response.data);
-    console.log("Track: ", response.data.project.track);
 
     //Write response to DB.
     const project = new Hapyak.Project({
@@ -104,7 +107,6 @@ exports.createProject = async (req, res) => {
 
     return res.status(200).send(response.data);
   } catch (error) {
-    console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };
@@ -153,7 +155,6 @@ exports.getAnnotation = async (req, res) => {
 
   try {
     const response = await axios(options);
-    console.log(response.data);
     return response.data;
   } catch (error) {
     // return res.status(error.response.status).send("Error");
@@ -162,13 +163,9 @@ exports.getAnnotation = async (req, res) => {
 };
 
 exports.createAnnotation = async (req, res) => {
-  console.log(req.body.projectId);
-
   const projectId = req.body.projectId;
-
   const hapyToken = await exports.getHapyakToken();
   const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/annotation/`;
-
   const body = {
     type: "quiz",
     quiz: [
@@ -204,7 +201,7 @@ exports.createAnnotation = async (req, res) => {
       }
     ],
     passing_mark: 51,
-    start: 4,
+    start: 3,
     end: 15
   };
 
@@ -220,7 +217,6 @@ exports.createAnnotation = async (req, res) => {
 
   try {
     const response = await axios(options);
-    console.log(response.data);
 
     //Write response to DB.
     const project = new Hapyak.Annotation({
@@ -235,15 +231,15 @@ exports.createAnnotation = async (req, res) => {
 
     return res.status(200).send(response.data);
   } catch (error) {
-    console.log(error);
-
     return res.status(error.response.status).send("Error");
   }
 };
 
 exports.deleteAnnotation = async (req, res) => {
   const hapyToken = await exports.getHapyakToken();
-  const url = `${HAPYAKSERVICEURL}customer/project/225545/annotation/1306111/`;
+  const annotationId = req.body.annotationId;
+  const projectId = req.body.projectId;
+  const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/annotation/${annotationId}/`;
 
   const options = {
     method: "delete",
@@ -256,7 +252,7 @@ exports.deleteAnnotation = async (req, res) => {
 
   try {
     const response = await axios(options);
-    console.log(response.data);
+    await Hapyak.Annotation.findOneAndRemove({ id: annotationId });
     return response.data;
   } catch (error) {
     return res.status(error.response.status).send("Error");
@@ -270,7 +266,6 @@ exports.listAnnotations = async (req, res) => {
     const response = await Hapyak.Annotation.find({ projectId });
     return res.send({ data: response });
   } catch (error) {
-    console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };
