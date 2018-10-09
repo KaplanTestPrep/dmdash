@@ -599,7 +599,6 @@ exports.getBcVideo = async (accountId, videoId, token) => {
 
   try {
     response = await axios(options);
-    console.log("Response", response.data);
     return response.data;
   } catch (error) {
     console.log(error.response.status, error.response.statusText);
