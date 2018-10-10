@@ -94,6 +94,21 @@ exports.createProject = async (req, res) => {
   try {
     const response = await axios(options);
 
+    //Error handling for "This video record already exists in our database"
+    if (
+      response.data.message &&
+      response.data.message ===
+        "This video record already exists in our database. You cannot update or create a new project with it."
+    ) {
+      throw {
+        response: {
+          status: 409,
+          message:
+            "This video record already exists in our database. You cannot update or create a new project with it."
+        }
+      };
+    }
+
     //Write response to DB.
     const project = new Hapyak.Project({
       id: response.data.project.id,
@@ -107,7 +122,8 @@ exports.createProject = async (req, res) => {
 
     return res.status(200).send(response.data);
   } catch (error) {
-    return res.status(error.response.status).send("Error");
+    console.log(error);
+    return res.status(error.response.status).send(error.response.message);
   }
 };
 
@@ -137,12 +153,11 @@ exports.deleteProject = async (req, res) => {
 };
 
 exports.getAnnotation = async (req, res) => {
+  const projectId = req.body.projectId;
+  const annotationId = req.body.annotationId;
   const hapyToken = await exports.getHapyakToken();
 
-  // ******
-  //https://api.hapyak.com/api/customer/project/225545/annotation/1300207/
-  const url = `${HAPYAKSERVICEURL}customer/project/225545/annotation/1300207/`;
-  // ******
+  const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/annotation/${annotationId}/`;
 
   const options = {
     method: "get",
@@ -164,46 +179,52 @@ exports.getAnnotation = async (req, res) => {
 
 exports.createAnnotation = async (req, res) => {
   const projectId = req.body.projectId;
+  const annotation = req.body.annotation;
   const hapyToken = await exports.getHapyakToken();
   const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/annotation/`;
-  const body = {
-    type: "quiz",
-    quiz: [
-      {
-        text: "What's the capital of New York?",
-        answers: [
-          {
-            text: "Albany",
-            correct: true
-          },
-          {
-            text: "Syracuse",
-            correct: false
-          }
-        ]
-      },
-      {
-        text: "Can you check it? Yes you can.",
-        answers: [
-          {
-            text: "Red",
-            correct: true
-          },
-          {
-            text: "Yellow",
-            correct: true
-          },
-          {
-            text: "Blue",
-            correct: true
-          }
-        ]
-      }
-    ],
-    passing_mark: 51,
-    start: 3,
-    end: 15
-  };
+  // const body = makeAnnotationBody(annotation);
+  console.log(url);
+  console.log(annotation);
+  const body = annotation;
+
+  // {
+  //   type: "quiz",
+  //   quiz: [
+  //     {
+  //       text: "What's the capital of New York?",
+  //       answers: [
+  //         {
+  //           text: "Albany",
+  //           correct: true
+  //         },
+  //         {
+  //           text: "Syracuse",
+  //           correct: false
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       text: "Can you check it? Yes you can.",
+  //       answers: [
+  //         {
+  //           text: "Red",
+  //           correct: true
+  //         },
+  //         {
+  //           text: "Yellow",
+  //           correct: true
+  //         },
+  //         {
+  //           text: "Blue",
+  //           correct: true
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   passing_mark: 51,
+  //   start: 3,
+  //   end: 15
+  // };
 
   const options = {
     method: "post",
@@ -226,7 +247,6 @@ exports.createAnnotation = async (req, res) => {
       startTime: body.start,
       created: Date.now()
     });
-
     await project.save();
 
     return res.status(200).send(response.data);
@@ -292,3 +312,5 @@ exports.getHapyakToken = async () => {
     expires: response.data.expires
   };
 };
+
+function makeAnnotationBody(annotation) {}
