@@ -10622,20 +10622,23 @@ window.$ = _jquery2.default;
 
   function handleCreateProject(e) {
     console.log("Project Created!");
-
     var videoId = (0, _jquery2.default)("#bcVideoId").val();
 
-    _jquery2.default.ajax({
-      url: "/createProject",
-      type: "POST",
-      data: {
-        video_source_id: videoId
-      }
-    }).done(function (res) {
-      console.log(res);
-    }).fail(function (err) {
-      console.log(err);
-    });
+    createHapyProject(videoId);
+
+    // $.ajax({
+    //   url: `/createProject`,
+    //   type: "POST",
+    //   data: {
+    //     video_source_id: videoId
+    //   }
+    // })
+    //   .done(res => {
+    //     console.log(res);
+    //   })
+    //   .fail(err => {
+    //     console.log(err);
+    //   });
 
     projectList.ajax.reload();
   }
@@ -10705,11 +10708,8 @@ window.$ = _jquery2.default;
 
   function handleCreateAnno(e) {
     console.log("Create Annotation");
-
     var pathName = window.location.pathname.split("/");
     var projectId = pathName[pathName.length - 1];
-
-    console.log(projectId);
 
     _jquery2.default.ajax({
       url: "/createAnnotation",
@@ -10784,19 +10784,120 @@ window.$ = _jquery2.default;
 
   async function handleAnnotationsImport(e) {
     e.preventDefault();
+    var file = document.getElementById("selectCSV").files[0];
+    if (!file) return;
 
     var completed = 0;
     var fail = 0;
     var total = 0;
 
-    var file = document.getElementById("selectCSV").files[0];
-    if (!file) return;
+    var results = await (0, _utils.papaPromisified)(file, true);
+    var dataRows = results.data;
+    console.log(dataRows);
 
-    var results = await (0, _utils.papaPromisified)(file);
-    var videos = results.data;
-    videos.shift();
+    var videoIdKey = void 0;
+    var projectAnnoList = [];
 
-    console.log(videos);
+    for (var i = 0; i < dataRows.length; i++) {
+      if (dataRows[i].videoId !== "") {
+        videoIdKey = dataRows[i].videoId;
+        projectAnnoList[videoIdKey] = [];
+      } else {
+        projectAnnoList[videoIdKey].push(cleanObjectBlanks(dataRows[i]));
+      }
+    }
+
+    for (var videoId in projectAnnoList) {
+      var projectId = null;
+      // skip loop if the property is from prototype
+      if (!projectAnnoList.hasOwnProperty(videoId)) continue;
+
+      var annotationsArray = projectAnnoList[videoId];
+
+      //Create Project
+      try {
+        var result = await createHapyProject(videoId);
+        projectId = result.project.id;
+      } catch (err) {
+        console.log(err);
+      }
+
+      //Create Annotation
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = annotationsArray[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var annotation = _step.value;
+
+          try {
+            console.log("Creating " + annotation.type + " annotation");
+            await createHapyAnnotation(annotation, projectId);
+          } catch (err) {
+            console.log("Annoation Error:", err);
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }
+  }
+
+  function createHapyProject(videoId) {
+    console.log("createHapyProject");
+    return new Promise(function (resolve, reject) {
+      _jquery2.default.ajax({
+        url: "/createProject",
+        type: "POST",
+        data: {
+          video_source_id: videoId
+        }
+      }).done(function (res) {
+        return resolve(res);
+      }).fail(function (err) {
+        return reject(err);
+      });
+    });
+  }
+
+  function createHapyAnnotation(annotation, projectId) {
+    console.log("createHapyProject");
+    console.log("Annotation: ", annotation);
+    return new Promise(function (resolve, reject) {
+      _jquery2.default.ajax({
+        url: "/createAnnotation",
+        type: "POST",
+        data: {
+          projectId: projectId,
+          annotation: annotation
+        }
+      }).done(function (res) {
+        return resolve(res);
+      }).fail(function (err) {
+        return reject(err);
+      });
+    });
+  }
+
+  function cleanObjectBlanks(obj) {
+    for (var propName in obj) {
+      if (obj[propName] === "") {
+        delete obj[propName];
+      }
+    }
+    return obj;
   }
 });
 
@@ -11014,6 +11115,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 function papaPromisified(file) {
+  var header = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
   return new Promise(function (resolve, reject) {
     var config = {
       encoding: "ISO-8859-1",
@@ -11021,7 +11124,8 @@ function papaPromisified(file) {
       download: false,
       skipEmptyLines: true,
       error: reject,
-      complete: resolve
+      complete: resolve,
+      header: header
     };
 
     Papa.parse(file, config);

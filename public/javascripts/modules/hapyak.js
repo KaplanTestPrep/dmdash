@@ -82,22 +82,23 @@ $(document).ready(function() {
 
   function handleCreateProject(e) {
     console.log("Project Created!");
-
     const videoId = $("#bcVideoId").val();
 
-    $.ajax({
-      url: `/createProject`,
-      type: "POST",
-      data: {
-        video_source_id: videoId
-      }
-    })
-      .done(res => {
-        console.log(res);
-      })
-      .fail(err => {
-        console.log(err);
-      });
+    createHapyProject(videoId);
+
+    // $.ajax({
+    //   url: `/createProject`,
+    //   type: "POST",
+    //   data: {
+    //     video_source_id: videoId
+    //   }
+    // })
+    //   .done(res => {
+    //     console.log(res);
+    //   })
+    //   .fail(err => {
+    //     console.log(err);
+    //   });
 
     projectList.ajax.reload();
   }
@@ -170,11 +171,8 @@ $(document).ready(function() {
 
   function handleCreateAnno(e) {
     console.log("Create Annotation");
-
     const pathName = window.location.pathname.split("/");
     const projectId = pathName[pathName.length - 1];
-
-    console.log(projectId);
 
     $.ajax({
       url: `/createAnnotation`,
@@ -256,18 +254,102 @@ $(document).ready(function() {
 
   async function handleAnnotationsImport(e) {
     e.preventDefault();
+    const file = document.getElementById("selectCSV").files[0];
+    if (!file) return;
 
     let completed = 0;
     let fail = 0;
     let total = 0;
 
-    const file = document.getElementById("selectCSV").files[0];
-    if (!file) return;
+    let results = await papaPromisified(file, true);
+    let dataRows = results.data;
+    console.log(dataRows);
 
-    let results = await papaPromisified(file);
-    let videos = results.data;
-    videos.shift();
+    let videoIdKey;
+    const projectAnnoList = [];
 
-    console.log(videos);
+    for (let i = 0; i < dataRows.length; i++) {
+      if (dataRows[i].videoId !== "") {
+        videoIdKey = dataRows[i].videoId;
+        projectAnnoList[videoIdKey] = [];
+      } else {
+        projectAnnoList[videoIdKey].push(cleanObjectBlanks(dataRows[i]));
+      }
+    }
+
+    for (let videoId in projectAnnoList) {
+      let projectId = null;
+      // skip loop if the property is from prototype
+      if (!projectAnnoList.hasOwnProperty(videoId)) continue;
+
+      let annotationsArray = projectAnnoList[videoId];
+
+      //Create Project
+      try {
+        let result = await createHapyProject(videoId);
+        projectId = result.project.id;
+      } catch (err) {
+        console.log(err);
+      }
+
+      //Create Annotation
+      for (const annotation of annotationsArray) {
+        try {
+          console.log(`Creating ${annotation.type} annotation`);
+          await createHapyAnnotation(annotation, projectId);
+        } catch (err) {
+          console.log("Annoation Error:", err);
+        }
+      }
+    }
+  }
+
+  function createHapyProject(videoId) {
+    console.log("createHapyProject");
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: `/createProject`,
+        type: "POST",
+        data: {
+          video_source_id: videoId
+        }
+      })
+        .done(res => {
+          return resolve(res);
+        })
+        .fail(err => {
+          return reject(err);
+        });
+    });
+  }
+
+  function createHapyAnnotation(annotation, projectId) {
+    console.log("createHapyProject");
+    console.log("Annotation: ", annotation);
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: `/createAnnotation`,
+        type: "POST",
+        data: {
+          projectId,
+          annotation
+        }
+      })
+        .done(res => {
+          return resolve(res);
+        })
+        .fail(err => {
+          return reject(err);
+        });
+    });
+  }
+
+  function cleanObjectBlanks(obj) {
+    for (var propName in obj) {
+      if (obj[propName] === "") {
+        delete obj[propName];
+      }
+    }
+    return obj;
   }
 });
