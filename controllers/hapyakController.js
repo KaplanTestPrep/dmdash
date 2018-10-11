@@ -182,49 +182,7 @@ exports.createAnnotation = async (req, res) => {
   const annotation = req.body.annotation;
   const hapyToken = await exports.getHapyakToken();
   const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/annotation/`;
-  // const body = makeAnnotationBody(annotation);
-  console.log(url);
-  console.log(annotation);
-  const body = annotation;
-
-  // {
-  //   type: "quiz",
-  //   quiz: [
-  //     {
-  //       text: "What's the capital of New York?",
-  //       answers: [
-  //         {
-  //           text: "Albany",
-  //           correct: true
-  //         },
-  //         {
-  //           text: "Syracuse",
-  //           correct: false
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       text: "Can you check it? Yes you can.",
-  //       answers: [
-  //         {
-  //           text: "Red",
-  //           correct: true
-  //         },
-  //         {
-  //           text: "Yellow",
-  //           correct: true
-  //         },
-  //         {
-  //           text: "Blue",
-  //           correct: true
-  //         }
-  //       ]
-  //     }
-  //   ],
-  //   passing_mark: 51,
-  //   start: 3,
-  //   end: 15
-  // };
+  const body = makeAnnotationBody(annotation);
 
   const options = {
     method: "post",
@@ -251,6 +209,7 @@ exports.createAnnotation = async (req, res) => {
 
     return res.status(200).send(response.data);
   } catch (error) {
+    console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };
@@ -313,4 +272,43 @@ exports.getHapyakToken = async () => {
   };
 };
 
-function makeAnnotationBody(annotation) {}
+function makeAnnotationBody(annotation) {
+  if (annotation.type !== "quiz") return annotation;
+
+  if (annotation.type === "quiz") {
+    let quiz = {};
+    let answers = [];
+
+    quiz.text = annotation.questionText;
+    answers.push({
+      text: annotation.answerOptionA,
+      correct: "A" === annotation.answerOptionCorrect
+    });
+    answers.push({
+      text: annotation.answerOptionB,
+      correct: "B" === annotation.answerOptionCorrect
+    });
+    answers.push({
+      text: annotation.answerOptionC,
+      correct: "C" === annotation.answerOptionCorrect
+    });
+    answers.push({
+      text: annotation.answerOptionD,
+      correct: "D" === annotation.answerOptionCorrect
+    });
+
+    delete annotation.questionText;
+    delete annotation.answerOptionA;
+    delete annotation.answerOptionB;
+    delete annotation.answerOptionC;
+    delete annotation.answerOptionD;
+    delete annotation.answerOptionCorrect;
+
+    quiz.answers = answers;
+    annotation.quiz = [quiz];
+
+    console.log(answers);
+    console.log(annotation);
+    return annotation;
+  }
+}
