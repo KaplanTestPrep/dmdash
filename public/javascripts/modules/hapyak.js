@@ -80,27 +80,17 @@ $(document).ready(function() {
     pageLength: 25
   });
 
-  function handleCreateProject(e) {
+  async function handleCreateProject(e) {
     console.log("Project Created!");
     const videoId = $("#bcVideoId").val();
 
-    createHapyProject(videoId);
-
-    // $.ajax({
-    //   url: `/createProject`,
-    //   type: "POST",
-    //   data: {
-    //     video_source_id: videoId
-    //   }
-    // })
-    //   .done(res => {
-    //     console.log(res);
-    //   })
-    //   .fail(err => {
-    //     console.log(err);
-    //   });
-
-    projectList.ajax.reload();
+    //Create Project
+    try {
+      await createHapyProject(videoId);
+      projectList.ajax.reload();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   function handleDeleteProject(e) {
@@ -261,9 +251,14 @@ $(document).ready(function() {
     let fail = 0;
     let total = 0;
 
+    $("#resultsCard").removeClass("hidden");
+    $("ul#success").html("");
+    $("ul#fail").html("");
+
     let results = await papaPromisified(file, true);
     let dataRows = results.data;
-    console.log(dataRows);
+    total = dataRows.length;
+    console.log(total);
 
     let videoIdKey;
     const projectAnnoList = [];
@@ -278,18 +273,37 @@ $(document).ready(function() {
     }
 
     for (let videoId in projectAnnoList) {
-      let projectId = null;
       // skip loop if the property is from prototype
       if (!projectAnnoList.hasOwnProperty(videoId)) continue;
 
+      let projectId = null;
       let annotationsArray = projectAnnoList[videoId];
 
       //Create Project
       try {
         let result = await createHapyProject(videoId);
         projectId = result.project.id;
+
+        completed++;
+        $(".progress-bar").css("width", `${(completed / total) * 100}%`);
+        $("#percentage").text(
+          `Progress: ${Math.round((completed / total) * 100)}%`
+        );
+        $("ul#success").append(
+          `<li>Project for video ${videoId} successfully created.</li>`
+        );
       } catch (err) {
-        console.log(err);
+        completed += annotationsArray.length + 1;
+        fail++;
+        console.log(`Project ${videoId} Failed: ${err.responseText}`, err);
+        $(".progress-bar").css("width", `${(completed / total) * 100}%`);
+        $("#percentage").text(
+          `Progress: ${Math.round((completed / total) * 100)}%`
+        );
+        $("ul#fail").append(
+          `<li>Project ${videoId} Failed: ${err.responseText}</li>`
+        );
+        continue;
       }
 
       //Create Annotation
@@ -297,8 +311,29 @@ $(document).ready(function() {
         try {
           console.log(`Creating ${annotation.type} annotation`);
           await createHapyAnnotation(annotation, projectId);
+
+          completed++;
+          $(".progress-bar").css("width", `${(completed / total) * 100}%`);
+          $("#percentage").text(
+            `Progress: ${Math.round((completed / total) * 100)}%`
+          );
+          $("ul#success").append(
+            `<li>Annotation ${annotation.type} successfully created.</li>`
+          );
         } catch (err) {
-          console.log("Annoation Error:", err);
+          completed++;
+          fail++;
+          console.log(`${annotation.type} Failed: ${err.responseText}`, err);
+          $(".progress-bar").css("width", `${(completed / total) * 100}%`);
+          $("#percentage").text(
+            `Progress: ${Math.round((completed / total) * 100)}%`
+          );
+          $("ul#fail").append(
+            `<li>${annotation.type} Failed: ${err.responseText}</li>`
+          );
+
+          console.log("Error with annotation: Delete project!");
+          deleteHapyProject(projectId);
         }
       }
     }
@@ -341,6 +376,16 @@ $(document).ready(function() {
         .fail(err => {
           return reject(err);
         });
+    });
+  }
+
+  function deleteHapyProject(projectId) {
+    $.ajax({
+      url: "/deleteProject",
+      dataType: "json",
+      type: "DELETE",
+      contentType: "application/json",
+      data: JSON.stringify({ toBeDeleted: projectsId })
     });
   }
 

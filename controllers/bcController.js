@@ -602,6 +602,11 @@ exports.getBcVideo = async (accountId, videoId, token) => {
     return response.data;
   } catch (error) {
     console.log(error.response.status, error.response.statusText);
+    if (error.response.status === 404)
+      return {
+        status: 404,
+        statusText: "Video Not Found"
+      };
     return error;
   }
 };

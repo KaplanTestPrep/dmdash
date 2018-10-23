@@ -10620,27 +10620,17 @@ window.$ = _jquery2.default;
     pageLength: 25
   });
 
-  function handleCreateProject(e) {
+  async function handleCreateProject(e) {
     console.log("Project Created!");
     var videoId = (0, _jquery2.default)("#bcVideoId").val();
 
-    createHapyProject(videoId);
-
-    // $.ajax({
-    //   url: `/createProject`,
-    //   type: "POST",
-    //   data: {
-    //     video_source_id: videoId
-    //   }
-    // })
-    //   .done(res => {
-    //     console.log(res);
-    //   })
-    //   .fail(err => {
-    //     console.log(err);
-    //   });
-
-    projectList.ajax.reload();
+    //Create Project
+    try {
+      await createHapyProject(videoId);
+      projectList.ajax.reload();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   function handleDeleteProject(e) {
@@ -10791,9 +10781,14 @@ window.$ = _jquery2.default;
     var fail = 0;
     var total = 0;
 
+    (0, _jquery2.default)("#resultsCard").removeClass("hidden");
+    (0, _jquery2.default)("ul#success").html("");
+    (0, _jquery2.default)("ul#fail").html("");
+
     var results = await (0, _utils.papaPromisified)(file, true);
     var dataRows = results.data;
-    console.log(dataRows);
+    total = dataRows.length;
+    console.log(total);
 
     var videoIdKey = void 0;
     var projectAnnoList = [];
@@ -10808,18 +10803,29 @@ window.$ = _jquery2.default;
     }
 
     for (var videoId in projectAnnoList) {
-      var projectId = null;
       // skip loop if the property is from prototype
       if (!projectAnnoList.hasOwnProperty(videoId)) continue;
 
+      var projectId = null;
       var annotationsArray = projectAnnoList[videoId];
 
       //Create Project
       try {
         var result = await createHapyProject(videoId);
         projectId = result.project.id;
+
+        completed++;
+        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+        (0, _jquery2.default)("ul#success").append("<li>Project for video " + videoId + " successfully created.</li>");
       } catch (err) {
-        console.log(err);
+        completed += annotationsArray.length + 1;
+        fail++;
+        console.log("Project " + videoId + " Failed: " + err.responseText, err);
+        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+        (0, _jquery2.default)("ul#fail").append("<li>Project " + videoId + " Failed: " + err.responseText + "</li>");
+        continue;
       }
 
       //Create Annotation
@@ -10834,8 +10840,21 @@ window.$ = _jquery2.default;
           try {
             console.log("Creating " + annotation.type + " annotation");
             await createHapyAnnotation(annotation, projectId);
+
+            completed++;
+            (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+            (0, _jquery2.default)("ul#success").append("<li>Annotation " + annotation.type + " successfully created.</li>");
           } catch (err) {
-            console.log("Annoation Error:", err);
+            completed++;
+            fail++;
+            console.log(annotation.type + " Failed: " + err.responseText, err);
+            (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+            (0, _jquery2.default)("ul#fail").append("<li>" + annotation.type + " Failed: " + err.responseText + "</li>");
+
+            console.log("Error with annotation: Delete project!");
+            deleteHapyProject(projectId);
           }
         }
       } catch (err) {
@@ -10888,6 +10907,16 @@ window.$ = _jquery2.default;
       }).fail(function (err) {
         return reject(err);
       });
+    });
+  }
+
+  function deleteHapyProject(projectId) {
+    _jquery2.default.ajax({
+      url: "/deleteProject",
+      dataType: "json",
+      type: "DELETE",
+      contentType: "application/json",
+      data: JSON.stringify({ toBeDeleted: projectsId })
     });
   }
 

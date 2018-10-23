@@ -73,6 +73,12 @@ exports.createProject = async (req, res) => {
 
   //hardcode ATOM BC account for now
   const videoInfo = await getBcVideo(1107601866001, videoId, bcToken);
+  console.log("videoInfo: ", videoInfo.status);
+
+  if (videoInfo.status === 404) {
+    return res.status(videoInfo.status).send(videoInfo.statusText);
+  }
+
   const title = videoInfo.name;
 
   const body = {
@@ -122,7 +128,7 @@ exports.createProject = async (req, res) => {
 
     return res.status(200).send(response.data);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(error.response.status).send(error.response.message);
   }
 };
@@ -147,7 +153,7 @@ exports.deleteProject = async (req, res) => {
 
     return res.status(200).send(response.data);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };
@@ -209,7 +215,7 @@ exports.createAnnotation = async (req, res) => {
 
     return res.status(200).send(response.data);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };
@@ -307,8 +313,6 @@ function makeAnnotationBody(annotation) {
     quiz.answers = answers;
     annotation.quiz = [quiz];
 
-    console.log(answers);
-    console.log(annotation);
     return annotation;
   }
 }
