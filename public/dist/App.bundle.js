@@ -10916,7 +10916,7 @@ window.$ = _jquery2.default;
       dataType: "json",
       type: "DELETE",
       contentType: "application/json",
-      data: JSON.stringify({ toBeDeleted: projectsId })
+      data: JSON.stringify({ toBeDeleted: projectId })
     });
   }
 
