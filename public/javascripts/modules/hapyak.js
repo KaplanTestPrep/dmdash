@@ -258,7 +258,6 @@ $(document).ready(function() {
     let results = await papaPromisified(file, true);
     let dataRows = results.data;
     total = dataRows.length;
-    console.log(total);
 
     let videoIdKey;
     const projectAnnoList = [];
@@ -295,7 +294,6 @@ $(document).ready(function() {
       } catch (err) {
         completed += annotationsArray.length + 1;
         fail++;
-        console.log(`Project ${videoId} Failed: ${err.responseText}`, err);
         $(".progress-bar").css("width", `${(completed / total) * 100}%`);
         $("#percentage").text(
           `Progress: ${Math.round((completed / total) * 100)}%`
@@ -310,11 +308,10 @@ $(document).ready(function() {
       //Create Annotation
       for (const annotation of annotationsArray) {
         try {
-          console.log(`Creating ${annotation.type} annotation`);
           await createHapyAnnotation(annotation, projectId);
-
           completed++;
           skipped--;
+
           $(".progress-bar").css("width", `${(completed / total) * 100}%`);
           $("#percentage").text(
             `Progress: ${Math.round((completed / total) * 100)}%`
@@ -325,7 +322,6 @@ $(document).ready(function() {
         } catch (err) {
           completed += skipped;
           fail++;
-          console.log(`${annotation.type} Failed: ${err.responseText}`, err);
           $(".progress-bar").css("width", `${(completed / total) * 100}%`);
           $("#percentage").text(
             `Progress: ${Math.round((completed / total) * 100)}%`
@@ -333,9 +329,8 @@ $(document).ready(function() {
           $("ul#fail").append(
             `<li>${annotation.type} Failed: ${err.responseText}</li>`
           );
-
-          console.log("Error with annotation: Delete project!");
           deleteHapyProject(projectId);
+          $("ul#fail").append(`<li>Project for video ${videoId} Deleted!</li>`);
           break;
         }
       }
@@ -343,7 +338,6 @@ $(document).ready(function() {
   }
 
   function createHapyProject(videoId) {
-    console.log("createHapyProject");
     return new Promise((resolve, reject) => {
       $.ajax({
         url: `/createProject`,
@@ -362,8 +356,6 @@ $(document).ready(function() {
   }
 
   function createHapyAnnotation(annotation, projectId) {
-    console.log("createHapyProject");
-    console.log("Annotation: ", annotation);
     return new Promise((resolve, reject) => {
       $.ajax({
         url: `/createAnnotation`,

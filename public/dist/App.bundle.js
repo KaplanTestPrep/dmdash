@@ -10788,7 +10788,6 @@ window.$ = _jquery2.default;
     var results = await (0, _utils.papaPromisified)(file, true);
     var dataRows = results.data;
     total = dataRows.length;
-    console.log(total);
 
     var videoIdKey = void 0;
     var projectAnnoList = [];
@@ -10821,7 +10820,6 @@ window.$ = _jquery2.default;
       } catch (err) {
         completed += annotationsArray.length + 1;
         fail++;
-        console.log("Project " + videoId + " Failed: " + err.responseText, err);
         (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
         (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
         (0, _jquery2.default)("ul#fail").append("<li>Project " + videoId + " Failed: " + err.responseText + "</li>");
@@ -10839,24 +10837,21 @@ window.$ = _jquery2.default;
           var annotation = _step.value;
 
           try {
-            console.log("Creating " + annotation.type + " annotation");
             await createHapyAnnotation(annotation, projectId);
-
             completed++;
             skipped--;
+
             (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
             (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
             (0, _jquery2.default)("ul#success").append("<li>Annotation " + annotation.type + " successfully created.</li>");
           } catch (err) {
             completed += skipped;
             fail++;
-            console.log(annotation.type + " Failed: " + err.responseText, err);
             (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
             (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
             (0, _jquery2.default)("ul#fail").append("<li>" + annotation.type + " Failed: " + err.responseText + "</li>");
-
-            console.log("Error with annotation: Delete project!");
             deleteHapyProject(projectId);
+            (0, _jquery2.default)("ul#fail").append("<li>Project for video " + videoId + " Deleted!</li>");
             break;
           }
         }
@@ -10878,7 +10873,6 @@ window.$ = _jquery2.default;
   }
 
   function createHapyProject(videoId) {
-    console.log("createHapyProject");
     return new Promise(function (resolve, reject) {
       _jquery2.default.ajax({
         url: "/createProject",
@@ -10895,8 +10889,6 @@ window.$ = _jquery2.default;
   }
 
   function createHapyAnnotation(annotation, projectId) {
-    console.log("createHapyProject");
-    console.log("Annotation: ", annotation);
     return new Promise(function (resolve, reject) {
       _jquery2.default.ajax({
         url: "/createAnnotation",
