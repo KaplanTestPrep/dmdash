@@ -306,6 +306,7 @@ $(document).ready(function() {
         continue;
       }
 
+      let skipped = annotationsArray.length;
       //Create Annotation
       for (const annotation of annotationsArray) {
         try {
@@ -313,6 +314,7 @@ $(document).ready(function() {
           await createHapyAnnotation(annotation, projectId);
 
           completed++;
+          skipped--;
           $(".progress-bar").css("width", `${(completed / total) * 100}%`);
           $("#percentage").text(
             `Progress: ${Math.round((completed / total) * 100)}%`
@@ -321,7 +323,7 @@ $(document).ready(function() {
             `<li>Annotation ${annotation.type} successfully created.</li>`
           );
         } catch (err) {
-          completed++;
+          completed += skipped;
           fail++;
           console.log(`${annotation.type} Failed: ${err.responseText}`, err);
           $(".progress-bar").css("width", `${(completed / total) * 100}%`);
@@ -334,6 +336,7 @@ $(document).ready(function() {
 
           console.log("Error with annotation: Delete project!");
           deleteHapyProject(projectId);
+          break;
         }
       }
     }

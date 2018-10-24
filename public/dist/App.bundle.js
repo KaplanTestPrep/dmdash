@@ -10828,6 +10828,7 @@ window.$ = _jquery2.default;
         continue;
       }
 
+      var skipped = annotationsArray.length;
       //Create Annotation
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
@@ -10842,11 +10843,12 @@ window.$ = _jquery2.default;
             await createHapyAnnotation(annotation, projectId);
 
             completed++;
+            skipped--;
             (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
             (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
             (0, _jquery2.default)("ul#success").append("<li>Annotation " + annotation.type + " successfully created.</li>");
           } catch (err) {
-            completed++;
+            completed += skipped;
             fail++;
             console.log(annotation.type + " Failed: " + err.responseText, err);
             (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
@@ -10855,6 +10857,7 @@ window.$ = _jquery2.default;
 
             console.log("Error with annotation: Delete project!");
             deleteHapyProject(projectId);
+            break;
           }
         }
       } catch (err) {
