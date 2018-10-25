@@ -10724,8 +10724,6 @@ window.$ = _jquery2.default;
   }
 
   function handleDeleteAnno(e) {
-    console.log("Anno Deleted!");
-
     var annotations = projectDetailsList.rows(".selected").data();
     if (annotations.length === 0) {
       swal({

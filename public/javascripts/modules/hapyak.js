@@ -189,8 +189,6 @@ $(document).ready(function() {
   }
 
   function handleDeleteAnno(e) {
-    console.log("Anno Deleted!");
-
     const annotations = projectDetailsList.rows(".selected").data();
     if (annotations.length === 0) {
       swal({
