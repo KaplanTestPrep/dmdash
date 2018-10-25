@@ -94,9 +94,18 @@ $(document).ready(function() {
   }
 
   function handleDeleteProject(e) {
-    console.log("Project Deleted!");
-
     const projects = projectList.rows(".selected").data();
+    if (projects.length === 0) {
+      swal({
+        position: "top",
+        type: "warning",
+        title: "Nothing selected",
+        showConfirmButton: false,
+        timer: 800
+      });
+      return;
+    }
+
     const msg = `Are you sure you want to delete ${projects.length} projects?`;
 
     swal({
@@ -183,11 +192,20 @@ $(document).ready(function() {
     console.log("Anno Deleted!");
 
     const annotations = projectDetailsList.rows(".selected").data();
-    console.log(annotations);
+    if (annotations.length === 0) {
+      swal({
+        position: "top",
+        type: "warning",
+        title: "Nothing selected",
+        showConfirmButton: false,
+        timer: 1000
+      });
+      return;
+    }
 
     const msg = `Are you sure you want to delete ${
       annotations.length
-    } projects?`;
+    } annotation(s)?`;
 
     swal({
       title: "Are you sure?",

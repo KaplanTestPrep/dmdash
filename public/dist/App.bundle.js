@@ -10634,9 +10634,18 @@ window.$ = _jquery2.default;
   }
 
   function handleDeleteProject(e) {
-    console.log("Project Deleted!");
-
     var projects = projectList.rows(".selected").data();
+    if (projects.length === 0) {
+      swal({
+        position: "top",
+        type: "warning",
+        title: "Nothing selected",
+        showConfirmButton: false,
+        timer: 800
+      });
+      return;
+    }
+
     var msg = "Are you sure you want to delete " + projects.length + " projects?";
 
     swal({
@@ -10718,9 +10727,18 @@ window.$ = _jquery2.default;
     console.log("Anno Deleted!");
 
     var annotations = projectDetailsList.rows(".selected").data();
-    console.log(annotations);
+    if (annotations.length === 0) {
+      swal({
+        position: "top",
+        type: "warning",
+        title: "Nothing selected",
+        showConfirmButton: false,
+        timer: 1000
+      });
+      return;
+    }
 
-    var msg = "Are you sure you want to delete " + annotations.length + " projects?";
+    var msg = "Are you sure you want to delete " + annotations.length + " annotation(s)?";
 
     swal({
       title: "Are you sure?",
