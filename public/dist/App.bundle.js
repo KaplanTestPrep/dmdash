@@ -9997,33 +9997,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-function papaPromisified(file) {
-  var header = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-  return new Promise(function (resolve, reject) {
-    var config = {
-      encoding: "ISO-8859-1",
-      delimiter: "",
-      download: false,
-      skipEmptyLines: true,
-      error: reject,
-      complete: resolve,
-      header: header
-    };
-
-    Papa.parse(file, config);
-  });
-}
-
-exports.papaPromisified = papaPromisified;
+throw new Error("Module build failed: Error: ENOENT: no such file or directory, open 'C:\\Users\\iahmetovic\\Desktop\\Projects\\dmdash\\public\\javascripts\\modules\\utils.js'");
 
 /***/ }),
 /* 2 */
@@ -10572,7 +10548,7 @@ async function handleMetadataCSV(e) {
 "use strict";
 
 
-var _utils = __webpack_require__(1);
+var _utils = __webpack_require__(7);
 
 var _jquery = __webpack_require__(0);
 
@@ -11184,6 +11160,36 @@ new webpack.ProvidePlugin({
     size: 8
   });
 });
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function papaPromisified(file) {
+  var header = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+  return new Promise(function (resolve, reject) {
+    var config = {
+      encoding: "ISO-8859-1",
+      delimiter: "",
+      download: false,
+      skipEmptyLines: true,
+      error: reject,
+      complete: resolve,
+      header: header
+    };
+
+    Papa.parse(file, config);
+  });
+}
+
+exports.papaPromisified = papaPromisified;
 
 /***/ })
 /******/ ]);

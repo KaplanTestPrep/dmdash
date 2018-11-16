@@ -1,4 +1,4 @@
-import { papaPromisified } from "./utils";
+import { papaPromisified } from "../config/utils";
 import $ from "jquery";
 window.jQuery = $;
 window.$ = $;
