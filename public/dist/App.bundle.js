@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -9993,7 +9993,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 	return jQuery;
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
 /* 1 */
@@ -10002,9 +10002,39 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function papaPromisified(file) {
+  var header = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+  return new Promise(function (resolve, reject) {
+    var config = {
+      encoding: "ISO-8859-1",
+      delimiter: "",
+      download: false,
+      skipEmptyLines: true,
+      error: reject,
+      complete: resolve,
+      header: header
+    };
+
+    Papa.parse(file, config);
+  });
+}
+
+exports.papaPromisified = papaPromisified;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _utils = __webpack_require__(6);
+var _utils = __webpack_require__(1);
 
 var _jquery = __webpack_require__(0);
 
@@ -10536,13 +10566,13 @@ async function handleMetadataCSV(e) {
 // }
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _utils = __webpack_require__(6);
+var _utils = __webpack_require__(1);
 
 var _jquery = __webpack_require__(0);
 
@@ -10803,19 +10833,24 @@ window.$ = _jquery2.default;
 
     var results = await (0, _utils.papaPromisified)(file, true);
     var dataRows = results.data;
-    total = dataRows.length;
+    total = 0;
 
     var videoIdKey = void 0;
     var projectAnnoList = [];
 
-    for (var i = 0; i < dataRows.length; i++) {
-      if (dataRows[i].videoId !== "") {
-        videoIdKey = dataRows[i].videoId;
+    dataRows.forEach(function (row) {
+      if (row.videoId !== "") {
+        videoIdKey = row.videoId;
         projectAnnoList[videoIdKey] = [];
+        total++;
       } else {
-        projectAnnoList[videoIdKey].push(cleanObjectBlanks(dataRows[i]));
+        var cleanRow = cleanObjectBlanks(row);
+        if (!isEmpty(cleanRow)) {
+          projectAnnoList[videoIdKey].push(row);
+          total++;
+        }
       }
-    }
+    });
 
     for (var videoId in projectAnnoList) {
       // skip loop if the property is from prototype
@@ -10939,10 +10974,17 @@ window.$ = _jquery2.default;
     }
     return obj;
   }
+
+  function isEmpty(obj) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) return false;
+    }
+    return true;
+  }
 });
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11076,7 +11118,7 @@ window.$ = _jquery2.default;
 });
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11106,17 +11148,17 @@ module.exports = function (module) {
 };
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-__webpack_require__(3);
-
-__webpack_require__(1);
+__webpack_require__(4);
 
 __webpack_require__(2);
+
+__webpack_require__(3);
 
 var _jquery = __webpack_require__(0);
 
@@ -11143,36 +11185,6 @@ new webpack.ProvidePlugin({
     size: 8
   });
 });
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-function papaPromisified(file) {
-  var header = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-  return new Promise(function (resolve, reject) {
-    var config = {
-      encoding: "ISO-8859-1",
-      delimiter: ",",
-      download: false,
-      skipEmptyLines: true,
-      error: reject,
-      complete: resolve,
-      header: header
-    };
-
-    Papa.parse(file, config);
-  });
-}
-
-exports.papaPromisified = papaPromisified;
 
 /***/ })
 /******/ ]);

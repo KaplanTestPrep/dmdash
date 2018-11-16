@@ -273,19 +273,24 @@ $(document).ready(function() {
 
     let results = await papaPromisified(file, true);
     let dataRows = results.data;
-    total = dataRows.length;
+    total = 0;
 
     let videoIdKey;
     const projectAnnoList = [];
 
-    for (let i = 0; i < dataRows.length; i++) {
-      if (dataRows[i].videoId !== "") {
-        videoIdKey = dataRows[i].videoId;
+    dataRows.forEach(row => {
+      if (row.videoId !== "") {
+        videoIdKey = row.videoId;
         projectAnnoList[videoIdKey] = [];
+        total++;
       } else {
-        projectAnnoList[videoIdKey].push(cleanObjectBlanks(dataRows[i]));
+        let cleanRow = cleanObjectBlanks(row);
+        if (!isEmpty(cleanRow)) {
+          projectAnnoList[videoIdKey].push(row);
+          total++;
+        }
       }
-    }
+    });
 
     for (let videoId in projectAnnoList) {
       // skip loop if the property is from prototype
@@ -407,5 +412,12 @@ $(document).ready(function() {
       }
     }
     return obj;
+  }
+
+  function isEmpty(obj) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) return false;
+    }
+    return true;
   }
 });
