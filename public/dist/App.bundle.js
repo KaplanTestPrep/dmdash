@@ -10853,7 +10853,6 @@ window.$ = _jquery2.default;
     });
 
     for (var videoId in projectAnnoList) {
-      // skip loop if the property is from prototype
       if (!projectAnnoList.hasOwnProperty(videoId)) continue;
 
       var projectId = null;
@@ -10867,13 +10866,13 @@ window.$ = _jquery2.default;
         completed++;
         (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
         (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)("ul#success").append("<li>Project for video " + videoId + " successfully created.</li>");
+        (0, _jquery2.default)("ul#success").append("<li>" + videoId + " - Project successfully created.</li>");
       } catch (err) {
         completed += annotationsArray.length + 1;
         fail++;
         (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
         (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)("ul#fail").append("<li>Project " + videoId + " Failed: " + err.responseText + "</li>");
+        (0, _jquery2.default)("ul#fail").append("<li>" + videoId + " Failed: " + err.responseText + "</li>");
         continue;
       }
 
@@ -10894,15 +10893,15 @@ window.$ = _jquery2.default;
 
             (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
             (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-            (0, _jquery2.default)("ul#success").append("<li>Annotation " + annotation.type + " successfully created.</li>");
+            (0, _jquery2.default)("ul#success").append("<li>" + videoId + " - Annotation " + annotation.type + " successfully created.</li>");
           } catch (err) {
             completed += skipped;
             fail++;
             (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
             (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-            (0, _jquery2.default)("ul#fail").append("<li>" + annotation.type + " Failed: " + err.responseText + "</li>");
+            (0, _jquery2.default)("ul#fail").append("<li>" + videoId + " - " + annotation.type + " Failed - Project Deleted: " + err.responseText + "</li>");
             deleteHapyProject(projectId);
-            (0, _jquery2.default)("ul#fail").append("<li>Project for video " + videoId + " Deleted!</li>");
+            // $("ul#fail").append(`<li>Project for video ${videoId} Deleted!</li>`);
             break;
           }
         }

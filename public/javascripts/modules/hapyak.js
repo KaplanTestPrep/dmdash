@@ -293,7 +293,6 @@ $(document).ready(function() {
     });
 
     for (let videoId in projectAnnoList) {
-      // skip loop if the property is from prototype
       if (!projectAnnoList.hasOwnProperty(videoId)) continue;
 
       let projectId = null;
@@ -310,7 +309,7 @@ $(document).ready(function() {
           `Progress: ${Math.round((completed / total) * 100)}%`
         );
         $("ul#success").append(
-          `<li>Project for video ${videoId} successfully created.</li>`
+          `<li>${videoId} - Project successfully created.</li>`
         );
       } catch (err) {
         completed += annotationsArray.length + 1;
@@ -319,9 +318,7 @@ $(document).ready(function() {
         $("#percentage").text(
           `Progress: ${Math.round((completed / total) * 100)}%`
         );
-        $("ul#fail").append(
-          `<li>Project ${videoId} Failed: ${err.responseText}</li>`
-        );
+        $("ul#fail").append(`<li>${videoId} Failed: ${err.responseText}</li>`);
         continue;
       }
 
@@ -338,7 +335,9 @@ $(document).ready(function() {
             `Progress: ${Math.round((completed / total) * 100)}%`
           );
           $("ul#success").append(
-            `<li>Annotation ${annotation.type} successfully created.</li>`
+            `<li>${videoId} - Annotation ${
+              annotation.type
+            } successfully created.</li>`
           );
         } catch (err) {
           completed += skipped;
@@ -348,10 +347,12 @@ $(document).ready(function() {
             `Progress: ${Math.round((completed / total) * 100)}%`
           );
           $("ul#fail").append(
-            `<li>${annotation.type} Failed: ${err.responseText}</li>`
+            `<li>${videoId} - ${annotation.type} Failed - Project Deleted: ${
+              err.responseText
+            }</li>`
           );
           deleteHapyProject(projectId);
-          $("ul#fail").append(`<li>Project for video ${videoId} Deleted!</li>`);
+          // $("ul#fail").append(`<li>Project for video ${videoId} Deleted!</li>`);
           break;
         }
       }
