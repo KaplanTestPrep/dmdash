@@ -10848,6 +10848,7 @@ window.$ = _jquery2.default;
         fail++;
         (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
         (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+        console.log(videoId + " Failed: " + err);
         (0, _jquery2.default)("ul#fail").append("<li>" + videoId + " Failed: " + err.responseText + "</li>");
         continue;
       }
@@ -10875,6 +10876,7 @@ window.$ = _jquery2.default;
             fail++;
             (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
             (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+            console.log(videoId + " - " + annotation.type + " Failed - Project Deleted): " + err);
             (0, _jquery2.default)("ul#fail").append("<li>" + videoId + " - " + annotation.type + " Failed - Project Deleted: " + err.responseText + "</li>");
             deleteHapyProject(projectId);
             // $("ul#fail").append(`<li>Project for video ${videoId} Deleted!</li>`);

@@ -318,6 +318,7 @@ $(document).ready(function() {
         $("#percentage").text(
           `Progress: ${Math.round((completed / total) * 100)}%`
         );
+        console.log(`${videoId} Failed: ${err}`);
         $("ul#fail").append(`<li>${videoId} Failed: ${err.responseText}</li>`);
         continue;
       }
@@ -345,6 +346,9 @@ $(document).ready(function() {
           $(".progress-bar").css("width", `${(completed / total) * 100}%`);
           $("#percentage").text(
             `Progress: ${Math.round((completed / total) * 100)}%`
+          );
+          console.log(
+            `${videoId} - ${annotation.type} Failed - Project Deleted): ${err}`
           );
           $("ul#fail").append(
             `<li>${videoId} - ${annotation.type} Failed - Project Deleted: ${
