@@ -383,6 +383,7 @@ $(document).ready(function() {
   }
 
   function createHapyAnnotation(annotation, projectId) {
+    console.log(annotation);
     return new Promise((resolve, reject) => {
       $.ajax({
         url: `/createAnnotation`,
