@@ -279,7 +279,22 @@ exports.getHapyakToken = async () => {
 };
 
 function makeAnnotationBody(annotation) {
-  if (annotation.type !== "quiz") return annotation;
+  annotation.start = parseInt(annotation.start, 10);
+  annotation.end = parseInt(annotation.end, 10);
+  if (annotation.pause) annotation.pause = parseInt(annotation.pause, 10);
+  if (annotation.passing_mark)
+    annotation.passing_mark = parseInt(annotation.passing_mark, 10);
+  if (annotation.reset_variables)
+    annotation.reset_variables = isTrue(annotation.reset_variables);
+  if (annotation.multiple_answers)
+    annotation.multiple_answers = isTrue(annotation.multiple_answers);
+  if (annotation.multiple_required)
+    annotation.multiple_required = isTrue(annotation.multiple_required);
+  if (annotation.show_skip) annotation.show_skip = isTrue(annotation.show_skip);
+  if (annotation.show_retry)
+    annotation.show_retry = isTrue(annotation.show_retry);
+  if (annotation.show_results)
+    annotation.show_results = isTrue(annotation.show_results);
 
   if (annotation.type === "quiz") {
     let quiz = {};
@@ -315,4 +330,10 @@ function makeAnnotationBody(annotation) {
 
     return annotation;
   }
+
+  return annotation;
+}
+
+function isTrue(string) {
+  return string.toLowerCase() == "true";
 }

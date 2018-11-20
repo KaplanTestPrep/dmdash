@@ -10912,7 +10912,6 @@ window.$ = _jquery2.default;
   }
 
   function createHapyAnnotation(annotation, projectId) {
-    console.log(annotation);
     return new Promise(function (resolve, reject) {
       _jquery2.default.ajax({
         url: "/createAnnotation",
