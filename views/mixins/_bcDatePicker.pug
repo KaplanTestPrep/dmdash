@@ -1,5 +1,5 @@
-mixin datePicker(label="Select Date")
+mixin datePicker(label="Select Date", id="datepicker")
     .form-group
-        label.col-md-3.control-label Videos Updated After:
+        label.col-md-3.control-label= label
         .col-md-3
-            input.form-control.datepicker#datepicker(type='text', placeholder='Select Date here')
+            input.form-control.datepicker.datepicker(id=id, type='text', placeholder='Select Date here')

@@ -1,0 +1,33 @@
+extends layout
+
+include mixins/_progressBar
+
+block content
+    .row
+        .col-lg-12.col-md-12
+            .card
+                form.form-horizontal#annotationsImportForm
+                    .card-header
+                        h4.card-title
+                            | Import Annotations
+                    .card-content
+                        .form-group
+                            label.col-md-3.control-label Select Environment: 
+                            .col-md-3
+                                .bootstrap-select
+                                    select.selectpicker(id="env", name="Environment")
+                                        each env in accounts
+                                            option(value=env.code)=env.name
+                        .form-group
+                            label.col-md-3.control-label Select CSV file to upload:
+                            .col-md-3
+                                input.btn.btn-default#selectCSV(type="file" name="csv" accept="text/csv" required)
+                    .card-footer
+                        .form-group
+                            label.col-md-3
+                            .col-md-9
+                                button.btn.btn-fill.btn-default#metadataUpdateBtn(type="submit") Import Annotations
+                                span#status
+    +progressBar()
+    script(src='/js/papaparse.min.js')
+

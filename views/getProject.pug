@@ -1,0 +1,45 @@
+extends layout
+
+include mixins/_progressBar
+
+block content
+    .row
+        .col-lg-12.col-md-12
+            .card
+                form.form-horizontal#loadNewEnvForm
+                    .card-content
+                        .form-group
+                            label.col-md-3.control-label Set Your Environment
+                            .col-md-3
+                                .bootstrap-select
+                                    select.selectpicker(id="env", name="Environment")
+                                        each env in accounts
+                                            option(value=env.code)=env.name
+    .row
+        .col-lg-12.col-md-12
+            .card
+                .card-content
+                    .toolbar
+                        .row
+                            .col-md-3
+                                button.btn.btn-default#hapyDeleteProj Delete Project
+                    .fresh-datatables
+                        table#hapyakProjects.table.table-striped.table-no-bordered.table-hover
+                            thead
+                                tr
+                                    th _Id
+                                    th Id
+                                    th Title
+                                    th Video
+                                    th Brightcove Video ID
+                                    th Track
+                                    th Created
+                            tfoot
+                                tr
+                                    th _Id
+                                    th Id
+                                    th title
+                                    th Video
+                                    th Brightcove Video ID
+                                    th Track
+                                    th Created

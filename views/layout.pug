@@ -119,6 +119,22 @@ html(lang='en')
                     a(href='/refIdToIdTool')
                       span.sidebar-mini RI
                       span.sidebar-normal RefId to Video Id
+            li(class=( active === 'hap' ? 'active' : null ))
+              a(data-toggle='collapse', href='#hap')
+                i.ti-panel
+                p
+                  | Hapyak
+                  b.caret
+              #hap.collapse(class=( active === 'hap' ? 'in' : null ), aria-expanded=( active === 'hap' ? 'true' : 'false' ))
+                ul.nav
+                  li(class=( pageTitle === 'Project List' ? 'active' : null ))
+                    a(href='/getProjectTool')
+                      span.sidebar-mini GP
+                      span.sidebar-normal Project List
+                  li(class=( pageTitle === 'Import Annotations' ? 'active' : null ))
+                    a(href='/importAnnotations')
+                      span.sidebar-mini IA
+                      span.sidebar-normal Import Annotations
       .main-panel
         nav.navbar.navbar-default
           .container-fluid

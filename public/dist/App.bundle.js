@@ -6183,7 +6183,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			}
 			val = "auto";
 		}
-
 		// Check for style in case a browser which returns unreliable values
 		// for getComputedStyle silently falls back to the reliable elem.style
 		valueIsBorderBox = valueIsBorderBox && (support.boxSizingReliable() || val === elem.style[dimension]);
@@ -6195,19 +6194,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		if (val === "auto" || !parseFloat(val) && jQuery.css(elem, "display", false, styles) === "inline") {
 
 			val = elem["offset" + dimension[0].toUpperCase() + dimension.slice(1)];
-
-			// offsetWidth/offsetHeight provide border-box values
-			valueIsBorderBox = true;
-		}
-
-		// Normalize "" and auto
-		val = parseFloat(val) || 0;
-
-		// Adjust for the element's box model
-		return val + boxModelAdjustment(elem, dimension, extra || (isBorderBox ? "border" : "content"), valueIsBorderBox, styles,
-
-		// Provide the current computed size to request scroll gutter calculation (gh-3589)
-		val) + "px";
 	}
 
 	jQuery.extend({
@@ -10004,6 +9990,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
+var _utils = __webpack_require__(5);
+
 var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
@@ -10134,7 +10122,8 @@ function handleVideoRenditions(e) {
   (0, _jquery2.default)("#resultsCard").removeClass("hidden");
 
   var accountId = (0, _jquery2.default)("#bcAccount").val();
-  var update = (0, _jquery2.default)("#datepicker").val();
+  var dateFrom = (0, _jquery2.default)("#dateFrom").val();
+  var dateTo = (0, _jquery2.default)("#dateTo").val();
   var renditionsTable = (0, _jquery2.default)("#renditionsTable");
 
   if (!_jquery2.default.fn.DataTable.isDataTable("#renditionsTable")) {
@@ -10145,7 +10134,7 @@ function handleVideoRenditions(e) {
         text: "Download CSV",
         className: "btn btn-default"
       }],
-      ajax: "/bc/getRenditions/" + accountId + "/" + update,
+      ajax: "/bc/getRenditions/" + accountId + "/" + dateFrom + "/" + dateTo,
       columns: [{ data: "videoId" }, { data: "accountId" }, { data: "refId" }, { data: "videoName" }, { data: "description" }, { data: "state" }, { data: "createdAt" }, { data: "updatedAt" }, { data: "publishedAt" }, { data: "duration" }, { data: "folderId" }, { data: "digitalMasterId" }, { data: "tags" }, { data: "textTrackId" }, { data: "textTrackSrc" }, { data: "textTrackLang" }, { data: "textTrackLabel" }, { data: "textTrackKind" }, { data: "renditions" }, { data: "renditionCount" }],
       columnDefs: [{
         targets: [0, 1, 5, 6, 8, 10, 11, 13, 14, 15, 17, 18],
@@ -10157,7 +10146,7 @@ function handleVideoRenditions(e) {
     });
   } else {
     renditionsTable = new _jquery2.default.fn.dataTable.Api("#renditionsTable");
-    renditionsTable.ajax.url("/bc/getRenditions/" + accountId + "/" + update).load();
+    renditionsTable.ajax.url("/bc/getRenditions/" + accountId + "/" + dateFrom + "/" + dateTo).load();
   }
 }
 
@@ -10291,7 +10280,7 @@ async function handleCreatePlaylist(e) {
   var file = document.getElementById("selectCSV").files[0];
   if (!file) return;
 
-  var results = await papaPromisified(file);
+  var results = await (0, _utils.papaPromisified)(file);
   var dataRows = results.data;
   dataRows.shift();
   console.log(dataRows);
@@ -10365,7 +10354,7 @@ async function handleRefIdUpdateForm(e) {
   var file = document.getElementById("selectCSV").files[0];
   if (!file) return;
 
-  var results = await papaPromisified(file);
+  var results = await (0, _utils.papaPromisified)(file);
   var videos = results.data;
   videos.shift();
 
@@ -10410,8 +10399,6 @@ async function handleRefIdUpdateForm(e) {
 }
 
 function handleMediaShareForm(e) {
-  console.log("FUCK OFFFFFFF");
-
   e.preventDefault();
   (0, _jquery2.default)("#resultsCard").removeClass("hidden");
   (0, _jquery2.default)("ul#success").html("");
@@ -10468,7 +10455,7 @@ async function handleMetadataCSV(e) {
   var file = document.getElementById("selectCSV").files[0];
   if (!file) return;
 
-  var results = await papaPromisified(file);
+  var results = await (0, _utils.papaPromisified)(file);
   var videos = results.data;
   videos.shift();
 
@@ -10519,20 +10506,20 @@ async function handleMetadataCSV(e) {
   document.getElementById("metadataUpdateForm").reset();
 }
 
-function papaPromisified(file) {
-  return new Promise(function (resolve, reject) {
-    var config = {
-      encoding: "ISO-8859-1",
-      delimiter: ",",
-      download: false,
-      skipEmptyLines: true,
-      error: reject,
-      complete: resolve
-    };
+// function papaPromisified(file) {
+//   return new Promise(function(resolve, reject) {
+//     let config = {
+//       encoding: "ISO-8859-1",
+//       delimiter: ",",
+//       download: false,
+//       skipEmptyLines: true,
+//       error: reject,
+//       complete: resolve
+//     };
 
-    Papa.parse(file, config);
-  });
-}
+//     Papa.parse(file, config);
+//   });
+// }
 
 /***/ }),
 /* 2 */
@@ -10552,13 +10539,13 @@ window.$ = _jquery2.default;
 
 (0, _jquery2.default)(document).ready(function () {
   // Datatable init
-  var table = (0, _jquery2.default)("#datatables").DataTable({
-    dom: 'lfrtBip',
+  var table = (0, _jquery2.default)("#zoomRecordings").DataTable({
+    dom: "lfrtBip",
     buttons: [{
-      extend: 'csvHtml5',
-      text: 'Download CSV',
-      className: 'btn btn-default',
-      filename: 'Tutor-recordings-report'
+      extend: "csvHtml5",
+      text: "Download CSV",
+      className: "btn btn-default",
+      filename: "Tutor-recordings-report"
     }],
     ajax: "/getTutorRecordings",
     columns: [{ data: "user" }, { data: "topic" }, { data: "recording_start" }, { data: "file_type" }, { data: "download_url" }],
@@ -10570,13 +10557,13 @@ window.$ = _jquery2.default;
     pageLength: 25
   });
 
-  (0, _jquery2.default)("#datatables").on("click", "tr", function () {
+  (0, _jquery2.default)("#zoomRecordings").on("click", "tr", function () {
     (0, _jquery2.default)(this).toggleClass("selected");
   });
 
   (0, _jquery2.default)("#delete").click(function () {
     var recordings = table.rows(".selected").data();
-    var msg = 'Are you sure you want to delete ' + recordings.length + ' recordings?';
+    var msg = "Are you sure you want to delete " + recordings.length + " recordings?";
 
     swal({
       title: "Are you sure?",
@@ -10641,28 +10628,28 @@ window.$ = _jquery2.default;
     var fail = 0;
     var total = emails.length;
 
-    (0, _jquery2.default)('#resultsCard').removeClass('hidden');
-    (0, _jquery2.default)('ul#success').html("");
-    (0, _jquery2.default)('ul#fail').html("");
+    (0, _jquery2.default)("#resultsCard").removeClass("hidden");
+    (0, _jquery2.default)("ul#success").html("");
+    (0, _jquery2.default)("ul#fail").html("");
 
     emails.forEach(function (email) {
       _jquery2.default.ajax({
-        url: '/setAlternateHosts/' + email,
+        url: "/setAlternateHosts/" + email,
         type: "POST"
       }).done(function (res) {
         console.log(res);
         completed++;
-        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
-        (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-        (0, _jquery2.default)('ul#success').append('<li>' + email + ' Sucessfully processsed.</li>');
+        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+        (0, _jquery2.default)("ul#success").append("<li>" + email + " Sucessfully processsed.</li>");
       }).fail(function (err) {
         completed++;
         fail++;
 
-        console.log(email + ' Failed: ' + err.responseText, err);
-        (0, _jquery2.default)('.progress-bar').css("width", completed / total * 100 + '%');
-        (0, _jquery2.default)("#percentage").text('Progress: ' + Math.round(completed / total * 100) + '%');
-        (0, _jquery2.default)('ul#fail').append('<li>' + email + ' Failed: ' + err.responseText + '</li>');
+        console.log(email + " Failed: " + err.responseText, err);
+        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+        (0, _jquery2.default)("ul#fail").append("<li>" + email + " Failed: " + err.responseText + "</li>");
       });
     });
   });
@@ -10709,6 +10696,8 @@ __webpack_require__(2);
 
 __webpack_require__(1);
 
+__webpack_require__(6);
+
 var _jquery = __webpack_require__(0);
 
 var _jquery2 = _interopRequireDefault(_jquery);
@@ -10725,15 +10714,484 @@ new webpack.ProvidePlugin({
 */
 
 (0, _jquery2.default)(document).ready(function () {
-
-  (0, _jquery2.default)('#datepicker').datetimepicker({
-    format: 'YYYY-MM-DD'
+  (0, _jquery2.default)(".datepicker").datetimepicker({
+    format: "YYYY-MM-DD"
   });
 
-  (0, _jquery2.default)('.selectpicker').selectpicker({
-    style: 'btn-default',
+  (0, _jquery2.default)(".selectpicker").selectpicker({
+    style: "btn-default",
     size: 8
   });
+});
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function papaPromisified(file) {
+  var header = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+  return new Promise(function (resolve, reject) {
+    var config = {
+      encoding: "ISO-8859-1",
+      delimiter: "",
+      download: false,
+      skipEmptyLines: true,
+      error: reject,
+      complete: resolve,
+      header: header
+    };
+
+    Papa.parse(file, config);
+  });
+}
+
+exports.papaPromisified = papaPromisified;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _utils = __webpack_require__(5);
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+window.jQuery = _jquery2.default;
+window.$ = _jquery2.default;
+
+(0, _jquery2.default)(document).ready(function () {
+  (0, _jquery2.default)("#hapyCreateProj").click(function (e) {
+    return handleCreateProject(e);
+  });
+  (0, _jquery2.default)("#hapyDeleteProj").click(function (e) {
+    return handleDeleteProject(e);
+  });
+  (0, _jquery2.default)("#hapyCreateAnno").click(function (e) {
+    return handleCreateAnno(e);
+  });
+  (0, _jquery2.default)("#hapyDeleteAnno").click(function (e) {
+    return handleDeleteAnno(e);
+  });
+  (0, _jquery2.default)("#annotationsImportForm").submit(function (e) {
+    return handleAnnotationsImport(e);
+  });
+  (0, _jquery2.default)("#env").change(function (e) {
+    return handleLoadNewEnv(e);
+  });
+  (0, _jquery2.default)("#hapyakProjects").on("click", "tr", function () {
+    (0, _jquery2.default)(this).toggleClass("selected");
+  });
+  (0, _jquery2.default)("#hapyakProjectDetails").on("click", "tr", function () {
+    (0, _jquery2.default)(this).toggleClass("selected");
+  });
+
+  (0, _jquery2.default)("#hapyakProjects").on("dblclick", "tr", function (e) {
+    return handleProjectDetails(e);
+  });
+  var env = (0, _jquery2.default)("#env").val();
+  console.log(env);
+
+  var projectList = (0, _jquery2.default)("#hapyakProjects").DataTable({
+    dom: "lfrtBip",
+    buttons: [{
+      extend: "csvHtml5",
+      text: "Download CSV",
+      className: "btn btn-default",
+      filename: "Hapyak_Projects"
+    }],
+    ajax: {
+      url: "/listProjects",
+      data: function data(d) {
+        d.env = document.getElementById("env").value;
+      }
+    },
+    columns: [{ data: "_id" }, { data: "id" }, { data: "title" }, { data: "video" }, { data: "brightcoveId" }, { data: "track" }, { data: "created" }],
+    columnDefs: [{
+      targets: [0],
+      visible: false,
+      searchable: true
+    }],
+    pageLength: 25
+  });
+
+  var pathName = window.location.pathname;
+  var pathNameSplit = pathName.split("/");
+  var slug = pathNameSplit[pathNameSplit.length - 1];
+
+  var projectDetailsList = (0, _jquery2.default)("#hapyakProjectDetails").DataTable({
+    dom: "lfrtBip",
+    buttons: [{
+      extend: "csvHtml5",
+      text: "Download CSV",
+      className: "btn btn-default",
+      filename: "ProjectAnnotations"
+    }],
+    ajax: "/listAnnotations/" + slug,
+    columns: [{ data: "startTime" }, { data: "id" }, { data: "projectId" }, { data: "type" }, { data: "created" }],
+    columnDefs: [{
+      targets: [0],
+      visible: true,
+      searchable: true
+    }],
+    pageLength: 25
+  });
+
+  async function handleCreateProject(e) {
+    console.log("Project Created!");
+    var videoId = (0, _jquery2.default)("#bcVideoId").val();
+
+    //Create Project
+    try {
+      await createHapyProject(videoId);
+      projectList.ajax.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  function handleLoadNewEnv(e) {
+    e.preventDefault();
+    projectList.ajax.reload();
+  }
+
+  function handleDeleteProject(e) {
+    var projects = projectList.rows(".selected").data();
+    var env = document.getElementById("env").value;
+    if (projects.length === 0) {
+      swal({
+        position: "top",
+        type: "warning",
+        title: "Nothing selected",
+        showConfirmButton: false,
+        timer: 800
+      });
+      return;
+    }
+
+    var msg = "Are you sure you want to delete " + projects.length + " projects?";
+
+    swal({
+      title: "Are you sure?",
+      text: msg,
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
+    }).then(function (result) {
+      if (result.value) {
+        for (var i = 0; i < projects.length; i++) {
+          _jquery2.default.ajax({
+            url: "/deleteProject",
+            dataType: "json",
+            type: "DELETE",
+            contentType: "application/json",
+            data: JSON.stringify({ toBeDeleted: projects[i].id, env: env })
+          });
+        }
+
+        swal({
+          position: "top",
+          type: "success",
+          title: "Recording(s) deleted!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        }).then(function (result) {
+          projectList.rows(".selected").remove().draw(false);
+        });
+        // result.dismiss can be 'cancel', 'overlay',
+        // 'close', and 'timer'
+      } else if (result.dismiss) {
+        swal({
+          position: "top",
+          type: "error",
+          title: "Canceled!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        });
+      }
+    });
+  }
+
+  function handleProjectDetails(e) {
+    console.log("Project Details!");
+    var projectId = e.currentTarget.children[0].innerText;
+
+    var url = "/projects/" + projectId;
+
+    console.log(url);
+    window.location.href = "/getProjectTool/" + projectId;
+  }
+
+  function handleCreateAnno(e) {
+    console.log("Create Annotation");
+    var pathName = window.location.pathname.split("/");
+    var projectId = pathName[pathName.length - 1];
+
+    _jquery2.default.ajax({
+      url: "/createAnnotation",
+      type: "POST",
+      data: {
+        projectId: projectId
+      }
+    }).done(function (res) {
+      console.log(res);
+    }).fail(function (err) {
+      console.log(err);
+    });
+  }
+
+  function handleDeleteAnno(e) {
+    var annotations = projectDetailsList.rows(".selected").data();
+    var env = document.getElementById("env").value;
+    if (annotations.length === 0) {
+      swal({
+        position: "top",
+        type: "warning",
+        title: "Nothing selected",
+        showConfirmButton: false,
+        timer: 1000
+      });
+      return;
+    }
+
+    var msg = "Are you sure you want to delete " + annotations.length + " annotation(s)?";
+
+    swal({
+      title: "Are you sure?",
+      text: msg,
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
+    }).then(function (result) {
+      if (result.value) {
+        for (var i = 0; i < annotations.length; i++) {
+          _jquery2.default.ajax({
+            url: "/deleteAnnotation",
+            dataType: "json",
+            type: "DELETE",
+            contentType: "application/json",
+            data: JSON.stringify({
+              projectId: annotations[i].projectId,
+              annotationId: annotations[i].id,
+              env: env
+            })
+          });
+        }
+
+        swal({
+          position: "top",
+          type: "success",
+          title: "Recording(s) deleted!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        }).then(function (result) {
+          projectDetailsList.rows(".selected").remove().draw(false);
+        });
+        // result.dismiss can be 'cancel', 'overlay',
+        // 'close', and 'timer'
+      } else if (result.dismiss) {
+        swal({
+          position: "top",
+          type: "error",
+          title: "Canceled!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        });
+      }
+    });
+  }
+
+  async function handleAnnotationsImport(e) {
+    e.preventDefault();
+    var env = document.getElementById("env").value;
+    var file = document.getElementById("selectCSV").files[0];
+    if (!file) return;
+
+    var completed = 0;
+    var fail = 0;
+    var total = 0;
+
+    (0, _jquery2.default)("#resultsCard").removeClass("hidden");
+    (0, _jquery2.default)("ul#success").html("");
+    (0, _jquery2.default)("ul#fail").html("");
+
+    var results = await (0, _utils.papaPromisified)(file, true);
+    var dataRows = results.data;
+    total = 0;
+
+    var videoIdKey = void 0;
+    var projectAnnoList = [];
+
+    dataRows.forEach(function (row) {
+      if (row.videoId !== "") {
+        videoIdKey = row.videoId;
+        projectAnnoList[videoIdKey] = [];
+        total++;
+      } else {
+        var cleanRow = cleanObjectBlanks(row);
+        if (!isEmpty(cleanRow)) {
+          projectAnnoList[videoIdKey].push(row);
+          total++;
+        }
+      }
+    });
+
+    for (var videoId in projectAnnoList) {
+      if (!projectAnnoList.hasOwnProperty(videoId)) continue;
+
+      var projectId = null;
+      var annotationsArray = projectAnnoList[videoId];
+
+      //Create Project
+      try {
+        var result = await createHapyProject(env, videoId);
+        projectId = result.project.id;
+
+        completed++;
+        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+        (0, _jquery2.default)("ul#success").append("<li>" + videoId + " - Project successfully created.</li>");
+      } catch (err) {
+        completed += annotationsArray.length + 1;
+        fail++;
+        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+        console.log(videoId + " Failed:", err);
+        (0, _jquery2.default)("ul#fail").append("<li>" + videoId + " Failed: " + err.responseText + "</li>");
+        continue;
+      }
+
+      var skipped = annotationsArray.length;
+      //Create Annotation
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = annotationsArray[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var annotation = _step.value;
+
+          try {
+            await createHapyAnnotation(env, annotation, projectId);
+            completed++;
+            skipped--;
+
+            (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+            (0, _jquery2.default)("ul#success").append("<li>" + videoId + " - Annotation " + annotation.type + " successfully created.</li>");
+          } catch (err) {
+            completed += skipped;
+            fail++;
+            (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+            (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+            console.log(videoId + " - " + annotation.type + " Failed - Project Deleted): ", err);
+            (0, _jquery2.default)("ul#fail").append("<li>" + videoId + " - " + annotation.type + " Failed - Project Deleted: " + err.responseText + "</li>");
+            deleteHapyProject(projectId);
+            // $("ul#fail").append(`<li>Project for video ${videoId} Deleted!</li>`);
+            break;
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }
+  }
+
+  function createHapyProject(env, videoId) {
+    return new Promise(function (resolve, reject) {
+      _jquery2.default.ajax({
+        url: "/createProject",
+        type: "POST",
+        data: {
+          video_source_id: videoId,
+          env: env
+        }
+      }).done(function (res) {
+        return resolve(res);
+      }).fail(function (err) {
+        return reject(err);
+      });
+    });
+  }
+
+  function createHapyAnnotation(env, annotation, projectId) {
+    return new Promise(function (resolve, reject) {
+      _jquery2.default.ajax({
+        url: "/createAnnotation",
+        type: "POST",
+        data: {
+          env: env,
+          projectId: projectId,
+          annotation: annotation
+        }
+      }).done(function (res) {
+        return resolve(res);
+      }).fail(function (err) {
+        return reject(err);
+      });
+    });
+  }
+
+  function deleteHapyProject(projectId) {
+    _jquery2.default.ajax({
+      url: "/deleteProject",
+      dataType: "json",
+      type: "DELETE",
+      contentType: "application/json",
+      data: JSON.stringify({ toBeDeleted: projectId })
+    });
+  }
+
+  function cleanObjectBlanks(obj) {
+    for (var propName in obj) {
+      if (obj[propName] === "") {
+        delete obj[propName];
+      }
+    }
+    return obj;
+  }
+
+  function isEmpty(obj) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) return false;
+    }
+    return true;
+  }
 });
 
 /***/ })

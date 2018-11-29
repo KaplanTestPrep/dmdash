@@ -5,6 +5,7 @@ const authController = require("../controllers/authController");
 const dashController = require("../controllers/dashController");
 const zoomController = require("../controllers/zoomController");
 const bcController = require("../controllers/bcController");
+const hapyakController = require("../controllers/hapyakController");
 const wowzaController = require("../controllers/wowzaController");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
@@ -65,7 +66,7 @@ router.get(
 );
 
 router.get(
-  "/bc/getRenditions/:accountId/:update",
+  "/bc/getRenditions/:accountId/:dateFrom/:dateTo",
   authController.isLoggedIn,
   catchErrors(bcController.getRenditions)
 );
@@ -168,6 +169,65 @@ router.get(
 );
 
 router.post("/refIdToId", authController.isLoggedIn, bcController.refIdToId);
+
+router.get(
+  "/getProjectTool",
+  authController.isLoggedIn,
+  hapyakController.getProjectTool
+);
+
+router.get(
+  "/importAnnotations",
+  authController.isLoggedIn,
+  hapyakController.importAnnotations
+);
+
+router.get(
+  "/getProjectTool/:projectId",
+  authController.isLoggedIn,
+  hapyakController.projectPage
+);
+
+router.get(
+  "/getProject",
+  authController.isLoggedIn,
+  hapyakController.getProject
+);
+
+router.get(
+  "/listProjects",
+  authController.isLoggedIn,
+  hapyakController.listProjects
+);
+
+router.post(
+  "/createProject",
+  authController.isLoggedIn,
+  hapyakController.createProject
+);
+
+router.delete(
+  "/deleteProject",
+  authController.isLoggedIn,
+  hapyakController.deleteProject
+);
+
+router.post(
+  "/createAnnotation",
+  authController.isLoggedIn,
+  hapyakController.createAnnotation
+);
+
+router.delete(
+  "/deleteAnnotation",
+  authController.isLoggedIn,
+  hapyakController.deleteAnnotation
+);
+router.get(
+  "/listAnnotations/:projectId",
+  authController.isLoggedIn,
+  hapyakController.listAnnotations
+);
 
 // router.get("/auth/google", authController.authenticate);
 // router.get("/auth/google/callback", authController.authCallback);

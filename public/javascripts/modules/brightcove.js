@@ -1,3 +1,4 @@
+import { papaPromisified } from "../config/utils";
 import $ from "jquery";
 window.jQuery = $;
 window.$ = $;
@@ -119,7 +120,8 @@ function handleVideoRenditions(e) {
   $("#resultsCard").removeClass("hidden");
 
   const accountId = $("#bcAccount").val();
-  const update = $("#datepicker").val();
+  const dateFrom = $("#dateFrom").val();
+  const dateTo = $("#dateTo").val();
   let renditionsTable = $("#renditionsTable");
 
   if (!$.fn.DataTable.isDataTable("#renditionsTable")) {
@@ -132,7 +134,7 @@ function handleVideoRenditions(e) {
           className: "btn btn-default"
         }
       ],
-      ajax: `/bc/getRenditions/${accountId}/${update}`,
+      ajax: `/bc/getRenditions/${accountId}/${dateFrom}/${dateTo}`,
       columns: [
         { data: "videoId" },
         { data: "accountId" },
@@ -167,7 +169,9 @@ function handleVideoRenditions(e) {
     });
   } else {
     renditionsTable = new $.fn.dataTable.Api("#renditionsTable");
-    renditionsTable.ajax.url(`/bc/getRenditions/${accountId}/${update}`).load();
+    renditionsTable.ajax
+      .url(`/bc/getRenditions/${accountId}/${dateFrom}/${dateTo}`)
+      .load();
   }
 }
 
@@ -454,8 +458,6 @@ async function handleRefIdUpdateForm(e) {
 }
 
 function handleMediaShareForm(e) {
-  console.log("FUCK OFFFFFFF");
-
   e.preventDefault();
   $("#resultsCard").removeClass("hidden");
   $("ul#success").html("");
@@ -584,17 +586,17 @@ async function handleMetadataCSV(e) {
   document.getElementById("metadataUpdateForm").reset();
 }
 
-function papaPromisified(file) {
-  return new Promise(function(resolve, reject) {
-    let config = {
-      encoding: "ISO-8859-1",
-      delimiter: ",",
-      download: false,
-      skipEmptyLines: true,
-      error: reject,
-      complete: resolve
-    };
+// function papaPromisified(file) {
+//   return new Promise(function(resolve, reject) {
+//     let config = {
+//       encoding: "ISO-8859-1",
+//       delimiter: ",",
+//       download: false,
+//       skipEmptyLines: true,
+//       error: reject,
+//       complete: resolve
+//     };
 
-    Papa.parse(file, config);
-  });
-}
+//     Papa.parse(file, config);
+//   });
+// }

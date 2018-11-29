@@ -1,0 +1,15 @@
+videoId,type,start,end,top,left,height,width,content,url,link_url,multiple_answers,multiple_required,pass_message,passing_mark,reset_variables,show_results,show_retry,show_skip,questionText,answerOptionA,answerOptionB,answerOptionC,answerOptionD,answerOptionCorrect
+5.82604E+12,,,,,,,,,,,,,,,,,,,,,,,,
+,pop,2,12,5%,5%,100px,200px,Top left pop,,,,,,,,,,,,,,,,
+,pop,4,14,95%,5%,100px,200px,Top right pop,,,,,,,,,,,,,,,,
+,pop,6,16,5%,95%,100px,200px,Bottom left pop,,,,,,,,,,,,,,,,
+,pop,8,18,95%,95%,100px,200px,Bottom right pop,,,,,,,,,,,,,,,,
+,image,1,20,30%,30%,300px,300px,,https://common.liveonlinetechnology.com/uploads/Rick.jpg,www.google.com,,,,,,,,,,,,,,
+,quiz,20,40,,,,,,,,,,,,,,,,Which division of the brain would provide reflex reactions to visual or auditory stimuli?,Forebrain,Midbrain,Hindbrain,Spinal Cord,B
+5.82603E+12,,,,,,,,,,,,,,,,,,,,,,,,
+,pop,2,12,5%,5%,100px,200px,Top left pop,,,,,,,,,,,,,,,,
+,pop,4,14,95%,5%,100px,200px,Top right pop,,,,,,,,,,,,,,,,
+,pop,6,16,5%,95%,100px,200px,Bottom left pop,,,,,,,,,,,,,,,,
+,pop,8,18,95%,95%,100px,200px,Bottom right pop,,,,,,,,,,,,,,,,
+,image,1,20,30%,30%,300px,300px,,https://common.liveonlinetechnology.com/uploads/Rick.jpg,www.google.com,,,,,,,,,,,,,,
+,quiz,20,40,,,,,,,,,,,,,,,,Which division of the brain would provide reflex reactions to visual or auditory stimuli?,Forebrain,Midbrain,Hindbrain,Spinal Cord,B
