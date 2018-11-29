@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -9993,11 +9993,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 	return jQuery;
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module)))
 
 /***/ }),
-/* 1 */,
-/* 2 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10005,7 +10004,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _utils = __webpack_require__(7);
+var _utils = __webpack_require__(5);
 
 var _jquery = __webpack_require__(0);
 
@@ -10537,13 +10536,246 @@ async function handleMetadataCSV(e) {
 // }
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+window.jQuery = _jquery2.default;
+window.$ = _jquery2.default;
+
+(0, _jquery2.default)(document).ready(function () {
+  // Datatable init
+  var table = (0, _jquery2.default)("#zoomRecordings").DataTable({
+    dom: "lfrtBip",
+    buttons: [{
+      extend: "csvHtml5",
+      text: "Download CSV",
+      className: "btn btn-default",
+      filename: "Tutor-recordings-report"
+    }],
+    ajax: "/getTutorRecordings",
+    columns: [{ data: "user" }, { data: "topic" }, { data: "recording_start" }, { data: "file_type" }, { data: "download_url" }],
+    columnDefs: [{
+      targets: [3],
+      visible: false,
+      searchable: true
+    }],
+    pageLength: 25
+  });
+
+  (0, _jquery2.default)("#zoomRecordings").on("click", "tr", function () {
+    (0, _jquery2.default)(this).toggleClass("selected");
+  });
+
+  (0, _jquery2.default)("#delete").click(function () {
+    var recordings = table.rows(".selected").data();
+    var msg = "Are you sure you want to delete " + recordings.length + " recordings?";
+
+    swal({
+      title: "Are you sure?",
+      text: msg,
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+      buttonsStyling: false
+    }).then(function (result) {
+      if (result.value) {
+        var toBeDeleted = [];
+        for (var i = 0; i < recordings.length; i++) {
+          var rec = {
+            id: recordings[i].id,
+            meetingId: recordings[i].meeting_id
+          };
+          toBeDeleted.push(rec);
+        }
+
+        _jquery2.default.ajax({
+          url: "/deleteRecordings",
+          dataType: "json",
+          type: "POST",
+          contentType: "application/json",
+          data: JSON.stringify(toBeDeleted)
+        });
+
+        swal({
+          position: "top",
+          type: "success",
+          title: "Recording(s) deleted!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        }).then(function (result) {
+          table.rows(".selected").remove().draw(false);
+        });
+        // result.dismiss can be 'cancel', 'overlay',
+        // 'close', and 'timer'
+      } else if (result.dismiss) {
+        swal({
+          position: "top",
+          type: "error",
+          title: "Canceled!",
+          showConfirmButton: false,
+          timer: 800,
+          buttonsStyling: false
+        });
+      }
+    });
+  });
+
+  (0, _jquery2.default)("#addCoHosts").click(function (e) {
+    e.preventDefault();
+    var emails = (0, _jquery2.default)("textarea").val().trim().split(/[\r\n,]+/);
+
+    var percentDone = 0;
+    var completed = 0;
+    var fail = 0;
+    var total = emails.length;
+
+    (0, _jquery2.default)("#resultsCard").removeClass("hidden");
+    (0, _jquery2.default)("ul#success").html("");
+    (0, _jquery2.default)("ul#fail").html("");
+
+    emails.forEach(function (email) {
+      _jquery2.default.ajax({
+        url: "/setAlternateHosts/" + email,
+        type: "POST"
+      }).done(function (res) {
+        console.log(res);
+        completed++;
+        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+        (0, _jquery2.default)("ul#success").append("<li>" + email + " Sucessfully processsed.</li>");
+      }).fail(function (err) {
+        completed++;
+        fail++;
+
+        console.log(email + " Failed: " + err.responseText, err);
+        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
+        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
+        (0, _jquery2.default)("ul#fail").append("<li>" + email + " Failed: " + err.responseText + "</li>");
+      });
+    });
+  });
+});
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _utils = __webpack_require__(7);
+module.exports = function (module) {
+	if (!module.webpackPolyfill) {
+		module.deprecate = function () {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function get() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function get() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(2);
+
+__webpack_require__(1);
+
+__webpack_require__(6);
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+window.jQuery = _jquery2.default;
+window.$ = _jquery2.default;
+/*  OR webpack
+new webpack.ProvidePlugin({
+  $: 'jquery',
+  jQuery: 'jquery'
+})
+*/
+
+(0, _jquery2.default)(document).ready(function () {
+  (0, _jquery2.default)(".datepicker").datetimepicker({
+    format: "YYYY-MM-DD"
+  });
+
+  (0, _jquery2.default)(".selectpicker").selectpicker({
+    style: "btn-default",
+    size: 8
+  });
+});
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function papaPromisified(file) {
+  var header = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+  return new Promise(function (resolve, reject) {
+    var config = {
+      encoding: "ISO-8859-1",
+      delimiter: "",
+      download: false,
+      skipEmptyLines: true,
+      error: reject,
+      complete: resolve,
+      header: header
+    };
+
+    Papa.parse(file, config);
+  });
+}
+
+exports.papaPromisified = papaPromisified;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _utils = __webpack_require__(5);
 
 var _jquery = __webpack_require__(0);
 
@@ -10975,239 +11207,6 @@ window.$ = _jquery2.default;
     return true;
   }
 });
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-window.jQuery = _jquery2.default;
-window.$ = _jquery2.default;
-
-(0, _jquery2.default)(document).ready(function () {
-  // Datatable init
-  var table = (0, _jquery2.default)("#zoomRecordings").DataTable({
-    dom: "lfrtBip",
-    buttons: [{
-      extend: "csvHtml5",
-      text: "Download CSV",
-      className: "btn btn-default",
-      filename: "Tutor-recordings-report"
-    }],
-    ajax: "/getTutorRecordings",
-    columns: [{ data: "user" }, { data: "topic" }, { data: "recording_start" }, { data: "file_type" }, { data: "download_url" }],
-    columnDefs: [{
-      targets: [3],
-      visible: false,
-      searchable: true
-    }],
-    pageLength: 25
-  });
-
-  (0, _jquery2.default)("#zoomRecordings").on("click", "tr", function () {
-    (0, _jquery2.default)(this).toggleClass("selected");
-  });
-
-  (0, _jquery2.default)("#delete").click(function () {
-    var recordings = table.rows(".selected").data();
-    var msg = "Are you sure you want to delete " + recordings.length + " recordings?";
-
-    swal({
-      title: "Are you sure?",
-      text: msg,
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
-      confirmButtonClass: "btn btn-success",
-      cancelButtonClass: "btn btn-danger",
-      buttonsStyling: false
-    }).then(function (result) {
-      if (result.value) {
-        var toBeDeleted = [];
-        for (var i = 0; i < recordings.length; i++) {
-          var rec = {
-            id: recordings[i].id,
-            meetingId: recordings[i].meeting_id
-          };
-          toBeDeleted.push(rec);
-        }
-
-        _jquery2.default.ajax({
-          url: "/deleteRecordings",
-          dataType: "json",
-          type: "POST",
-          contentType: "application/json",
-          data: JSON.stringify(toBeDeleted)
-        });
-
-        swal({
-          position: "top",
-          type: "success",
-          title: "Recording(s) deleted!",
-          showConfirmButton: false,
-          timer: 800,
-          buttonsStyling: false
-        }).then(function (result) {
-          table.rows(".selected").remove().draw(false);
-        });
-        // result.dismiss can be 'cancel', 'overlay',
-        // 'close', and 'timer'
-      } else if (result.dismiss) {
-        swal({
-          position: "top",
-          type: "error",
-          title: "Canceled!",
-          showConfirmButton: false,
-          timer: 800,
-          buttonsStyling: false
-        });
-      }
-    });
-  });
-
-  (0, _jquery2.default)("#addCoHosts").click(function (e) {
-    e.preventDefault();
-    var emails = (0, _jquery2.default)("textarea").val().trim().split(/[\r\n,]+/);
-
-    var percentDone = 0;
-    var completed = 0;
-    var fail = 0;
-    var total = emails.length;
-
-    (0, _jquery2.default)("#resultsCard").removeClass("hidden");
-    (0, _jquery2.default)("ul#success").html("");
-    (0, _jquery2.default)("ul#fail").html("");
-
-    emails.forEach(function (email) {
-      _jquery2.default.ajax({
-        url: "/setAlternateHosts/" + email,
-        type: "POST"
-      }).done(function (res) {
-        console.log(res);
-        completed++;
-        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
-        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)("ul#success").append("<li>" + email + " Sucessfully processsed.</li>");
-      }).fail(function (err) {
-        completed++;
-        fail++;
-
-        console.log(email + " Failed: " + err.responseText, err);
-        (0, _jquery2.default)(".progress-bar").css("width", completed / total * 100 + "%");
-        (0, _jquery2.default)("#percentage").text("Progress: " + Math.round(completed / total * 100) + "%");
-        (0, _jquery2.default)("ul#fail").append("<li>" + email + " Failed: " + err.responseText + "</li>");
-      });
-    });
-  });
-});
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function (module) {
-	if (!module.webpackPolyfill) {
-		module.deprecate = function () {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if (!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function get() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function get() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(4);
-
-__webpack_require__(2);
-
-__webpack_require__(3);
-
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-window.jQuery = _jquery2.default;
-window.$ = _jquery2.default;
-/*  OR webpack
-new webpack.ProvidePlugin({
-  $: 'jquery',
-  jQuery: 'jquery'
-})
-*/
-
-(0, _jquery2.default)(document).ready(function () {
-  (0, _jquery2.default)(".datepicker").datetimepicker({
-    format: "YYYY-MM-DD"
-  });
-
-  (0, _jquery2.default)(".selectpicker").selectpicker({
-    style: "btn-default",
-    size: 8
-  });
-});
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-function papaPromisified(file) {
-  var header = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-  return new Promise(function (resolve, reject) {
-    var config = {
-      encoding: "ISO-8859-1",
-      delimiter: "",
-      download: false,
-      skipEmptyLines: true,
-      error: reject,
-      complete: resolve,
-      header: header
-    };
-
-    Papa.parse(file, config);
-  });
-}
-
-exports.papaPromisified = papaPromisified;
 
 /***/ })
 /******/ ]);
