@@ -10570,6 +10570,9 @@ window.$ = _jquery2.default;
   (0, _jquery2.default)("#annotationsImportForm").submit(function (e) {
     return handleAnnotationsImport(e);
   });
+  (0, _jquery2.default)("#env").change(function (e) {
+    return handleLoadNewEnv(e);
+  });
   (0, _jquery2.default)("#hapyakProjects").on("click", "tr", function () {
     (0, _jquery2.default)(this).toggleClass("selected");
   });
@@ -10580,6 +10583,8 @@ window.$ = _jquery2.default;
   (0, _jquery2.default)("#hapyakProjects").on("dblclick", "tr", function (e) {
     return handleProjectDetails(e);
   });
+  var env = (0, _jquery2.default)("#env").val();
+  console.log(env);
 
   var projectList = (0, _jquery2.default)("#hapyakProjects").DataTable({
     dom: "lfrtBip",
@@ -10589,7 +10594,12 @@ window.$ = _jquery2.default;
       className: "btn btn-default",
       filename: "Hapyak_Projects"
     }],
-    ajax: "/listProjects",
+    ajax: {
+      url: "/listProjects",
+      data: function data(d) {
+        d.env = document.getElementById("env").value;
+      }
+    },
     columns: [{ data: "_id" }, { data: "id" }, { data: "title" }, { data: "video" }, { data: "brightcoveId" }, { data: "track" }, { data: "created" }],
     columnDefs: [{
       targets: [0],
@@ -10634,8 +10644,14 @@ window.$ = _jquery2.default;
     }
   }
 
+  function handleLoadNewEnv(e) {
+    e.preventDefault();
+    projectList.ajax.reload();
+  }
+
   function handleDeleteProject(e) {
     var projects = projectList.rows(".selected").data();
+    var env = document.getElementById("env").value;
     if (projects.length === 0) {
       swal({
         position: "top",
@@ -10667,7 +10683,7 @@ window.$ = _jquery2.default;
             dataType: "json",
             type: "DELETE",
             contentType: "application/json",
-            data: JSON.stringify({ toBeDeleted: projects[i].id })
+            data: JSON.stringify({ toBeDeleted: projects[i].id, env: env })
           });
         }
 
@@ -10726,6 +10742,7 @@ window.$ = _jquery2.default;
 
   function handleDeleteAnno(e) {
     var annotations = projectDetailsList.rows(".selected").data();
+    var env = document.getElementById("env").value;
     if (annotations.length === 0) {
       swal({
         position: "top",
@@ -10759,7 +10776,8 @@ window.$ = _jquery2.default;
             contentType: "application/json",
             data: JSON.stringify({
               projectId: annotations[i].projectId,
-              annotationId: annotations[i].id
+              annotationId: annotations[i].id,
+              env: env
             })
           });
         }
@@ -10791,6 +10809,7 @@ window.$ = _jquery2.default;
 
   async function handleAnnotationsImport(e) {
     e.preventDefault();
+    var env = document.getElementById("env").value;
     var file = document.getElementById("selectCSV").files[0];
     if (!file) return;
 
@@ -10831,7 +10850,7 @@ window.$ = _jquery2.default;
 
       //Create Project
       try {
-        var result = await createHapyProject(videoId);
+        var result = await createHapyProject(env, videoId);
         projectId = result.project.id;
 
         completed++;
@@ -10859,7 +10878,7 @@ window.$ = _jquery2.default;
           var annotation = _step.value;
 
           try {
-            await createHapyAnnotation(annotation, projectId);
+            await createHapyAnnotation(env, annotation, projectId);
             completed++;
             skipped--;
 
@@ -10895,13 +10914,14 @@ window.$ = _jquery2.default;
     }
   }
 
-  function createHapyProject(videoId) {
+  function createHapyProject(env, videoId) {
     return new Promise(function (resolve, reject) {
       _jquery2.default.ajax({
         url: "/createProject",
         type: "POST",
         data: {
-          video_source_id: videoId
+          video_source_id: videoId,
+          env: env
         }
       }).done(function (res) {
         return resolve(res);
@@ -10911,12 +10931,13 @@ window.$ = _jquery2.default;
     });
   }
 
-  function createHapyAnnotation(annotation, projectId) {
+  function createHapyAnnotation(env, annotation, projectId) {
     return new Promise(function (resolve, reject) {
       _jquery2.default.ajax({
         url: "/createAnnotation",
         type: "POST",
         data: {
+          env: env,
           projectId: projectId,
           annotation: annotation
         }
