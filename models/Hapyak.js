@@ -31,9 +31,6 @@ const projectSchema = new Schema({
   }
 });
 
-projectSchema.plugin(mongoddbErrorHandler);
-let Project = mongoose.model("Project", projectSchema);
-
 const annotationSchema = new Schema({
   id: {
     type: Number,
@@ -58,10 +55,20 @@ const annotationSchema = new Schema({
   }
 });
 
+projectSchema.plugin(mongoddbErrorHandler);
+let Project = mongoose.model("Project", projectSchema);
+
 annotationSchema.plugin(mongoddbErrorHandler);
 let Annotation = mongoose.model("Annotation", annotationSchema);
 
+let ProjectSubA = mongoose.model("ProjectSubA", projectSchema);
+let ProjectSubB = mongoose.model("ProjectSubB", projectSchema);
+
+let AnnotationSubA = mongoose.model("AnnotationSubA", annotationSchema);
+let AnnotationSubB = mongoose.model("AnnotationSubB", annotationSchema);
+
 module.exports = {
-  Project,
-  Annotation
+  Hapyak: { Project, Annotation },
+  HapyakSubA: { Project: ProjectSubA, Annotation: AnnotationSubA },
+  HapyakSubB: { Project: ProjectSubB, Annotation: AnnotationSubB }
 };
