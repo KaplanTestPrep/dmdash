@@ -9,6 +9,7 @@ $(document).ready(function() {
   $("#hapyCreateAnno").click(e => handleCreateAnno(e));
   $("#hapyDeleteAnno").click(e => handleDeleteAnno(e));
   $("#annotationsImportForm").submit(e => handleAnnotationsImport(e));
+  $("#env").change(e => handleLoadNewEnv(e));
   $("#hapyakProjects").on("click", "tr", function() {
     $(this).toggleClass("selected");
   });
@@ -17,6 +18,8 @@ $(document).ready(function() {
   });
 
   $("#hapyakProjects").on("dblclick", "tr", e => handleProjectDetails(e));
+  let env = $("#env").val();
+  console.log(env);
 
   const projectList = $("#hapyakProjects").DataTable({
     dom: "lfrtBip",
@@ -28,7 +31,12 @@ $(document).ready(function() {
         filename: "Hapyak_Projects"
       }
     ],
-    ajax: "/listProjects",
+    ajax: {
+      url: "/listProjects",
+      data: function(d) {
+        d.env = document.getElementById("env").value;
+      }
+    },
     columns: [
       { data: "_id" },
       { data: "id" },
@@ -93,8 +101,14 @@ $(document).ready(function() {
     }
   }
 
+  function handleLoadNewEnv(e) {
+    e.preventDefault();
+    projectList.ajax.reload();
+  }
+
   function handleDeleteProject(e) {
     const projects = projectList.rows(".selected").data();
+    const env = document.getElementById("env").value;
     if (projects.length === 0) {
       swal({
         position: "top",
@@ -126,7 +140,7 @@ $(document).ready(function() {
             dataType: "json",
             type: "DELETE",
             contentType: "application/json",
-            data: JSON.stringify({ toBeDeleted: projects[i].id })
+            data: JSON.stringify({ toBeDeleted: projects[i].id, env })
           });
         }
 
@@ -190,6 +204,7 @@ $(document).ready(function() {
 
   function handleDeleteAnno(e) {
     const annotations = projectDetailsList.rows(".selected").data();
+    const env = document.getElementById("env").value;
     if (annotations.length === 0) {
       swal({
         position: "top",
@@ -225,7 +240,8 @@ $(document).ready(function() {
             contentType: "application/json",
             data: JSON.stringify({
               projectId: annotations[i].projectId,
-              annotationId: annotations[i].id
+              annotationId: annotations[i].id,
+              env
             })
           });
         }
@@ -260,6 +276,7 @@ $(document).ready(function() {
 
   async function handleAnnotationsImport(e) {
     e.preventDefault();
+    const env = document.getElementById("env").value;
     const file = document.getElementById("selectCSV").files[0];
     if (!file) return;
 
@@ -300,7 +317,7 @@ $(document).ready(function() {
 
       //Create Project
       try {
-        let result = await createHapyProject(videoId);
+        let result = await createHapyProject(env, videoId);
         projectId = result.project.id;
 
         completed++;
@@ -327,7 +344,7 @@ $(document).ready(function() {
       //Create Annotation
       for (const annotation of annotationsArray) {
         try {
-          await createHapyAnnotation(annotation, projectId);
+          await createHapyAnnotation(env, annotation, projectId);
           completed++;
           skipped--;
 
@@ -364,13 +381,14 @@ $(document).ready(function() {
     }
   }
 
-  function createHapyProject(videoId) {
+  function createHapyProject(env, videoId) {
     return new Promise((resolve, reject) => {
       $.ajax({
         url: `/createProject`,
         type: "POST",
         data: {
-          video_source_id: videoId
+          video_source_id: videoId,
+          env
         }
       })
         .done(res => {
@@ -382,12 +400,13 @@ $(document).ready(function() {
     });
   }
 
-  function createHapyAnnotation(annotation, projectId) {
+  function createHapyAnnotation(env, annotation, projectId) {
     return new Promise((resolve, reject) => {
       $.ajax({
         url: `/createAnnotation`,
         type: "POST",
         data: {
+          env,
           projectId,
           annotation
         }
