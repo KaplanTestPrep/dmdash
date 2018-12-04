@@ -347,14 +347,18 @@ function makeAnnotationBody(annotation) {
       text: annotation.answerOptionB,
       correct: "B" === annotation.answerOptionCorrect
     });
-    answers.push({
-      text: annotation.answerOptionC,
-      correct: "C" === annotation.answerOptionCorrect
-    });
-    answers.push({
-      text: annotation.answerOptionD,
-      correct: "D" === annotation.answerOptionCorrect
-    });
+    if (annotation.answerOptionC) {
+      answers.push({
+        text: annotation.answerOptionC,
+        correct: "C" === annotation.answerOptionCorrect
+      });
+    }
+    if (annotation.answerOptionD) {
+      answers.push({
+        text: annotation.answerOptionD,
+        correct: "D" === annotation.answerOptionCorrect
+      });
+    }
 
     delete annotation.questionText;
     delete annotation.answerOptionA;
@@ -366,6 +370,7 @@ function makeAnnotationBody(annotation) {
     quiz.answers = answers;
     annotation.quiz = [quiz];
 
+    console.log(answers);
     return annotation;
   }
 
