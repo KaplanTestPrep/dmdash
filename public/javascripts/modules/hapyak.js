@@ -387,7 +387,7 @@ $(document).ready(function() {
         url: `/createProject`,
         type: "POST",
         data: {
-          video_source_id: videoId,
+          refId: videoId,
           env
         }
       })

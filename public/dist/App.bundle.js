@@ -10949,7 +10949,7 @@ window.$ = _jquery2.default;
         url: "/createProject",
         type: "POST",
         data: {
-          video_source_id: videoId,
+          refId: videoId,
           env: env
         }
       }).done(function (res) {
