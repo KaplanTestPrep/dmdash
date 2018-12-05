@@ -332,7 +332,10 @@ exports.getHapyakToken = async env => {
 function makeAnnotationBody(annotation) {
   annotation.start = parseInt(annotation.start, 10);
   annotation.end = parseInt(annotation.end, 10);
-  if (annotation.pause) annotation.pause = parseInt(annotation.pause, 10);
+  if (annotation.pause) {
+    annotation.pause =
+      annotation.pause === "TRUE" || annotation.pause === "true";
+  }
   if (annotation.passing_mark)
     annotation.passing_mark = parseInt(annotation.passing_mark, 10);
   if (annotation.reset_variables)
