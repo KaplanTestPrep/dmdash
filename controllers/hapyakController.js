@@ -384,6 +384,7 @@ function makeAnnotationBody(annotation) {
     delete annotation.answerOptionB;
     delete annotation.answerOptionC;
     delete annotation.answerOptionD;
+    delete annotation.answerOptionE;
     delete annotation.answerOptionCorrect;
 
     quiz.answers = answers;
