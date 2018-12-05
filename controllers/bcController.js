@@ -93,25 +93,6 @@ exports.refIdToIdTool = (req, res) => {
 
 // -----------
 
-async function getVideoIdFromRefID(accountId, ref, refType) {
-  if (refType === "id") return Promise.resolve(ref);
-  else if (refType === "refId") {
-    const bcToken = await exports.getBcToken();
-    const headers = {
-      Authorization: `Bearer ${bcToken.token}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    };
-    const url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/ref:${ref}`;
-    const options = {
-      method: "get",
-      url,
-      headers
-    };
-
-    return axios(options);
-  }
-}
-
 async function updateVideo(accountId, videoId, body) {
   const bcToken = await exports.getBcToken();
   const url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/${videoId}`;
@@ -138,10 +119,13 @@ exports.refIdToId = async (req, res) => {
   let videoId = null;
 
   try {
-    let response = await getVideoIdFromRefID(accountIdSource, ref, "refId");
+    let response = await exports.getVideoIdFromRefID(
+      accountIdSource,
+      ref,
+      "refId"
+    );
     if (typeof response !== "object") videoId = response;
     else videoId = response.data.id;
-    console.log("Video id:", videoId);
     return res.status(200).send(videoId);
   } catch (error) {
     console.log(error.response.status);
@@ -297,7 +281,7 @@ exports.createPlaylist = async (req, res) => {
   let videoIdPromises = [];
 
   videoIdPromises = playlist.video_ids.map(ref => {
-    return getVideoIdFromRefID(accountId, ref, refType);
+    return exports.getVideoIdFromRefID(accountId, ref, refType);
   });
 
   try {
@@ -339,7 +323,7 @@ exports.removeTextTrack = async (req, res) => {
   let response = "";
 
   try {
-    response = await getVideoIdFromRefID(accountId, ref, refType);
+    response = await exports.getVideoIdFromRefID(accountId, ref, refType);
     if (typeof response !== "object") videoId = response;
     else videoId = response.data.id;
   } catch (error) {
@@ -363,7 +347,7 @@ exports.mediaShare = async (req, res) => {
   let response = {};
 
   try {
-    response = await getVideoIdFromRefID(accountIdSource, ref, refType);
+    response = await exports.getVideoIdFromRefID(accountIdSource, ref, refType);
     if (typeof response !== "object") videoId = response;
     else videoId = response.data.id;
   } catch (error) {
@@ -404,7 +388,7 @@ exports.metadataUpdate = async (req, res) => {
   let response = "";
 
   try {
-    response = await getVideoIdFromRefID(accountId, ref, refType);
+    response = await exports.getVideoIdFromRefID(accountId, ref, refType);
     if (typeof response !== "object") videoId = response;
     else videoId = response.data.id;
   } catch (error) {
@@ -444,7 +428,7 @@ exports.refIdUpdate = async (req, res) => {
   let response = "";
 
   try {
-    response = await getVideoIdFromRefID(accountId, ref, refType);
+    response = await exports.getVideoIdFromRefID(accountId, ref, refType);
     if (typeof response !== "object") videoId = response;
     else videoId = response.data.id;
   } catch (error) {
@@ -545,7 +529,7 @@ exports.retranscodeVideo = async (req, res) => {
   let videoId = "";
 
   try {
-    response = await getVideoIdFromRefID(accountId, ref, refType);
+    response = await exports.getVideoIdFromRefID(accountId, ref, refType);
     if (typeof response !== "object") videoId = response;
     else videoId = response.data.id;
   } catch (error) {
@@ -608,6 +592,25 @@ exports.getBcVideo = async (accountId, videoId, token) => {
         statusText: "Video Not Found"
       };
     return error;
+  }
+};
+
+exports.getVideoIdFromRefID = async (accountId, ref, refType) => {
+  if (refType === "id") return Promise.resolve(ref);
+  else if (refType === "refId") {
+    const bcToken = await exports.getBcToken();
+    const headers = {
+      Authorization: `Bearer ${bcToken.token}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    };
+    const url = `https://cms.api.brightcove.com/v1/accounts/${accountId}/videos/ref:${ref}`;
+    const options = {
+      method: "get",
+      url,
+      headers
+    };
+
+    return axios(options);
   }
 };
 
