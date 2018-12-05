@@ -1,6 +1,10 @@
 const { Hapyak, HapyakSubA, HapyakSubB } = require("../models/Hapyak");
 const axios = require("axios");
-const { getBcToken, getBcVideo } = require("./bcController");
+const {
+  getBcToken,
+  getBcVideo,
+  getVideoIdFromRefID
+} = require("./bcController");
 const { accounts, hapyakToBcAccountMap } = require("../config/hapyakConfig");
 
 // CONFIGS - to be moved into config file
@@ -71,23 +75,32 @@ exports.getProject = async (req, res) => {
 };
 
 exports.createProject = async (req, res) => {
-  const videoId = req.body.video_source_id;
+  let videoId = "";
+  const refId = req.body.refId;
   const env = req.body.env || "PROD";
-  let db = setDBEnv(env);
+  const db = setDBEnv(env);
   const hapyToken = await exports.getHapyakToken(env);
   const url = `${HAPYAKSERVICEURL}customer/project/`;
   const bcToken = await getBcToken();
+
+  try {
+    const videoIdResponse = await getVideoIdFromRefID(
+      hapyakToBcAccountMap[env],
+      refId,
+      "refId"
+    );
+    if (typeof videoIdResponse !== "object") videoId = videoIdResponse;
+    else videoId = videoIdResponse.data.id;
+  } catch (error) {
+    console.log(error);
+    return res.status(error.response.status).send(error.response.statusText);
+  }
 
   const videoInfo = await getBcVideo(
     hapyakToBcAccountMap[env],
     videoId,
     bcToken
   );
-  console.log("videoInfo: ", videoInfo.status);
-
-  if (videoInfo.status === 404) {
-    return res.status(videoInfo.status).send(videoInfo.statusText);
-  }
 
   const title = videoInfo.name;
 
@@ -146,7 +159,7 @@ exports.createProject = async (req, res) => {
 exports.deleteProject = async (req, res) => {
   const id = req.body.toBeDeleted;
   const env = req.body.env || "PROD";
-  let db = setDBEnv(env);
+  const db = setDBEnv(env);
   const hapyToken = await exports.getHapyakToken(env);
   const url = `${HAPYAKSERVICEURL}customer/project/${id}/`;
 
@@ -200,7 +213,7 @@ exports.createAnnotation = async (req, res) => {
   const projectId = req.body.projectId;
   const annotation = req.body.annotation;
   const env = req.body.env || "PROD";
-  let db = setDBEnv(env);
+  const db = setDBEnv(env);
   const hapyToken = await exports.getHapyakToken(env);
   const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/annotation/`;
   const body = makeAnnotationBody(annotation);
@@ -239,7 +252,7 @@ exports.deleteAnnotation = async (req, res) => {
   const annotationId = req.body.annotationId;
   const projectId = req.body.projectId;
   const env = req.body.env || "PROD";
-  let db = setDBEnv(env);
+  const db = setDBEnv(env);
   const hapyToken = await exports.getHapyakToken(env);
   const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/annotation/${annotationId}/`;
 
@@ -263,7 +276,7 @@ exports.deleteAnnotation = async (req, res) => {
 
 exports.listAnnotations = async (req, res) => {
   const env = req.body.env || "PROD";
-  let db = setDBEnv(env);
+  const db = setDBEnv(env);
   let projectId = parseInt(req.params.projectId, 10);
 
   try {
