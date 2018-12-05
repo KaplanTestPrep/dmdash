@@ -372,6 +372,12 @@ function makeAnnotationBody(annotation) {
         correct: "D" === annotation.answerOptionCorrect
       });
     }
+    if (annotation.answerOptionE) {
+      answers.push({
+        text: annotation.answerOptionE,
+        correct: "E" === annotation.answerOptionCorrect
+      });
+    }
 
     delete annotation.questionText;
     delete annotation.answerOptionA;
