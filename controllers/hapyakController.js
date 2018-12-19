@@ -330,8 +330,8 @@ exports.getHapyakToken = async env => {
 };
 
 function makeAnnotationBody(annotation) {
-  annotation.start = parseInt(annotation.start, 10);
-  annotation.end = parseInt(annotation.end, 10);
+  annotation.start = parseFloat(annotation.start, 10);
+  annotation.end = parseFloat(annotation.end, 10);
   if (annotation.pause) {
     annotation.pause =
       annotation.pause === "TRUE" || annotation.pause === "true";
@@ -344,6 +344,8 @@ function makeAnnotationBody(annotation) {
     annotation.multiple_answers = isTrue(annotation.multiple_answers);
   if (annotation.multiple_required)
     annotation.multiple_required = isTrue(annotation.multiple_required);
+  if (annotation.show_review)
+    annotation.show_review = isTrue(annotation.show_review);
   if (annotation.show_skip) annotation.show_skip = isTrue(annotation.show_skip);
   if (annotation.show_retry)
     annotation.show_retry = isTrue(annotation.show_retry);
