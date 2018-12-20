@@ -19,7 +19,6 @@ $(document).ready(function() {
 
   $("#hapyakProjects").on("dblclick", "tr", e => handleProjectDetails(e));
   let env = $("#env").val();
-  console.log(env);
 
   const projectList = $("#hapyakProjects").DataTable({
     dom: "lfrtBip",

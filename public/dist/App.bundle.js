@@ -10613,7 +10613,6 @@ window.$ = _jquery2.default;
     return handleProjectDetails(e);
   });
   var env = (0, _jquery2.default)("#env").val();
-  console.log(env);
 
   var projectList = (0, _jquery2.default)("#hapyakProjects").DataTable({
     dom: "lfrtBip",
