@@ -236,14 +236,14 @@ exports.createAnnotation = async (req, res) => {
       id: response.data.annotation.id,
       projectId,
       type: response.data.annotation.type,
-      startTime: body.start,
+      startTime: body.start || 0,
       created: Date.now()
     });
     await project.save();
 
     return res.status(200).send(response.data);
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };
@@ -399,7 +399,9 @@ function makeAnnotationBody(annotation) {
 
     console.log(answers);
     return annotation;
-  } else if (annotation.type === "contents") {
+  }
+
+  if (annotation.type === "contents") {
     delete annotation.start;
     delete annotation.end;
   }
