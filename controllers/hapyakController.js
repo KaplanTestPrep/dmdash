@@ -399,6 +399,9 @@ function makeAnnotationBody(annotation) {
 
     console.log(answers);
     return annotation;
+  } else if (annotation.type === "contents") {
+    delete annotation.start;
+    delete annotation.end;
   }
 
   return annotation;
