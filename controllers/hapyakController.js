@@ -332,6 +332,8 @@ exports.getHapyakToken = async env => {
 function makeAnnotationBody(annotation) {
   annotation.start = parseFloat(annotation.start, 10);
   annotation.end = parseFloat(annotation.end, 10);
+  if (annotation.duration) {
+    annotation.duration = parseFloat(annotation.duration, 10);
   if (annotation.pause) {
     annotation.pause =
       annotation.pause === "TRUE" || annotation.pause === "true";
