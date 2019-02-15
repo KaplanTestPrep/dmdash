@@ -1,10 +1,9 @@
-const jwt = require('jsonwebtoken');
-const axios = require('axios');
-const { moment } = require('../helpers');
+const jwt = require("jsonwebtoken");
+const axios = require("axios");
+const { moment } = require("../helpers");
 
-
-const TUTORS_GROUP_ID = 'W3d-qqpNTX6bnzuKhP5zCg';
-
+const TUTORS_GROUP_ID = "yCbn1L_jQNSgdjXFmlSffA"; // Metis
+// const TUTORS_GROUP_ID = "W3d-qqpNTX6bnzuKhP5zCg";
 
 exports.recordingsTool = (req, res) => {
   res.render("zoomRecordingsTool", {
@@ -20,23 +19,21 @@ exports.alternateHostTool = (req, res) => {
   });
 };
 
-// ---- APIs 
+// ---- APIs
 
 exports.getToken = () => {
   const payload = {
     iss: process.env.ZOOMAPIKEY,
     exp: new Date().getTime() + 5000
   };
-
   var token = jwt.sign(payload, process.env.ZOOMAPISECRET);
-
   return token;
 };
 
 exports.getDailyReport = () => {
   const url = "https://api.zoom.us/v2/report/daily";
   const token = exports.getToken();
-  
+
   return new Promise(resolve => {
     axios
       .get(url, {
@@ -44,11 +41,13 @@ exports.getDailyReport = () => {
           access_token: token
         }
       })
-      .then(function (response) {
+      .then(function(response) {
         // console.log("Response:", response.data);
         const todaysDate = new Date().toISOString().split("T")[0];
 
-        const dailyReportObj = response.data.dates.filter(report => report.date === todaysDate);
+        const dailyReportObj = response.data.dates.filter(
+          report => report.date === todaysDate
+        );
         resolve(dailyReportObj[0]);
       });
   });
@@ -84,10 +83,14 @@ exports.getTutorRecordings = async (req, res) => {
 
     const users = response.data.members;
 
-    // Get list of recordings for each user   
+    // Get list of recordings for each user
     // date format: 2017-08-28
-    const startDate = moment().subtract(1, "months").format('YYYY-MM-DD'); 
-    const endDate = moment().format('YYYY-MM-DD');
+    const startDate = moment()
+      .subtract(1, "months")
+      .format("YYYY-MM-DD");
+    const endDate = moment()
+      // .subtract(2, "months")
+      .format("YYYY-MM-DD");
 
     await Promise.all(
       users.map(async user => {
@@ -95,7 +98,7 @@ exports.getTutorRecordings = async (req, res) => {
         const token = exports.getToken();
         const userEmail = user.email;
 
-        const response = await axios.get(url, {
+        const response2 = await axios.get(url, {
           params: {
             access_token: token,
             userId: user.id,
@@ -104,46 +107,39 @@ exports.getTutorRecordings = async (req, res) => {
           }
         });
 
-        const meetings = response.data.meetings;
-        let recording = {};
+        if (response2.data.page_count > 0) {
+          const meetings = response2.data.meetings;
+          let recording = {};
 
-        meetings.forEach(meeting => {
+          meetings.forEach(meeting => {
+            const topic = meeting.topic;
 
-          const topic = meeting.topic;
-
-          meeting.recording_files.forEach(rawRecording => {
-
-            recording = (({
-              recording_start,
-              file_type,
-              download_url
-            }) => ({
+            meeting.recording_files.forEach(rawRecording => {
+              recording = (({ recording_start, file_type, download_url }) => ({
                 recording_start,
                 file_type,
                 download_url
               }))(rawRecording);
 
+              recording.user = userEmail;
+              recording.topic = topic;
 
-            recording.user = userEmail;
-            recording.topic = topic;
-
-            recordings.push(recording);
+              recordings.push(recording);
+            });
           });
-        });
+        }
       })
     );
-    
+
     pageNumber++;
   } while (pageNumber <= pageCount);
 
-
-  let filteredRecordings = recordings.filter(rec => rec.file_type === 'MP4');
+  let filteredRecordings = recordings.filter(rec => rec.file_type === "MP4");
 
   const data = { data: filteredRecordings };
-  res.setHeader('Content-Type', 'application/json');
+  res.setHeader("Content-Type", "application/json");
   res.send(JSON.stringify(data));
-}
-
+};
 
 exports.getRecordings = async (req, res) => {
   let recordings = [];
@@ -161,7 +157,7 @@ exports.getRecordings = async (req, res) => {
   });
 
   const pageCount = response.data.page_count;
-  let pageNumber = 1;              //response.data.page_number;
+  let pageNumber = 1; //response.data.page_number;
 
   do {
     // Get list of all users
@@ -177,10 +173,12 @@ exports.getRecordings = async (req, res) => {
 
     const users = response.data.users;
 
-    // Get list of recordings for each user   
+    // Get list of recordings for each user
     // date format: 2017-08-28
-    const startDate = moment().subtract(6, "months").format('YYYY-MM-DD'); 
-    const endDate = moment().format('YYYY-MM-DD');
+    const startDate = moment()
+      .subtract(6, "months")
+      .format("YYYY-MM-DD");
+    const endDate = moment().format("YYYY-MM-DD");
 
     await Promise.all(
       users.map(async user => {
@@ -201,11 +199,9 @@ exports.getRecordings = async (req, res) => {
         let recording = {};
 
         meetings.forEach(meeting => {
-
           const topic = meeting.topic;
 
           meeting.recording_files.forEach(rawRecording => {
-
             recording = (({
               id,
               meeting_id,
@@ -214,14 +210,13 @@ exports.getRecordings = async (req, res) => {
               recording_end,
               file_type
             }) => ({
-                id,
-                meeting_id,
-                file_size,
-                recording_start,
-                recording_end,
-                file_type
-              }))(rawRecording);
-
+              id,
+              meeting_id,
+              file_size,
+              recording_start,
+              recording_end,
+              file_type
+            }))(rawRecording);
 
             recording.user = userEmail;
             recording.topic = topic;
@@ -231,26 +226,24 @@ exports.getRecordings = async (req, res) => {
         });
       })
     );
-    
+
     pageNumber++;
   } while (pageNumber <= pageCount);
 
   const data = { data: recordings };
-  res.setHeader('Content-Type', 'application/json');
+  res.setHeader("Content-Type", "application/json");
   res.send(JSON.stringify(data));
 };
 
-
 exports.deleteRecordings = async (req, res) => {
   const toBeDeleted = req.body;
-  console.log(toBeDeleted);
 
   const token = exports.getToken();
   try {
     const promises = toBeDeleted.map(rec => {
       const url = `https://api.zoom.us/v2/meetings/${
         rec.meetingId
-        }/recordings/${rec.id}`;
+      }/recordings/${rec.id}`;
       return axios.delete(url, {
         params: {
           access_token: token
@@ -259,7 +252,6 @@ exports.deleteRecordings = async (req, res) => {
     });
 
     const response = await Promise.all(promises);
-    console.log(response);
   } catch (err) {
     console.log(err);
   }
@@ -272,7 +264,7 @@ exports.setAlternateHosts = async (req, res) => {
   const url = `https://api.zoom.us/v2/users/${email}/meetings`;
   const token = exports.getToken();
   let response = {};
-  
+
   try {
     response = await axios.get(url, {
       params: {
@@ -280,39 +272,40 @@ exports.setAlternateHosts = async (req, res) => {
         page_size: 100
       }
     });
-  } catch(error){
-    console.log("It's catching here ain't it?");
-    console.log(error.response.status, error.response.statusText);
-    return res.status(error.response.status).send({ error: error.response.statusText });
+  } catch (error) {
+    return res
+      .status(error.response.status)
+      .send({ error: error.response.statusText });
   }
 
   const meetings = response.data.meetings;
-  
+
   try {
     await Promise.all(
       meetings.map(async meeting => {
         meetingId = meeting.id;
         const url = `https://api.zoom.us/v2/meetings/${meetingId}`;
         const token = exports.getToken();
-        
+
         const response = await axios({
-          method: 'patch',
+          method: "patch",
           url,
           params: {
             access_token: token
           },
           data: {
-            "settings": {
-              "alternative_hosts": "LiveOnlineService@kaplan.com loltech@kaplan.com"
+            settings: {
+              alternative_hosts:
+                "LiveOnlineService@kaplan.com loltech@kaplan.com"
             }
           }
         });
       })
-    )
-  } catch(error) {
-    console.log("IS IT CATCHING HERE?");
-    console.log(error.response.status, error.response.statusText);
-    return res.status(error.response.status).send({ error: error.response.statusText });
+    );
+  } catch (error) {
+    return res
+      .status(error.response.status)
+      .send({ error: error.response.statusText });
   }
 
   res.sendStatus(200);
