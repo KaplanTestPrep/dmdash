@@ -18,7 +18,6 @@ $(document).ready(function() {
   });
 
   $("#hapyakProjects").on("dblclick", "tr", e => handleProjectDetails(e));
-  let env = $("#env").val();
 
   const projectList = $("#hapyakProjects").DataTable({
     dom: "lfrtBip",
@@ -32,32 +31,40 @@ $(document).ready(function() {
     ],
     ajax: {
       url: "/listProjects",
+      dataSrc: "",
       data: function(d) {
         d.env = document.getElementById("env").value;
       }
     },
     columns: [
-      { data: "_id" },
       { data: "id" },
       { data: "title" },
-      { data: "video" },
-      { data: "brightcoveId" },
-      { data: "track" },
-      { data: "created" }
+      { data: "video_id" },
+      { data: "video_source_id" },
+      { data: "track_id" },
+      { data: "tags" }
     ],
     columnDefs: [
-      {
-        targets: [0],
-        visible: false,
-        searchable: true
-      }
+      // {
+      //   targets: [0],
+      //   visible: false,
+      //   searchable: true
+      // },
+      { width: 60, targets: [0] },
+      { width: 300, targets: [1] },
+      { width: 60, targets: [2] },
+      { width: 400, targets: [3] },
+      { width: 60, targets: [4] }
     ],
+    autoWidth: true,
     pageLength: 25
   });
 
   const pathName = window.location.pathname;
   const pathNameSplit = pathName.split("/");
   const slug = pathNameSplit[pathNameSplit.length - 1];
+  const envSplit = pathName.split("env=");
+  const env = envSplit[0];
 
   const projectDetailsList = $("#hapyakProjectDetails").DataTable({
     dom: "lfrtBip",
@@ -69,21 +76,27 @@ $(document).ready(function() {
         filename: "ProjectAnnotations"
       }
     ],
-    ajax: `/listAnnotations/${slug}`,
-    columns: [
-      { data: "startTime" },
-      { data: "id" },
-      { data: "projectId" },
-      { data: "type" },
-      { data: "created" }
-    ],
-    columnDefs: [
-      {
-        targets: [0],
-        visible: true,
-        searchable: true
+    ajax: {
+      url: `/listAnnotations/${slug}`,
+      dataSrc: "",
+      data: function(d) {
+        d.env = env;
       }
+    },
+    columns: [
+      { data: "id" },
+      { data: "start" },
+      { data: "end" },
+      { data: "type" },
+      { data: "class" }
     ],
+    // columnDefs: [
+    //   {
+    //     targets: [0],
+    //     visible: true,
+    //     searchable: true
+    //   }
+    // ],
     pageLength: 25
   });
 
@@ -174,11 +187,9 @@ $(document).ready(function() {
   function handleProjectDetails(e) {
     console.log("Project Details!");
     const projectId = e.currentTarget.children[0].innerText;
+    const env = document.getElementById("env").value;
 
-    const url = `/projects/${projectId}`;
-
-    console.log(url);
-    window.location.href = `/getProjectTool/${projectId}`;
+    window.location.href = `/getProjectTool/${projectId}?env=${env}`;
   }
 
   function handleCreateAnno(e) {
