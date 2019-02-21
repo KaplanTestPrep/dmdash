@@ -27,36 +27,38 @@ exports.importAnnotations = (req, res) => {
   });
 };
 
-exports.projectPage = (req, res) => {
+exports.projectPage = async (req, res) => {
+  let projectDetails = await getProject(req.params.projectId, req.query.env);
+
   res.render("projectPage", {
     pageTitle: "Project Page",
-    active: "hap"
+    active: "hap",
+    title: projectDetails.title,
+    tags: projectDetails.tags,
+    id: projectDetails.id,
+    video_source_id: projectDetails.video_source_id,
+    annotation_count: projectDetails.annotation_count
   });
 };
 // -----------
 
 // ----------- APIs
 exports.listProjects = async (req, res) => {
-  console.log(req.body.env);
-  console.log(req.query.env);
   const env = req.query.env || "PROD";
-  let db = setDBEnv(env);
 
-  try {
-    const response = await db.Project.find({});
-    return res.send({ data: response });
-  } catch (error) {
-    return res.status(error.response.status).send("Error");
-  }
-};
+  // Local DB Project lookup --------
+  //
+  // let db = setDBEnv(env);
+  // try {
+  //   const response = await db.Project.find({});
+  //   return res.send({ data: response });
+  // } catch (error) {
+  //   return res.status(error.response.status).send("Error");
+  // }
+  // -----------------------------
 
-exports.getProject = async (req, res) => {
-  const videoId = req.body.videoId;
-  const env = req.body.env || "PROD";
   const hapyToken = await exports.getHapyakToken(env);
-
-  const url = `${HAPYAKSERVICEURL}customer/project/${videoId}/`;
-
+  const url = `${HAPYAKSERVICEURL}customer/project/`;
   const options = {
     method: "get",
     url,
@@ -68,11 +70,40 @@ exports.getProject = async (req, res) => {
 
   try {
     const response = await axios(options);
-    return res.send(response.data);
+    let results = response.data.result;
+    results.forEach(result => {
+      if (result.tags) result.tags = result.tags.join(", ");
+    });
+
+    return res.send(results);
   } catch (error) {
-    return res.status(error.response.status).send("Error");
+    return res.status(error).send("Error");
   }
 };
+
+// exports.getProject = async (req, res) => {
+//   const videoId = req.body.videoId;
+//   const env = req.body.env || "PROD";
+//   const hapyToken = await exports.getHapyakToken(env);
+
+//   const url = `${HAPYAKSERVICEURL}customer/project/${videoId}/`;
+
+//   const options = {
+//     method: "get",
+//     url,
+//     headers: {
+//       "X-Hapyak-Grant-Token": hapyToken.token,
+//       "Content-Type": "application/json"
+//     }
+//   };
+
+//   try {
+//     const response = await axios(options);
+//     return res.send(response.data);
+//   } catch (error) {
+//     return res.status(error.response.status).send("Error");
+//   }
+// };
 
 exports.createProject = async (req, res) => {
   let videoId = "";
@@ -204,6 +235,7 @@ exports.getAnnotation = async (req, res) => {
     const response = await axios(options);
     return response.data;
   } catch (error) {
+    console.log("getAnnotations Error: ", error);
     // return res.status(error.response.status).send("Error");
     return res.send("Error");
   }
@@ -276,15 +308,49 @@ exports.deleteAnnotation = async (req, res) => {
 
 exports.listAnnotations = async (req, res) => {
   const env = req.body.env || "PROD";
-  const db = setDBEnv(env);
+  const hapyToken = await exports.getHapyakToken(env);
   let projectId = parseInt(req.params.projectId, 10);
+  let subsetAnnotations = [];
 
-  try {
-    const response = await db.Annotation.find({ projectId });
-    return res.send({ data: response });
-  } catch (error) {
-    return res.status(error.response.status).send("Error");
-  }
+  // List annotations from local DB
+  // const db = setDBEnv(env);
+  //
+  // try {
+  //   const response = await db.Annotation.find({ projectId });
+  //   return res.send({ data: response });
+  // } catch (error) {
+  //   // return res.status(error.response.status).send("Error");
+  //   return res.send("Error");
+  // }
+
+  let projectDetails = await getProject(projectId, env, hapyToken);
+  if (projectDetails.annotation_count === 0) return {};
+
+  const annotations = await Promise.all(
+    projectDetails.annotations.map(anno => {
+      return getAnnotation(projectId, anno.id, env, hapyToken);
+    })
+  );
+
+  annotations.forEach(anno => {
+    let subsetAnno = {};
+
+    subsetAnno.id = anno.id;
+    subsetAnno.type = anno.type;
+    if (anno.type !== "quiz") {
+      subsetAnno.class = anno.properties.custom_classes;
+      subsetAnno.start = parseFloat(anno.properties.start, 10) || null;
+      subsetAnno.end = parseFloat(anno.properties.end, 10) || null;
+    } else {
+      subsetAnno.start = null;
+      subsetAnno.end = null;
+      subsetAnno.class = anno.custom_classes;
+    }
+
+    subsetAnnotations.push(subsetAnno);
+  });
+
+  return res.status(200).send(subsetAnnotations);
 };
 
 exports.getHapyakToken = async env => {
@@ -328,6 +394,49 @@ exports.getHapyakToken = async env => {
     expires: response.data.expires
   };
 };
+
+async function getProject(projectId, env, hapyToken) {
+  if (!hapyToken) hapyToken = await exports.getHapyakToken(env);
+
+  const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/`;
+
+  const options = {
+    method: "get",
+    url,
+    headers: {
+      "X-Hapyak-Grant-Token": hapyToken.token,
+      "Content-Type": "application/json"
+    }
+  };
+
+  try {
+    const response = await axios(options);
+    return response.data;
+  } catch (error) {}
+}
+
+async function getAnnotation(projectId, annotationId, env, hapyToken) {
+  if (!hapyToken) hapyToken = await exports.getHapyakToken(env);
+
+  const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/annotation/${annotationId}/`;
+
+  const options = {
+    method: "get",
+    url,
+    headers: {
+      "X-Hapyak-Grant-Token": hapyToken.token,
+      "Content-Type": "application/json"
+    }
+  };
+
+  try {
+    const response = await axios(options);
+    return response.data;
+  } catch (error) {
+    console.log("getAnnotations Error: ", error);
+    return false;
+  }
+}
 
 function makeAnnotationBody(annotation) {
   annotation.start = parseFloat(annotation.start, 10);
