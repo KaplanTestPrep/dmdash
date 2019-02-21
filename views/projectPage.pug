@@ -3,28 +3,53 @@ extends layout
 include mixins/_progressBar
 
 block content
-    .card
-        .card-content
-            .toolbar
-                .row
-                    //- .col-md-3
-                    //-     input.form-control#bcVideoId(type='text', placeholder='Annotations Start Time')
-                    .col-md-3
-                        button.btn.btn-default#hapyCreateAnno Create Annotation
-                        button.btn.btn-default#hapyDeleteAnno Delete Annotation
-            .fresh-datatables
-                table#hapyakProjectDetails.table.table-striped.table-no-bordered.table-hover
-                    thead
-                        tr
-                            th Start
-                            th Id
-                            th Project Id
-                            th Type
-                            th Created
-                    tfoot
-                        tr
-                            th Start
-                            th Id
-                            th Project Id
-                            th Type
-                            th Created
+    .container-fluid
+        .row
+            .col-md-12
+                .card
+                    .card-header
+                        h4.card-title=title
+                    .card-content
+                        form.form-horizontal
+                            .row
+                                .col-md-4
+                                    .form-group
+                                        label.col-md-4 ID:
+                                        p.col-md-8=id
+                                    .form-group
+                                        label.col-md-4 Video Source:
+                                        p.col-md-8=video_source_id
+                                .col-md-4
+                                    .form-group
+                                        label.col-md-4 Annotations Count:
+                                        p.col-md-8=annotation_count
+                                    .form-group
+                                        label.col-md-4 Tags:
+                                        p.col-md-8
+                                            if tags ? tags.join(", ") : null
+            .col-md-12
+                .card
+                    .card-content
+                        //- .toolbar
+                        //-     .row
+                        //-         //- .col-md-3
+                        //-         //-     input.form-control#bcVideoId(type='text', placeholder='Annotations Start Time')
+                        //-         .col-md-12
+                        //-             button.btn.btn-default#hapyCreateAnno Create Annotation
+                        //-             button.btn.btn-default#hapyDeleteAnno Delete Annotation
+                        .fresh-datatables
+                            table#hapyakProjectDetails.table.table-striped.table-no-bordered.table-hover
+                                thead
+                                    tr
+                                        th Id
+                                        th Start
+                                        th End
+                                        th Type
+                                        th Custom Classes
+                                tfoot
+                                    tr
+                                        th Id
+                                        th Start
+                                        th End
+                                        th Type
+                                        th Custom Classes
