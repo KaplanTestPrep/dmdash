@@ -188,11 +188,11 @@ router.get(
   hapyakController.projectPage
 );
 
-router.get(
-  "/getProject",
-  authController.isLoggedIn,
-  hapyakController.getProject
-);
+// router.get(
+//   "/getProject",
+//   authController.isLoggedIn,
+//   hapyakController.getProject
+// );
 
 router.get(
   "/listProjects",
