@@ -324,7 +324,7 @@ exports.listAnnotations = async (req, res) => {
   // }
 
   let projectDetails = await getProject(projectId, env, hapyToken);
-  if (projectDetails.annotation_count === 0) return {};
+  if (projectDetails.annotation_count === 0) return res.status(200).send({});
 
   const annotations = await Promise.all(
     projectDetails.annotations.map(anno => {
@@ -431,6 +431,7 @@ async function getAnnotation(projectId, annotationId, env, hapyToken) {
 
   try {
     const response = await axios(options);
+    console.log("RESPONSE", response.data);
     return response.data;
   } catch (error) {
     console.log("getAnnotations Error: ", error);
