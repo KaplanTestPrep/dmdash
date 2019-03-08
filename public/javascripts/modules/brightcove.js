@@ -532,6 +532,8 @@ async function handleMetadataCSV(e) {
   const accountId = $("#bcAccount").val();
   const refType = $("input[name=refType]:checked").val();
   const file = document.getElementById("selectCSV").files[0];
+  let tagsArr = [];
+
   if (!file) return;
 
   let results = await papaPromisified(file);
@@ -542,9 +544,10 @@ async function handleMetadataCSV(e) {
 
   videos.forEach(video => {
     let [ref, name, tags, description] = [...video];
-    let tagsArr = tags.split(",");
-    console.log(ref, name, tags, description, accountId, refType);
+    console.log("tags: ", tags);
+    if (tags !== "") tagsArr = tags.split(",");
 
+    console.log(ref, name, tagsArr, description, accountId, refType);
     $("#resultsCard").removeClass("hidden");
     $("ul#success").html("");
     $("ul#fail").html("");

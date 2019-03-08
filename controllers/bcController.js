@@ -403,7 +403,8 @@ exports.metadataUpdate = async (req, res) => {
   if (data.name && data.name !== "") {
     body.name = data.name;
   }
-  if (data.tags && data.tags !== "") {
+  // console.log(data.tags);
+  if (data.tags && data.tags.length > 0) {
     body.tags = data.tags;
   }
   if (data.description && data.description !== "") {

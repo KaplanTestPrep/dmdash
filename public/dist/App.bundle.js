@@ -10497,6 +10497,8 @@ async function handleMetadataCSV(e) {
   var accountId = (0, _jquery2.default)("#bcAccount").val();
   var refType = (0, _jquery2.default)("input[name=refType]:checked").val();
   var file = document.getElementById("selectCSV").files[0];
+  var tagsArr = [];
+
   if (!file) return;
 
   var results = await (0, _utils.papaPromisified)(file);
@@ -10512,9 +10514,10 @@ async function handleMetadataCSV(e) {
         tags = _ref2[2],
         description = _ref2[3];
 
-    var tagsArr = tags.split(",");
-    console.log(ref, name, tags, description, accountId, refType);
+    console.log("tags: ", tags);
+    if (tags !== "") tagsArr = tags.split(",");
 
+    console.log(ref, name, tagsArr, description, accountId, refType);
     (0, _jquery2.default)("#resultsCard").removeClass("hidden");
     (0, _jquery2.default)("ul#success").html("");
     (0, _jquery2.default)("ul#fail").html("");
@@ -10640,11 +10643,11 @@ window.$ = _jquery2.default;
     pageLength: 25
   });
 
-  var pathName = window.location.pathname;
-  var pathNameSplit = pathName.split("/");
+  // const pathName = window.location.pathname;
+  var pathNameSplit = window.location.pathname.split("/");
   var slug = pathNameSplit[pathNameSplit.length - 1];
-  var envSplit = pathName.split("env=");
-  var env = envSplit[0];
+  var envSplit = window.location.href.split("env=");
+  var env = envSplit[1];
 
   var projectDetailsList = (0, _jquery2.default)("#hapyakProjectDetails").DataTable({
     dom: "lfrtBip",
@@ -10655,7 +10658,7 @@ window.$ = _jquery2.default;
       filename: "ProjectAnnotations"
     }],
     ajax: {
-      url: "/listAnnotations/" + slug,
+      url: "/listAnnotations/" + slug + "?env=" + env,
       dataSrc: "",
       data: function data(d) {
         d.env = env;
