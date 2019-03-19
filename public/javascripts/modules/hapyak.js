@@ -60,11 +60,12 @@ $(document).ready(function() {
     pageLength: 25
   });
 
-  const pathName = window.location.pathname;
-  const pathNameSplit = pathName.split("/");
+  // const pathName = window.location.pathname;
+  const pathNameSplit = window.location.pathname.split("/");
   const slug = pathNameSplit[pathNameSplit.length - 1];
-  const envSplit = pathName.split("env=");
-  const env = envSplit[0];
+  const envSplit = window.location.href.split("env=");
+  const env = envSplit[1];
+  console.log("Details ENV: ", env);
 
   const projectDetailsList = $("#hapyakProjectDetails").DataTable({
     dom: "lfrtBip",

@@ -307,7 +307,8 @@ exports.deleteAnnotation = async (req, res) => {
 };
 
 exports.listAnnotations = async (req, res) => {
-  const env = req.body.env || "PROD";
+  const env = req.query.env || "PROD";
+  console.log("Env: ", env);
   const hapyToken = await exports.getHapyakToken(env);
   let projectId = parseInt(req.params.projectId, 10);
   let subsetAnnotations = [];
@@ -324,7 +325,8 @@ exports.listAnnotations = async (req, res) => {
   // }
 
   let projectDetails = await getProject(projectId, env, hapyToken);
-  if (projectDetails.annotation_count === 0) return res.status(200).send({});
+  if (!projectDetails.annotation_count && projectDetails.annotation_count === 0)
+    return res.status(200).send({});
 
   const annotations = await Promise.all(
     projectDetails.annotations.map(anno => {
@@ -350,6 +352,7 @@ exports.listAnnotations = async (req, res) => {
     subsetAnnotations.push(subsetAnno);
   });
 
+  console.log(subsetAnnotations);
   return res.status(200).send(subsetAnnotations);
 };
 
@@ -398,6 +401,7 @@ exports.getHapyakToken = async env => {
 async function getProject(projectId, env, hapyToken) {
   if (!hapyToken) hapyToken = await exports.getHapyakToken(env);
 
+  console.log(env);
   const url = `${HAPYAKSERVICEURL}customer/project/${projectId}/`;
 
   const options = {
@@ -412,7 +416,10 @@ async function getProject(projectId, env, hapyToken) {
   try {
     const response = await axios(options);
     return response.data;
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 }
 
 async function getAnnotation(projectId, annotationId, env, hapyToken) {
@@ -431,7 +438,6 @@ async function getAnnotation(projectId, annotationId, env, hapyToken) {
 
   try {
     const response = await axios(options);
-    console.log("RESPONSE", response.data);
     return response.data;
   } catch (error) {
     console.log("getAnnotations Error: ", error);
