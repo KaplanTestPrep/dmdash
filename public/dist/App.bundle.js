@@ -10648,7 +10648,6 @@ window.$ = _jquery2.default;
   var slug = pathNameSplit[pathNameSplit.length - 1];
   var envSplit = window.location.href.split("env=");
   var env = envSplit[1];
-  console.log("Details ENV: ", env);
 
   var projectDetailsList = (0, _jquery2.default)("#hapyakProjectDetails").DataTable({
     dom: "lfrtBip",

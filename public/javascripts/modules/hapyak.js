@@ -65,7 +65,6 @@ $(document).ready(function() {
   const slug = pathNameSplit[pathNameSplit.length - 1];
   const envSplit = window.location.href.split("env=");
   const env = envSplit[1];
-  console.log("Details ENV: ", env);
 
   const projectDetailsList = $("#hapyakProjectDetails").DataTable({
     dom: "lfrtBip",
