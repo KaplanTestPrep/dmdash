@@ -11,7 +11,8 @@ const passport = require("passport");
 const { catchErrors } = require("../handlers/errorHandlers");
 
 const apicache = require("apicache");
-const cache = apicache.options({ debug: true }).middleware;
+// const cache = apicache.options({ debug: true }).middleware; // Dev
+const cache = apicache.middleware;
 
 const removeBrowserCacheParam = (req, res, next) => {
   req.url = req.url.replace(/&?_=(\d+)/, "");
