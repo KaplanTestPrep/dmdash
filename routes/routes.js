@@ -8,8 +8,17 @@ const bcController = require("../controllers/bcController");
 const hapyakController = require("../controllers/hapyakController");
 const wowzaController = require("../controllers/wowzaController");
 const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const { catchErrors } = require("../handlers/errorHandlers");
+
+const apicache = require("apicache");
+const cache = apicache.options({ debug: true }).middleware;
+
+const removeBrowserCacheParam = (req, res, next) => {
+  req.url = req.url.replace(/&?_=(\d+)/, "");
+  req.originalUrl = req.originalUrl.replace(/&?_=(\d+)/, "");
+  // delete req.query._;
+  next();
+};
 
 router.get(
   "/",
@@ -197,6 +206,8 @@ router.get(
 router.get(
   "/listProjects",
   authController.isLoggedIn,
+  removeBrowserCacheParam,
+  cache("5 minutes"),
   hapyakController.listProjects
 );
 
