@@ -1,7 +1,7 @@
 const passport = require("passport");
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
-const logger = require('./loggingController');
+const logger = require("./loggingController");
 
 exports.logout = (req, res) => {
   req.flash("success", "You are now logged out!");
@@ -12,15 +12,15 @@ exports.logout = (req, res) => {
 exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
     //This is not updated for whatever reason ???
-    if(!req.user.email.endsWith('@kaplan.com')){
+    if (!req.user.email.endsWith("@kaplan.com")) {
       req.flash("danger", "You must login with a Kaplan email address!");
       req.logout();
       res.redirect("/login");
       return;
     }
-    
+
     console.log(`${req.method}: ${req.route.path}`);
-    
+
     if (req.route.path === "/login") {
       console.log("/login route and authenticated");
       res.redirect("/");
@@ -35,15 +35,6 @@ exports.isLoggedIn = (req, res, next) => {
   req.flash("danger", "Oops, you must be logged in to do that!");
   res.redirect("/login");
 };
-
-// exports.googleAuthenticate = (req, res) => {
-//   passport.authenticate("google", {
-//     scope: [
-//       "https://www.googleapis.com/auth/plus.login",
-//       "https://www.googleapis.com/auth/plus.profile.emails.read"
-//     ]
-//   });
-// };
 
 exports.authCallback = () => {
   passport.authenticate("google", { failureRedirect: "/login" }),
