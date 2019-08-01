@@ -2,7 +2,7 @@ const axios = require("axios");
 const { moment } = require("../helpers");
 const { wowzerServers, wowzaHost } = require("../config/wowzaConfig");
 
-// API
+// API  --- Not being used
 
 exports.getStatus = async (req, res) => {
   let serversStatus = await Promise.all(
