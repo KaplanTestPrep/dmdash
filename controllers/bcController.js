@@ -485,8 +485,6 @@ exports.bcThumbnailUpdate = async (req, res) => {
     return res.status(error.response.status).send("RefID not found!");
   }
 
-  // Dev Hardcode
-  // const tumbnailUrl = 'https://common.liveonlinetechnology.com/uploads/Rick.jpg';
   const tumbnailUrl = `https://common.liveonlinetechnology.com/uploads/${thumbnailFileName}`;
 
   const url = `https://ingest.api.brightcove.com/v1/accounts/${accountId}/videos/${videoId}/ingest-requests`;
@@ -522,7 +520,7 @@ exports.bcThumbnailUpdate = async (req, res) => {
 };
 
 exports.retranscodeVideo = async (req, res) => {
-  const data = req.body; // accountId, ref, refType, renditionProfile
+  const data = req.body;
   const accountId = req.body.accountId;
   const ref = req.body.ref;
   const refType = req.body.refType;
