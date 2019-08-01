@@ -55,7 +55,6 @@ exports.listProjects = async (req, res) => {
   // } catch (error) {
   //   return res.status(error.response.status).send("Error");
   // }
-  // -----------------------------
 
   const hapyToken = await exports.getHapyakToken(env);
   const url = `${HAPYAKSERVICEURL}customer/project/`;
@@ -80,30 +79,6 @@ exports.listProjects = async (req, res) => {
     return res.status(error).send("Error");
   }
 };
-
-// exports.getProject = async (req, res) => {
-//   const videoId = req.body.videoId;
-//   const env = req.body.env || "PROD";
-//   const hapyToken = await exports.getHapyakToken(env);
-
-//   const url = `${HAPYAKSERVICEURL}customer/project/${videoId}/`;
-
-//   const options = {
-//     method: "get",
-//     url,
-//     headers: {
-//       "X-Hapyak-Grant-Token": hapyToken.token,
-//       "Content-Type": "application/json"
-//     }
-//   };
-
-//   try {
-//     const response = await axios(options);
-//     return res.send(response.data);
-//   } catch (error) {
-//     return res.status(error.response.status).send("Error");
-//   }
-// };
 
 exports.createProject = async (req, res) => {
   let videoId = "";
@@ -209,7 +184,6 @@ exports.deleteProject = async (req, res) => {
 
     return res.status(200).send(response.data);
   } catch (error) {
-    // console.log(error);
     return res.status(error.response.status).send("Error");
   }
 };
@@ -236,7 +210,6 @@ exports.getAnnotation = async (req, res) => {
     return response.data;
   } catch (error) {
     console.log("getAnnotations Error: ", error);
-    // return res.status(error.response.status).send("Error");
     return res.send("Error");
   }
 };
@@ -312,17 +285,6 @@ exports.listAnnotations = async (req, res) => {
   const hapyToken = await exports.getHapyakToken(env);
   let projectId = parseInt(req.params.projectId, 10);
   let subsetAnnotations = [];
-
-  // List annotations from local DB
-  // const db = setDBEnv(env);
-  //
-  // try {
-  //   const response = await db.Annotation.find({ projectId });
-  //   return res.send({ data: response });
-  // } catch (error) {
-  //   // return res.status(error.response.status).send("Error");
-  //   return res.send("Error");
-  // }
 
   let projectDetails = await getProject(projectId, env, hapyToken);
   if (!projectDetails.annotation_count && projectDetails.annotation_count === 0)
