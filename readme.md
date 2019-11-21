@@ -1,6 +1,4 @@
-## What is this?
-
-Kaplan Digital Media Toolbox
+## Kaplan Digital Media Toolbox
 
 ## Run
 
