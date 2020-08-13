@@ -408,6 +408,9 @@ exports.metadataUpdate = async (req, res) => {
   if (data.description && data.description !== '') {
     body.description = data.description
   }
+  if (data.reference_id && data.reference_id !== '') {
+    body.reference_id = data.reference_id
+  }
 
   try {
     response = await updateVideo(accountId, videoId, body)
