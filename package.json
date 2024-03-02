@@ -42,7 +42,7 @@
     "passport-local-mongoose": "4.0.0",
     "pug": "^2.0.4",
     "winston": "^2.4.3",
-    "winston-daily-rotate-file": "^3.3.0"
+    "winston-daily-rotate-file": "^3.10.0"
   },
   "devDependencies": {
     "autoprefixer": "6.7.7",
